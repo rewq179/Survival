@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 890d0ef4267f8d74881499683af790ff
+timeCreated: 1521618239
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 116781
+  packageName: Polygonal - Creatures Pack
+  packageVersion: 1.0
+  assetPath: Assets/Polygonal Creatures Pack/Polygonal King Cobra/Prefabs/Polygonal
+    King Cobra Purple.prefab
+  uploadId: 241078

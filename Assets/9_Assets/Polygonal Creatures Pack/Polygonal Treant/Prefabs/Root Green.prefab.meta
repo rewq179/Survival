@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 2b8712f139d03674a838f1d6c5801501
+timeCreated: 1523437969
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 116781
+  packageName: Polygonal - Creatures Pack
+  packageVersion: 1.0
+  assetPath: Assets/Polygonal Creatures Pack/Polygonal Treant/Prefabs/Root Green.prefab
+  uploadId: 241078

@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 0357d2e48f314b343a0a7f5a17540cb7
+timeCreated: 1522832911
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 116781
+  packageName: Polygonal - Creatures Pack
+  packageVersion: 1.0
+  assetPath: Assets/Polygonal Creatures Pack/Polygonal Wolf/Prefabs/Polygonal Wolf
+    Brown.prefab
+  uploadId: 241078
