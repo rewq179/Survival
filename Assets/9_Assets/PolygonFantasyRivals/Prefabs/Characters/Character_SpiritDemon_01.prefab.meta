@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 9984be23625843a48a44d88aae5669f2
+timeCreated: 1526423979
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 118399
+  packageName: POLYGON Fantasy Rivals - Low Poly 3D Art by Synty
+  packageVersion: 1.3.1
+  assetPath: Assets/PolygonFantasyRivals/Prefabs/Characters/Character_SpiritDemon_01.prefab
+  uploadId: 736249

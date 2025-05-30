@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: f814648823e741444bb5f0103bcb8d24
+timeCreated: 1526430942
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 118399
+  packageName: POLYGON Fantasy Rivals - Low Poly 3D Art by Synty
+  packageVersion: 1.3.1
+  assetPath: Assets/PolygonFantasyRivals/Materials/Ground.mat
+  uploadId: 736249

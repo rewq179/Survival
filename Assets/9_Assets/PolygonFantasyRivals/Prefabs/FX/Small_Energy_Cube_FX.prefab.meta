@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 89cbbce214736ac4e9eee0fe39ec9727
+timeCreated: 1526434588
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 118399
+  packageName: POLYGON Fantasy Rivals - Low Poly 3D Art by Synty
+  packageVersion: 1.3.1
+  assetPath: Assets/PolygonFantasyRivals/Prefabs/FX/Small_Energy_Cube_FX.prefab
+  uploadId: 736249

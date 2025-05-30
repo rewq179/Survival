@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: b7457489f3593814cba7ad1f2b226721
+timeCreated: 1526437061
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 118399
+  packageName: POLYGON Fantasy Rivals - Low Poly 3D Art by Synty
+  packageVersion: 1.3.1
+  assetPath: Assets/PolygonFantasyRivals/Prefabs/Weapons/SM_Wep_AncientWarrior_01.prefab
+  uploadId: 736249

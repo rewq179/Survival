@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 5d31a5b9b348544439d8079453188ecc
+timeCreated: 1526434524
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 118399
+  packageName: POLYGON Fantasy Rivals - Low Poly 3D Art by Synty
+  packageVersion: 1.3.1
+  assetPath: Assets/PolygonFantasyRivals/Prefabs/FX/BloodSplat_FX.prefab
+  uploadId: 736249

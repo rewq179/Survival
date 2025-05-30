@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: d7974f8657de17b419d82f0d9530a5a0
+timeCreated: 1526437158
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 118399
+  packageName: POLYGON Fantasy Rivals - Low Poly 3D Art by Synty
+  packageVersion: 1.3.1
+  assetPath: Assets/PolygonFantasyRivals/Prefabs/FX/Fire_Circle_FX.prefab
+  uploadId: 736249

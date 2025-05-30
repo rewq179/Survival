@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 47300f85e6323324bb54c48aa574c9e8
+timeCreated: 1526434527
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 118399
+  packageName: POLYGON Fantasy Rivals - Low Poly 3D Art by Synty
+  packageVersion: 1.3.1
+  assetPath: Assets/PolygonFantasyRivals/Prefabs/FX/Sparks_FX.prefab
+  uploadId: 736249

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: a744caf4676601646ab2385371d1d140
+timeCreated: 1526423970
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 118399
+  packageName: POLYGON Fantasy Rivals - Low Poly 3D Art by Synty
+  packageVersion: 1.3.1
+  assetPath: Assets/PolygonFantasyRivals/Prefabs/Characters/Character_BR_PigButcher_01.prefab
+  uploadId: 736249
