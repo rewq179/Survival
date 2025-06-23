@@ -52,11 +52,16 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // 3D 이동 처리
         Vector3 movement = new Vector3(moveInput.x, 0, moveInput.y);
         rigidBody.linearVelocity = movement * moveSpeed;
 
-        // 공격 처리
+        if (movement.sqrMagnitude > 0.0001f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(movement, Vector3.up);
+            Quaternion newRotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
+            transform.rotation = newRotation;
+        }
+
         if (isAttacking)
         {
             // 공격 로직

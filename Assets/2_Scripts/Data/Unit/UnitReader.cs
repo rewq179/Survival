@@ -14,12 +14,24 @@ public class UnitData
     public int id;
     public string name;
     public float hp;
+    public float maxHp;
+    public float attack;
+    public float moveSpd;
+    public float cooldown;
+    public float critChance;
+    public float critMulti;
 
-    public UnitData(int id, string name, float hp)
+    public UnitData(int id, string name, float hp, float maxHp, float attack, float moveSpd, float cooldown, float critChance, float critMulti)
     {
         this.id = id;
         this.name = name;
         this.hp = hp;
+        this.maxHp = maxHp;
+        this.attack = attack;
+        this.moveSpd = moveSpd;
+        this.cooldown = cooldown;
+        this.critChance = critChance;
+        this.critMulti = critMulti;
     }
 }
 
@@ -27,13 +39,19 @@ public class UnitData
 public class UnitDataReader : BaseReader
 {
     [SerializeField]
-    public List<UnitData> DataList = new List<UnitData>();
+    public List<UnitData> unitDatas = new List<UnitData>();
 
-    internal void Update(List<GSTU_Cell> cells)
+    internal void SetData(List<GSTU_Cell> cells)
     {
         int id = 0;
         string name = string.Empty;
         float hp = 0;
+        float maxHp = 0;
+        float attack = 0;
+        float moveSpd = 0;
+        float cooldown = 0;
+        float critChance = 0;
+        float critMulti = 0;
 
         for (int i = 0; i < cells.Count; i++)
         {
@@ -56,10 +74,46 @@ public class UnitDataReader : BaseReader
                         hp = float.Parse(cells[i].value);
                         break;
                     }
+
+                case "maxHp":
+                    {
+                        maxHp = float.Parse(cells[i].value);
+                        break;
+                    }
+
+                case "attack":
+                    {
+                        attack = float.Parse(cells[i].value);
+                        break;
+                    }
+
+                case "moveSpd":
+                    {
+                        moveSpd = float.Parse(cells[i].value);
+                        break;
+                    }
+
+                case "cooldown":
+                    {
+                        cooldown = float.Parse(cells[i].value);
+                        break;
+                    }
+
+                case "critChance":
+                    {
+                        critChance = float.Parse(cells[i].value);
+                        break;
+                    }
+
+                case "critMulti":
+                    {
+                        critMulti = float.Parse(cells[i].value);
+                        break;
+                    }
             }
         }
 
-        DataList.Add(new UnitData(id, name, hp));
+        unitDatas.Add(new UnitData(id, name, hp, maxHp, attack, moveSpd, cooldown, critChance, critMulti));
     }
 }
 
@@ -67,11 +121,11 @@ public class UnitDataReader : BaseReader
 [CustomEditor(typeof(UnitDataReader))]
 public class UnitDataReaderEditor : Editor
 {
-    UnitDataReader data;
+    UnitDataReader dataReader;
 
     private void OnEnable()
     {
-        data = (UnitDataReader)target;
+        dataReader = (UnitDataReader)target;
     }
 
     public override void OnInspectorGUI()
@@ -83,20 +137,20 @@ public class UnitDataReaderEditor : Editor
         if (GUILayout.Button("데이터 읽기(API 호출)"))
         {
             UpdateStats(UpdateMethodOne);
-            data.DataList.Clear();
+            dataReader.unitDatas.Clear();
         }
     }
 
     void UpdateStats(UnityAction<GstuSpreadSheet> callback, bool mergedCells = false)
     {
-        SpreadsheetManager.Read(new GSTU_Search(data.sheetAddress, data.sheetName), callback, mergedCells);
+        SpreadsheetManager.Read(new GSTU_Search(dataReader.sheetAddress, dataReader.sheetName), callback, mergedCells);
     }
 
     void UpdateMethodOne(GstuSpreadSheet ss)
     {
-        for (int i = data.startRow; i <= data.endRow; ++i)
+        for (int i = dataReader.startRow; i <= dataReader.endRow; ++i)
         {
-            data.Update(ss.rows[i]);
+            dataReader.SetData(ss.rows[i]);
         }
 
         EditorUtility.SetDirty(target);
