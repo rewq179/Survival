@@ -2,6 +2,7 @@ using UnityEngine;
 using GoogleSheetsToUnity;
 using System.Collections.Generic;
 using System;
+using System.Globalization;
 using UnityEngine.Events;
 
 #if UNITY_EDITOR
@@ -55,11 +56,16 @@ public class UnitDataReader : BaseReader
 
         for (int i = 0; i < cells.Count; i++)
         {
-            switch (cells[i].columnId)
+            string columnId = cells[i].columnId.ToLowerInvariant();
+            
+            switch (columnId)
             {
                 case "id":
                     {
-                        id = int.Parse(cells[i].value);
+                        if (int.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out int parsedId))
+                        {
+                            id = parsedId;
+                        }
                         break;
                     }
 
@@ -71,43 +77,64 @@ public class UnitDataReader : BaseReader
 
                 case "hp":
                     {
-                        hp = float.Parse(cells[i].value);
+                        if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedHp))
+                        {
+                            hp = parsedHp;
+                        }
                         break;
                     }
 
-                case "maxHp":
+                case "maxhp":
                     {
-                        maxHp = float.Parse(cells[i].value);
+                        if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedMaxHp))
+                        {
+                            maxHp = parsedMaxHp;
+                        }
                         break;
                     }
 
                 case "attack":
                     {
-                        attack = float.Parse(cells[i].value);
+                        if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedAttack))
+                        {
+                            attack = parsedAttack;
+                        }
                         break;
                     }
 
-                case "moveSpd":
+                case "movespd":
                     {
-                        moveSpd = float.Parse(cells[i].value);
+                        if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedMoveSpd))
+                        {
+                            moveSpd = parsedMoveSpd;
+                        }
                         break;
                     }
 
                 case "cooldown":
                     {
-                        cooldown = float.Parse(cells[i].value);
+                        if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedCooldown))
+                        {
+                            cooldown = parsedCooldown;
+                        }
                         break;
                     }
 
-                case "critChance":
+                case "critchance":
                     {
-                        critChance = float.Parse(cells[i].value);
+                        if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedCritChance))
+                        {
+                            critChance = parsedCritChance;
+                        }
                         break;
                     }
 
-                case "critMulti":
+                case "critmulti":
                     {
-                        critMulti = float.Parse(cells[i].value);
+                        if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedCritMulti))
+                        {
+                            critMulti = parsedCritMulti;
+                        }
                         break;
                     }
             }

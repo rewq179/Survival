@@ -10,35 +10,72 @@ public class CharacterInfo : MonoBehaviour
     [SerializeField] private Image profileImage;
     [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private TextMeshProUGUI nameText;
+    
+    private Unit unit;
 
     public void Init(Unit unit)
     {
-        SetHp(unit);
-        SetExp(unit);
-        SetLevel(unit.Level);
+        this.unit = unit;
+
+        UnsubscribeFromEvents();
+        SubscribeToEvents();
+        UpdateAllUI();
+    }
+
+    private void SubscribeToEvents()
+    {
+        if (unit == null)
+            return;
+            
+        unit.OnHpChanged += UpdateHpUI;
+        unit.OnExpChanged += UpdateExpUI;
+        unit.OnLevelChanged += UpdateLevelUI;
+    }
+
+    private void UnsubscribeFromEvents()
+    {
+        if (unit == null)
+            return;
+            
+        unit.OnHpChanged -= UpdateHpUI;
+        unit.OnExpChanged -= UpdateExpUI;
+        unit.OnLevelChanged -= UpdateLevelUI;
+    }
+
+    private void UpdateAllUI()
+    {
+        UpdateHpUI(unit.CurHp);
+        UpdateExpUI(unit.CurExp);
+        UpdateLevelUI(unit.Level);
         SetName(string.Empty);
     }
 
-    private void SetHp(Unit unit)
+    private void UpdateHpUI(float hp)
     {
         hpBar.maxValue = unit.MaxHp;
-        hpBar.value = unit.CurHp;
+        hpBar.value = hp;
         hpText.text = $"{hpBar.value}/{hpBar.maxValue}";
     }
 
-    private void SetExp(Unit unit)
+    private void UpdateExpUI(float exp)
     {
         expBar.maxValue = unit.MaxExp;
-        expBar.value = unit.CurExp;
+        expBar.value = exp;
     }
 
-    private void SetLevel(int level)
+    private void UpdateLevelUI(int level)
     {
         levelText.text = level.ToString();
+        expBar.maxValue = unit.MaxExp;
     }
 
     private void SetName(string name)
     {
         nameText.text = name;
+    }
+
+    private void OnDestroy()
+    {
+        UnsubscribeFromEvents();
     }
 }

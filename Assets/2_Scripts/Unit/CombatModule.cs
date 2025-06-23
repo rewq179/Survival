@@ -1,9 +1,13 @@
 using UnityEngine;
+using System;
 
 public class CombatModule
 {
+    private float maxHp;
     private float curHp;
     private bool isDead;
+
+    public event Action<float> OnHpChanged;
 
     public float CurHp => curHp;
     public bool IsDead => isDead;
@@ -13,9 +17,20 @@ public class CombatModule
         isDead = false;
     }
 
+    public void SetHp(StatModule statModule)
+    {
+        maxHp = statModule.MaxHp;
+        curHp = maxHp;
+    }
+
     public void TakeDamage(int damage)
     {
-        curHp = Mathf.Clamp01(curHp - damage);
+        if (damage == 0)
+            return;
+
+        curHp = Mathf.Clamp(curHp - damage, 0, maxHp);
+        OnHpChanged?.Invoke(curHp);
+
         if (curHp <= 0)
             OnDead();
     }

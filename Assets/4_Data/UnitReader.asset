@@ -16,4 +16,22 @@ MonoBehaviour:
   sheetName: Monster
   startRow: 2
   endRow: 3
-  unitDatas: []
+  unitDatas:
+  - id: 1001
+    name: "\uAC1C"
+    hp: 10
+    maxHp: 0
+    attack: 1
+    moveSpd: 5
+    cooldown: 0
+    critChance: 0
+    critMulti: 1
+  - id: 1002
+    name: "\uACE0\uC591\uC774"
+    hp: 20
+    maxHp: 0
+    attack: 2
+    moveSpd: 5.5
+    cooldown: 0
+    critChance: 0
+    critMulti: 1
