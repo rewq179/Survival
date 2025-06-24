@@ -10,9 +10,9 @@ public enum IconType
 
 public class IconManager : MonoBehaviour
 {
-    private string skillIconPath = "Skill";
-    private string equipmentIconPath = "Equipment";
-    private string itemIconPath = "Item";
+    private string skillIconPath = "Icon/Skill";
+    private string equipmentIconPath = "Icon/Equipment";
+    private string itemIconPath = "Icon/Item";
 
     private Dictionary<string, Sprite> skillIcons = new Dictionary<string, Sprite>();
     private Dictionary<string, Sprite> equipmentIcons = new Dictionary<string, Sprite>();
