@@ -32,6 +32,13 @@ Shader "Shader Graphs/POLYGON_CustomCharacters"
 	SubShader
 	{
 		Tags{ "RenderType" = "Opaque"  "Queue" = "Geometry+0" "IsEmissive" = "true"  }
+		Stencil
+		{
+			Ref 1
+			Comp always
+			Pass replace
+		}
+		
 		Cull Back
 		CGPROGRAM
 		#pragma target 3.0

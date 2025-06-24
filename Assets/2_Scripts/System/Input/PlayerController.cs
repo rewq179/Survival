@@ -12,10 +12,15 @@ public class PlayerController : MonoBehaviour
     private float moveSpeed = 5f;
     private float rotationSpeed = 10f;
 
+    // 스킬 관련
+    private SkillManager skillManager;
+    private Camera mainCamera;
+
     private void Awake()
     {
         PlayerInputAction = new PlayerInputAction();
         rigidBody = GetComponent<Rigidbody>();
+        mainCamera = Camera.main;
     }
 
     private void OnEnable()
@@ -27,6 +32,7 @@ public class PlayerController : MonoBehaviour
         PlayerInputAction.Player.Move.performed += OnMove;
         PlayerInputAction.Player.Move.canceled += OnMove;
         PlayerInputAction.Player.Attack.performed += OnAttack;
+        PlayerInputAction.Player.Attack.performed += OnSkillActivate;
     }
 
     private void OnDisable()
@@ -35,6 +41,7 @@ public class PlayerController : MonoBehaviour
         PlayerInputAction.Player.Move.performed -= OnMove;
         PlayerInputAction.Player.Move.canceled -= OnMove;
         PlayerInputAction.Player.Attack.performed -= OnAttack;
+        PlayerInputAction.Player.Attack.performed -= OnSkillActivate;
 
         // 액션 비활성화
         PlayerInputAction.Player.Disable();
@@ -48,6 +55,14 @@ public class PlayerController : MonoBehaviour
     private void OnAttack(InputAction.CallbackContext context)
     {
         isAttacking = context.performed;
+    }
+
+    private void OnSkillActivate(InputAction.CallbackContext context)
+    {
+        if (skillManager == null)
+            skillManager = GameManager.Instance.skillManager;
+
+        skillManager.ActivateSkill();
     }
 
     private void FixedUpdate()
@@ -66,5 +81,12 @@ public class PlayerController : MonoBehaviour
         {
             // 공격 로직
         }
+    }
+
+    public Vector3 GetMouseWorldPosition()
+    {
+        Vector3 mousePos = Input.mousePosition;
+        mousePos.z = 10f; // 카메라에서의 거리
+        return mainCamera.ScreenToWorldPoint(mousePos);
     }
 }

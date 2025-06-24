@@ -35,6 +35,7 @@ public class SkillCoolButton : BaseAttackButton
         {
             skillManager.OnSkillCooldownChanged += OnSkillCooldownChanged;
             skillManager.OnSkillCooldownEnded += OnSkillCooldownEnded;
+            skillManager.OnSkillActivated += OnSkillActivated;
         }
     }
 
@@ -50,6 +51,11 @@ public class SkillCoolButton : BaseAttackButton
             EndCooldown();
     }
 
+    private void OnSkillActivated(string skillName)
+    {
+        Debug.Log(skillName);
+    }
+
     public override void OnClick()
     {
         base.OnClick();
@@ -60,7 +66,7 @@ public class SkillCoolButton : BaseAttackButton
 
     public void UpdateCooldown(float cooldown)
     {
-        cooldownSlider.value = maxCooldown - skillManager.GetCooldownRatio(skillData.id);
+        cooldownSlider.value = maxCooldown - skillManager.GetCooldown(skillData.id);
         cooldownText.text = $"{cooldown:F1}";
     }
 
@@ -77,6 +83,7 @@ public class SkillCoolButton : BaseAttackButton
         {
             skillManager.OnSkillCooldownChanged -= OnSkillCooldownChanged;
             skillManager.OnSkillCooldownEnded -= OnSkillCooldownEnded;
+            skillManager.OnSkillActivated -= OnSkillActivated;
         }
     }
 }

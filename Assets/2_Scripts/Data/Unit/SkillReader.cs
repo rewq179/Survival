@@ -16,13 +16,22 @@ public class SkillData
     public string name;
     public float cooldown;
     public float reqLevel;
+    public SkillIndicatorType indicatorType;
+    public float length;
+    public float angle;
+    public float width;
 
-    public SkillData(int id, string name, float cooldown, float reqLevel)
+    public SkillData(int id, string name, float cooldown, float reqLevel,
+        SkillIndicatorType indicatorType, float length, float angle, float width)
     {
         this.id = id;
         this.name = name;
         this.cooldown = cooldown;
         this.reqLevel = reqLevel;
+        this.indicatorType = indicatorType;
+        this.length = length;
+        this.angle = angle;
+        this.width = width;
     }
 }
 
@@ -38,49 +47,58 @@ public class SkillDataReader : BaseReader
         string name = string.Empty;
         float cooldown = 0;
         float reqLevel = 0;
+        SkillIndicatorType indicatorType = SkillIndicatorType.Circle;
+        float length = 0;
+        float angle = 0;
+        float width = 0;
 
         for (int i = 0; i < cells.Count; i++)
         {
             string columnId = cells[i].columnId.ToLowerInvariant();
-            
+
             switch (columnId)
             {
                 case "id":
-                    {
-                        if (int.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out int parsedId))
-                        {
-                            id = parsedId;
-                        }
-                        break;
-                    }
+                    if (int.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out int parsedId))
+                        id = parsedId;
+                    break;
 
                 case "name":
-                    {
-                        name = cells[i].value;
-                        break;
-                    }
+                    name = cells[i].value;
+                    break;
 
                 case "cooldown":
-                    {
-                        if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedCooldown))
-                        {
-                            cooldown = parsedCooldown;
-                        }
-                        break;
-                    }
+                    if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedCooldown))
+                        cooldown = parsedCooldown;
+                    break;
 
                 case "reqlevel":
-                    {
-                        if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedReqLevel))
-                        {
-                            reqLevel = parsedReqLevel;
-                        }
-                        break;
-                    }
+                    if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedReqLevel))
+                        reqLevel = parsedReqLevel;
+                    break;
+
+                case "indicatorType":
+                    indicatorType = (SkillIndicatorType)Enum.Parse(typeof(SkillIndicatorType), cells[i].value);
+                    break;
+
+                case "angle":
+                    if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedAngle))
+                        angle = parsedAngle;
+                    break;
+
+                case "length":
+                    if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedLength))
+                        length = parsedLength;
+                    break;
+
+                case "width":
+                    if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedWidth))
+                        width = parsedWidth;
+                    break;
             }
         }
 
-        skillDatas.Add(new SkillData(id, name, cooldown, reqLevel));
+        skillDatas.Add(new SkillData(id, name, cooldown, reqLevel, indicatorType, length, angle, width));
     }
 }
 
