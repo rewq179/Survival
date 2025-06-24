@@ -12,29 +12,38 @@ public class BaseAttackButton : MonoBehaviour
 
     [SerializeField] private Image skillIcon;
     [SerializeField] private ButtonType buttonType;
-    private bool isInteractable = true;
+    [SerializeField] protected Button attackButton;
+    protected SkillData skillData;
 
     public virtual void Reset()
     {
         gameObject.SetActive(false);
         skillIcon.sprite = null;
-        isInteractable = true;
+        attackButton.interactable = true;
+        skillData = null;
     }
 
     public virtual void Init(int skillId)
     {
-        SkillData data = DataManager.GetSkillData(skillId);
-        skillIcon.sprite = IconManager.Instance.GetSkillIcon(data.name);
-
+        skillData = DataManager.GetSkillData(skillId);
+        skillIcon.sprite = GameManager.Instance.iconManager.GetSkillIcon(skillData.name);
         gameObject.SetActive(true);
     }
 
     public virtual void OnClick()
     {
-        if (!isInteractable)
+        if (!attackButton.interactable)
             return;
 
-        if (buttonType == ButtonType.Once)
-            isInteractable = false;
+        switch (buttonType)
+        {
+            case ButtonType.Once:
+                attackButton.interactable = false;
+                break;
+                
+            case ButtonType.Cool:
+                attackButton.interactable = false;
+                break;
+        }
     }
 }

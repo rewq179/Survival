@@ -8,7 +8,8 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private GameObject playerUnitPrefab;
     [SerializeField] private DataManager dataManager;
-    [SerializeField] private IconManager iconManager;
+    public IconManager iconManager;
+    public SkillManager skillManager;
 
     private Unit playerUnit;
 
@@ -33,11 +34,11 @@ public class GameManager : MonoBehaviour
 
     private void InitializeGame()
     {
-        // 아이콘 먼저 로드
         iconManager.LoadAllIcons();
-
         dataManager.Init();
+
         CreatePlayerUnit();
+        SetUpSkillManager();
         SetupUnit();
         SetupUI();
 
@@ -54,6 +55,11 @@ public class GameManager : MonoBehaviour
     {
         if (playerUnit == null)
             playerUnit = Instantiate(playerUnitPrefab, Vector3.zero, Quaternion.identity).GetComponent<Unit>();
+    }
+
+    private void SetUpSkillManager()
+    {
+        skillManager.Init(playerUnit);
     }
 
     private void SetupUnit()

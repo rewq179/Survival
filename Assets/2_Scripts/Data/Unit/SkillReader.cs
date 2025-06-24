@@ -70,9 +70,6 @@ public class SkillDataReader : BaseReader
                     }
 
                 case "reqlevel":
-                case "req_level":
-                case "requiredlevel":
-                case "required_level":
                     {
                         if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedReqLevel))
                         {

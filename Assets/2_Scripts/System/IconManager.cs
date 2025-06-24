@@ -10,8 +10,6 @@ public enum IconType
 
 public class IconManager : MonoBehaviour
 {
-    public static IconManager Instance { get; private set; }
-
     private string skillIconPath = "Skill";
     private string equipmentIconPath = "Equipment";
     private string itemIconPath = "Item";
@@ -19,19 +17,6 @@ public class IconManager : MonoBehaviour
     private Dictionary<string, Sprite> skillIcons = new Dictionary<string, Sprite>();
     private Dictionary<string, Sprite> equipmentIcons = new Dictionary<string, Sprite>();
     private Dictionary<string, Sprite> itemIcons = new Dictionary<string, Sprite>();
-
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
 
     public void LoadAllIcons()
     {

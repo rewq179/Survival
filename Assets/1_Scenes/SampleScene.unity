@@ -354,7 +354,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 0}
   m_FillRect: {fileID: 1682055948}
   m_HandleRect: {fileID: 0}
-  m_Direction: 0
+  m_Direction: 1
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
@@ -374,8 +374,9 @@ GameObject:
   - component: {fileID: 267096340}
   - component: {fileID: 267096342}
   - component: {fileID: 267096343}
+  - component: {fileID: 267096344}
   m_Layer: 0
-  m_Name: GameManager
+  m_Name: Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -396,6 +397,7 @@ MonoBehaviour:
   playerUnitPrefab: {fileID: 6160173251280666463, guid: 057bea8c2316a6d479085c6d6f723dbb, type: 3}
   dataManager: {fileID: 267096342}
   iconManager: {fileID: 267096343}
+  skillManager: {fileID: 267096344}
 --- !u!4 &267096341
 Transform:
   m_ObjectHideFlags: 0
@@ -437,9 +439,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7865ef75e33a324e8fdac4a6455d2f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skillIconPath: Icons/Skills
-  equipmentIconPath: Icons/Equipment
-  itemIconPath: Icons/Items
+--- !u!114 &267096344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 267096339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d0bc936a1a7011408312b614b8348aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &292290903
 GameObject:
   m_ObjectHideFlags: 0
@@ -1118,6 +1129,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skillIcon: {fileID: 340559483}
   buttonType: 2
+  attackButton: {fileID: 414033143}
   cooldownSlider: {fileID: 1316256007}
   cooldownText: {fileID: 590123105}
 --- !u!114 &414033143
@@ -1473,6 +1485,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skillIcon: {fileID: 520326830}
   buttonType: 2
+  attackButton: {fileID: 546979681}
   cooldownSlider: {fileID: 1039053744}
   cooldownText: {fileID: 2034669115}
 --- !u!114 &546979681
@@ -1748,7 +1761,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 0}
   m_FillRect: {fileID: 1592458018}
   m_HandleRect: {fileID: 0}
-  m_Direction: 0
+  m_Direction: 1
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
@@ -1912,7 +1925,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 0}
   m_FillRect: {fileID: 1251077494}
   m_HandleRect: {fileID: 0}
-  m_Direction: 0
+  m_Direction: 1
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
@@ -2644,7 +2657,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 0}
   m_FillRect: {fileID: 1105326494}
   m_HandleRect: {fileID: 0}
-  m_Direction: 0
+  m_Direction: 1
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
@@ -3981,11 +3994,11 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 0}
   m_FillRect: {fileID: 2080887648}
   m_HandleRect: {fileID: 0}
-  m_Direction: 0
+  m_Direction: 1
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0.36
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -4045,6 +4058,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skillIcon: {fileID: 292290905}
   buttonType: 2
+  attackButton: {fileID: 1351360782}
   cooldownSlider: {fileID: 684729967}
   cooldownText: {fileID: 1979468471}
 --- !u!114 &1351360782
@@ -4690,6 +4704,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skillIcon: {fileID: 1172978735}
   buttonType: 1
+  attackButton: {fileID: 1865038994}
 --- !u!1 &1871999399
 GameObject:
   m_ObjectHideFlags: 0
@@ -5381,6 +5396,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skillIcon: {fileID: 1871999401}
   buttonType: 2
+  attackButton: {fileID: 2056591271}
   cooldownSlider: {fileID: 251843772}
   cooldownText: {fileID: 350830246}
 --- !u!1 &2080887647
@@ -5445,7 +5461,7 @@ MonoBehaviour:
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
-  m_FillAmount: 0.36
+  m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 2
   m_UseSpriteMesh: 0
@@ -5605,6 +5621,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skillIcon: {fileID: 684235906}
   buttonType: 2
+  attackButton: {fileID: 2109806022}
   cooldownSlider: {fileID: 616518047}
   cooldownText: {fileID: 1288424170}
 --- !u!114 &2109806022
@@ -6992,6 +7009,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skillIcon: {fileID: 8899631739060532278}
   buttonType: 0
+  attackButton: {fileID: 3871605957846825645}
 --- !u!1 &5651967879480912054
 GameObject:
   m_ObjectHideFlags: 0
