@@ -9,19 +9,34 @@ using System.Globalization;
 using UnityEditor;
 #endif
 
+public enum SkillKey
+{
+    Arrow,
+    Dagger,
+    Laser,
+    Nova,
+    FrontSpike,
+    EnergyExplosion,
+    LightningStrike,
+    Meteor,
+    Max,
+}
+
 [Serializable]
 public class SkillData
 {
     public int id;
+    public SkillKey type;
     public string name;
     public string description;
     public float cooldown;
     public float reqLevel;
     public List<IndicatorElement> elements;
 
-    public SkillData(int id, string name, string description, float cooldown, float reqLevel, List<IndicatorElement> elements)
+    public SkillData(int id, SkillKey type, string name, string description, float cooldown, float reqLevel, List<IndicatorElement> elements)
     {
         this.id = id;
+        this.type = type;
         this.name = name;
         this.description = description;
         this.cooldown = cooldown;
@@ -39,6 +54,7 @@ public class SkillDataReader : BaseReader
     internal void SetData(List<GSTU_Cell> cells)
     {
         int id = 0;
+        SkillKey type = SkillKey.Max;
         string name = string.Empty;
         string description = string.Empty;
         float cooldown = 0;
@@ -54,6 +70,11 @@ public class SkillDataReader : BaseReader
                 case "id":
                     if (int.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out int parsedId))
                         id = parsedId;
+                    break;
+
+                case "type":
+                    if (Enum.TryParse(cells[i].value, true, out SkillKey parsedType))
+                        type = parsedType;
                     break;
 
                 case "name":
@@ -83,7 +104,7 @@ public class SkillDataReader : BaseReader
             }
         }
 
-        skillDatas.Add(new SkillData(id, name, description, cooldown, reqLevel, elements));
+        skillDatas.Add(new SkillData(id, type, name, description, cooldown, reqLevel, elements));
     }
 
     private List<IndicatorElement> DecodeIndicatorElement(int skillId, string indicatorString)
