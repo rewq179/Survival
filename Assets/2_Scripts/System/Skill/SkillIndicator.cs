@@ -1,6 +1,32 @@
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.Video;
+
+[System.Serializable]
+public struct IndicatorElement
+{
+    public int skillId;
+    public int index;
+    public SkillIndicatorType type;
+    public float length;
+    public float width;
+    public float angle;
+    public float radius;
+    public float maxDistance;
+
+    public bool IsMainIndicator => index == 0;
+
+    public IndicatorElement(int skillId, int index, SkillIndicatorType type, float length = 0, float width = 0, float angle = 0, float radius = 0)
+    {
+        this.skillId = skillId;
+        this.index = index;
+        this.type = type;
+        this.length = length;
+        this.width = width;
+        this.angle = angle;
+        this.radius = radius;
+        maxDistance = radius > 0 ? radius * 1.4f : width * 1.4f;
+    }
+}
 
 public enum SkillIndicatorType
 {
@@ -14,87 +40,148 @@ public class SkillIndicator : MonoBehaviour
 {
     [SerializeField] private MeshFilter meshFilter;
     [SerializeField] private MeshRenderer meshRenderer;
-    private SkillIndicatorType indicatorType;
-    private float length = 5f;      // 직선, 부채꼴 반지름, 원 반지름
-    private float angle = 60f;      // 부채꼴 각도
-    private float width = 1f;       // 직선 두께
-    private const int SEGMENTS = 32;      // 원/부채꼴 세분화
 
-    public void Init(SkillIndicatorType indicatorType, float length, float angle, float width, Material indicatorMaterial)
+    private Mesh mesh;
+    private IndicatorElement indicatorElement;
+    private bool isMainIndicator;
+    public bool isPlayerIndicator;
+
+    private const float SEGMENTS = 32;      // 원/부채꼴 세분화
+    private const float INV_SEGMENTS = 1 / SEGMENTS;
+
+    public IndicatorElement Element => indicatorElement;
+    public Mesh Mesh => mesh;
+
+    public void Init(IndicatorElement element, Material indicatorMaterial, Mesh mesh, bool isPlayerIndicator)
     {
-        this.indicatorType = indicatorType;
-        this.length = length;
-        this.angle = angle;
-        this.width = width;
+        indicatorElement = element;
+        this.mesh = mesh;
+        isMainIndicator = indicatorElement.IsMainIndicator;
+        this.isPlayerIndicator = isPlayerIndicator;
+        
         meshRenderer.material = indicatorMaterial;
+        gameObject.SetActive(true);
     }
 
     public void Reset()
     {
         if (meshFilter.mesh != null)
-        {
-            DestroyImmediate(meshFilter.mesh);
             meshFilter.mesh = null;
-        }
-        
+
         transform.position = Vector3.zero;
         transform.rotation = Quaternion.identity;
         transform.localScale = Vector3.one;
+        mesh = null;
         gameObject.SetActive(false);
     }
 
-    public void DrawIndicator(Vector3 position)
+    public void DrawIndicator(Vector3 start, Vector3 mouse)
     {
-        transform.position = position;
-
-        meshFilter.mesh = indicatorType switch
+        if (isMainIndicator)
         {
-            SkillIndicatorType.Line => CreateLineMesh(length, width),
-            SkillIndicatorType.Sector => CreateSectorMesh(angle, length, SEGMENTS),
-            SkillIndicatorType.Circle => CreateCircleMesh(length, SEGMENTS),
-            _ => null,
-        };
+            switch (indicatorElement.type)
+            {
+                case SkillIndicatorType.Line:
+                    transform.position = start;
+                    Vector3 lineDir = (mouse - start).normalized;
+                    transform.rotation = Quaternion.LookRotation(lineDir);
+                    break;
+
+                case SkillIndicatorType.Sector:
+                    transform.position = start;
+                    Vector3 sectorDir = (mouse - start).normalized;
+                    transform.rotation = Quaternion.LookRotation(sectorDir);
+                    break;
+
+                case SkillIndicatorType.Circle:
+                    Vector3 direction = mouse - start;
+                    Vector3 position;
+
+                    if (direction.magnitude > indicatorElement.maxDistance)
+                        position = start + direction.normalized * indicatorElement.maxDistance;
+                    else
+                        position = mouse;
+
+                    transform.position = position;
+                    transform.rotation = Quaternion.identity;
+                    break;
+            }
+        }
+
+        else
+        {
+            switch (indicatorElement.type)
+            {
+                case SkillIndicatorType.Line:
+                    transform.position = start;
+                    transform.rotation = Quaternion.identity;
+                    break;
+
+                case SkillIndicatorType.Sector:
+                    transform.position = start;
+                    transform.rotation = Quaternion.identity;
+                    break;
+
+                case SkillIndicatorType.Circle:
+                    transform.position = start;
+                    transform.rotation = Quaternion.identity;
+                    break;
+            }
+        }
+        
+        meshFilter.mesh = mesh;
     }
 
-    // 직선 메시 생성
-    private Mesh CreateLineMesh(float length, float width)
+    /// <summary>
+    /// 직선 메시 생성
+    /// </summary>
+    /// <param name="length">메시 길이</param>
+    /// <param name="width">메시 너비</param>
+    public static Mesh CreateLineMesh(float length, float width)
     {
         Mesh mesh = new Mesh();
         float halfWidth = width * 0.5f;
         Vector3[] vertices = new Vector3[]
         {
-            new Vector3(-halfWidth, 0, 0),
+             new Vector3(-halfWidth, 0, 0),
             new Vector3(halfWidth, 0, 0),
             new Vector3(-halfWidth, 0, length),
             new Vector3(halfWidth, 0, length)
         };
+
         int[] triangles = new int[]
         {
             0, 2, 1,
             1, 2, 3
         };
+
         mesh.vertices = vertices;
         mesh.triangles = triangles;
         mesh.RecalculateNormals();
         return mesh;
     }
 
-    // 부채꼴 메시 생성
-    private Mesh CreateSectorMesh(float angle, float radius, int segments)
+    /// <summary>
+    /// 부채꼴 메시 생성
+    /// </summary>
+    /// <param name="angle">부채꼴 각도</param>
+    /// <param name="radius">부채꼴 반지름</param>
+    public static Mesh CreateSectorMesh(float angle, float radius)
     {
         Mesh mesh = new Mesh();
+
         List<Vector3> vertices = new List<Vector3> { Vector3.zero };
         List<int> triangles = new List<int>();
 
-        float angleStep = angle / segments;
-        for (int i = 0; i <= segments; i++)
+        float angleStep = angle * INV_SEGMENTS;
+        for (int i = 0; i <= SEGMENTS; i++)
         {
             float currentAngle = -angle * 0.5f + angleStep * i;
             float rad = Mathf.Deg2Rad * currentAngle;
             vertices.Add(new Vector3(Mathf.Sin(rad) * radius, 0, Mathf.Cos(rad) * radius));
         }
 
-        for (int i = 1; i <= segments; i++)
+        for (int i = 1; i <= SEGMENTS; i++)
         {
             triangles.Add(0);
             triangles.Add(i);
@@ -107,9 +194,36 @@ public class SkillIndicator : MonoBehaviour
         return mesh;
     }
 
-    // 원형 메시 생성
-    private Mesh CreateCircleMesh(float radius, int segments)
+    /// <summary>
+    /// 원형 메시 생성
+    /// </summary>
+    /// <param name="radius">원형 반지름</param>
+    public static Mesh CreateCircleMesh(float radius)
     {
-        return CreateSectorMesh(360f, radius, segments);
+        return CreateSectorMesh(360f, radius);
     }
+    
+    public static Vector3 GetElementEndPoint(Vector3 startPoint, Vector3 mouse, IndicatorElement element)
+    {
+        Vector3 direction = (mouse - startPoint).normalized;
+        if (direction == Vector3.zero)
+            direction = Vector3.forward;
+
+        switch (element.type)
+        {
+            case SkillIndicatorType.Line:
+                return startPoint + direction * element.length;
+
+            case SkillIndicatorType.Sector:
+                float halfAngleRad = element.angle * 0.5f * Mathf.Deg2Rad;
+                return startPoint + direction * (element.radius * Mathf.Cos(halfAngleRad) * 2f);
+
+            case SkillIndicatorType.Circle:
+                return startPoint + direction * element.radius * 2f;
+
+            default:
+                return startPoint;
+        }
+    }
+
 }

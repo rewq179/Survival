@@ -14,24 +14,19 @@ public class SkillData
 {
     public int id;
     public string name;
+    public string description;
     public float cooldown;
     public float reqLevel;
-    public SkillIndicatorType indicatorType;
-    public float length;
-    public float angle;
-    public float width;
+    public List<IndicatorElement> elements;
 
-    public SkillData(int id, string name, float cooldown, float reqLevel,
-        SkillIndicatorType indicatorType, float length, float angle, float width)
+    public SkillData(int id, string name, string description, float cooldown, float reqLevel, List<IndicatorElement> elements)
     {
         this.id = id;
         this.name = name;
+        this.description = description;
         this.cooldown = cooldown;
         this.reqLevel = reqLevel;
-        this.indicatorType = indicatorType;
-        this.length = length;
-        this.angle = angle;
-        this.width = width;
+        this.elements = elements;
     }
 }
 
@@ -45,12 +40,10 @@ public class SkillDataReader : BaseReader
     {
         int id = 0;
         string name = string.Empty;
+        string description = string.Empty;
         float cooldown = 0;
         float reqLevel = 0;
-        SkillIndicatorType indicatorType = SkillIndicatorType.Circle;
-        float length = 0;
-        float angle = 0;
-        float width = 0;
+        List<IndicatorElement> elements = new List<IndicatorElement>();
 
         for (int i = 0; i < cells.Count; i++)
         {
@@ -67,6 +60,10 @@ public class SkillDataReader : BaseReader
                     name = cells[i].value;
                     break;
 
+                case "desc":
+                    description = cells[i].value;
+                    break;
+
                 case "cooldown":
                     if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedCooldown))
                         cooldown = parsedCooldown;
@@ -77,28 +74,59 @@ public class SkillDataReader : BaseReader
                         reqLevel = parsedReqLevel;
                     break;
 
-                case "indicatorType":
-                    indicatorType = (SkillIndicatorType)Enum.Parse(typeof(SkillIndicatorType), cells[i].value);
-                    break;
-
-                case "angle":
-                    if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedAngle))
-                        angle = parsedAngle;
-                    break;
-
-                case "length":
-                    if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedLength))
-                        length = parsedLength;
-                    break;
-
-                case "width":
-                    if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedWidth))
-                        width = parsedWidth;
+                case "indicator":
+                    if (!string.IsNullOrEmpty(cells[i].value))
+                    {
+                        elements = DecodeIndicatorElement(id, cells[i].value);
+                    }
                     break;
             }
         }
 
-        skillDatas.Add(new SkillData(id, name, cooldown, reqLevel, indicatorType, length, angle, width));
+        skillDatas.Add(new SkillData(id, name, description, cooldown, reqLevel, elements));
+    }
+
+    private List<IndicatorElement> DecodeIndicatorElement(int skillId, string indicatorString)
+    {
+        List<IndicatorElement> elements = new List<IndicatorElement>();
+        
+        /// Line : 1.5 / 6, Circle : 2.5 / 360
+        string[] splits = indicatorString.Split(',');
+        foreach (string str in splits)
+        {
+            IndicatorElement element = DecodeSingleElement(str.Trim(), skillId, elements.Count);
+            elements.Add(element);
+        }
+
+        return elements;
+    }
+
+    private IndicatorElement DecodeSingleElement(string str, int skillId, int index)
+    {
+        string[] splits = str.Split(':');
+
+        if (splits.Length != 2)
+            return new IndicatorElement(skillId, index, SkillIndicatorType.Line);
+
+        Enum.TryParse(splits[0].Trim(), true, out SkillIndicatorType type);
+        string[] values = splits[1].Trim().Split('/');
+
+        if (values.Length != 2)
+            return new IndicatorElement(skillId, index, type);
+
+        string firstValue = values[0].Trim();
+        string secondValue = values[1].Trim();
+
+        float.TryParse(firstValue, NumberStyles.Any, CultureInfo.InvariantCulture, out float first);
+        float.TryParse(secondValue, NumberStyles.Any, CultureInfo.InvariantCulture, out float second);
+
+        return type switch
+        {
+            SkillIndicatorType.Line => new IndicatorElement(skillId, index, type, second, first, 0, 0),
+            SkillIndicatorType.Sector => new IndicatorElement(skillId, index, type, 0, 0, second, first),
+            SkillIndicatorType.Circle => new IndicatorElement(skillId, index, type, 0, 0, second, first),
+            _ => new IndicatorElement(skillId, index, type)
+        };
     }
 }
 

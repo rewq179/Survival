@@ -45,8 +45,8 @@ public class GameManager : MonoBehaviour
         playerUnit.Init();
         playerUnit.AddGold(100);
         playerUnit.AddSkill(1);
-        playerUnit.AddSkill(2);
-        playerUnit.AddSkill(3);
+        playerUnit.AddSkill(6);
+        playerUnit.AddSkill(9);
 
         InputManager.Instance.EnablePlayerInput();
     }
