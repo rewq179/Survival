@@ -8,15 +8,15 @@ public class PlayerSaveData
     public int level;
     public float exp;
     public int gold;
-    private List<int> skillIds = new();
+    private List<SkillKey> skillKeys = new();
 
-    public List<int> SkillIds => skillIds;
+    public List<SkillKey> SkillKeys => skillKeys;
 
     // 델리게이트/이벤트
     public event Action<int> OnLevelChanged;
     public event Action<float> OnExpChanged;
     public event Action<int> OnGoldChanged;
-    public event Action<List<int>> OnSkillChanged;
+    public event Action<List<SkillKey>> OnSkillChanged;
 
     public void Init(Unit unit)
     {
@@ -55,20 +55,20 @@ public class PlayerSaveData
         return levelUpCount;
     }
 
-    public void AddSkill(int skillId)
+    public void AddSkill(SkillKey skillKey)
     {
-        if (!skillIds.Contains(skillId))
+        if (!skillKeys.Contains(skillKey))
         {
-            skillIds.Add(skillId);
-            OnSkillChanged?.Invoke(skillIds);
+            skillKeys.Add(skillKey);
+            OnSkillChanged?.Invoke(skillKeys);
         }
     }
 
-    public void RemoveSkill(int skillId)
+    public void RemoveSkill(SkillKey skillKey)
     {
-        if (skillIds.Remove(skillId))
+        if (skillKeys.Remove(skillKey))
         {
-            OnSkillChanged?.Invoke(skillIds);
+            OnSkillChanged?.Invoke(skillKeys);
         }
     }
 

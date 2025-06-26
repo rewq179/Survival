@@ -15,5 +15,126 @@ MonoBehaviour:
   sheetAddress: 15RA8mCckMbGIXxx5Ukfmtih0TxDTEGkXiAVyrHf8Blw
   sheetName: Skill
   startRow: 2
-  endRow: 10
-  skillDatas: []
+  endRow: 9
+  skillDatas:
+  - skillKey: 0
+    name: Arrow
+    description: "\uD654\uC0B4\uC744 \uB0A0\uB9BD\uB2C8\uB2E4."
+    cooldown: 2
+    reqLevel: 0
+    elements:
+    - skillKey: 0
+      index: 0
+      type: 0
+      length: 10
+      width: 0.5
+      angle: 0
+      radius: 0
+      maxDistance: 0.7
+  - skillKey: 1
+    name: Dagger
+    description: "\uD68C\uC218\uB418\uB294 \uCE7C\uC744 \uB358\uC9D1\uB2C8\uB2E4."
+    cooldown: 4
+    reqLevel: 0
+    elements:
+    - skillKey: 1
+      index: 0
+      type: 0
+      length: 7
+      width: 1
+      angle: 0
+      radius: 0
+      maxDistance: 1.4
+  - skillKey: 2
+    name: Laser
+    description: "\uB808\uC774\uC800\uB97C \uC3E9\uB2C8\uB2E4."
+    cooldown: 5
+    reqLevel: 0
+    elements:
+    - skillKey: 2
+      index: 0
+      type: 0
+      length: 7
+      width: 2.5
+      angle: 0
+      radius: 0
+      maxDistance: 3.5
+  - skillKey: 3
+    name: Nova
+    description: "\uB0A0\uC544\uAC00\uBA70 \uC9C0\uC18D\uC801\uC73C\uB85C \uD3ED\uBC1C\uC744
+      \uC77C\uC73C\uD0B5\uB2C8\uB2E4."
+    cooldown: 5
+    reqLevel: 0
+    elements:
+    - skillKey: 3
+      index: 0
+      type: 0
+      length: 10
+      width: 0.5
+      angle: 0
+      radius: 0
+      maxDistance: 0.7
+    - skillKey: 3
+      index: 1
+      type: 2
+      length: 0
+      width: 0
+      angle: 360
+      radius: 2.5
+      maxDistance: 3.5
+  - skillKey: 4
+    name: FrontSpike
+    description: "\uBD80\uCC44\uAF34 \uD615\uD0DC\uC758 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
+    cooldown: 4
+    reqLevel: 0
+    elements:
+    - skillKey: 4
+      index: 0
+      type: 1
+      length: 0
+      width: 0
+      angle: 60
+      radius: 6
+      maxDistance: 8.4
+  - skillKey: 5
+    name: EnergyExplosion
+    description: "\uB2E8\uBC1C\uC131 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
+    cooldown: 7.5
+    reqLevel: 0
+    elements:
+    - skillKey: 5
+      index: 0
+      type: 2
+      length: 0
+      width: 0
+      angle: 360
+      radius: 3.5
+      maxDistance: 4.9
+  - skillKey: 6
+    name: LightningStrike
+    description: "\uC9C0\uC18D\uC801\uC778 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
+    cooldown: 10
+    reqLevel: 0
+    elements:
+    - skillKey: 6
+      index: 0
+      type: 2
+      length: 0
+      width: 0
+      angle: 360
+      radius: 2.5
+      maxDistance: 3.5
+  - skillKey: 7
+    name: Meteor
+    description: "\uC9C0\uC18D\uC801\uC778 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
+    cooldown: 12
+    reqLevel: 0
+    elements:
+    - skillKey: 7
+      index: 0
+      type: 2
+      length: 0
+      width: 0
+      angle: 360
+      radius: 3.1
+      maxDistance: 4.3399997

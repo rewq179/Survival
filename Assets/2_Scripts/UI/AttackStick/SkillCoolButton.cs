@@ -16,9 +16,9 @@ public class SkillCoolButton : BaseAttackButton
         cooldownText.text = string.Empty;
     }
 
-    public override void Init(int skillId)
+    public override void Init(SkillKey skillKey)
     {
-        base.Init(skillId);
+        base.Init(skillKey);
 
         maxCooldown = skillData.cooldown;
         cooldownSlider.maxValue = maxCooldown;
@@ -35,25 +35,19 @@ public class SkillCoolButton : BaseAttackButton
         {
             skillManager.OnSkillCooldownChanged += OnSkillCooldownChanged;
             skillManager.OnSkillCooldownEnded += OnSkillCooldownEnded;
-            skillManager.OnSkillActivated += OnSkillActivated;
         }
     }
 
-    private void OnSkillCooldownChanged(int skillId, float cooldown)
+    private void OnSkillCooldownChanged(SkillKey skillKey, float cooldown)
     {
-        if (skillId == skillData.id)
+        if (skillKey == skillData.skillKey)
             UpdateCooldown(cooldown);
     }
 
-    private void OnSkillCooldownEnded(int skillId)
+    private void OnSkillCooldownEnded(SkillKey skillKey)
     {
-        if (skillId == skillData.id)
+        if (skillKey == skillData.skillKey)
             EndCooldown();
-    }
-
-    private void OnSkillActivated(string skillName)
-    {
-        Debug.Log(skillName);
     }
 
     public override void OnClick()
@@ -61,12 +55,12 @@ public class SkillCoolButton : BaseAttackButton
         base.OnClick();
 
         if (skillManager != null)
-            skillManager.UseSkill(skillData.id);
+            skillManager.UseSkill(skillData.skillKey);
     }
 
     public void UpdateCooldown(float cooldown)
     {
-        cooldownSlider.value = maxCooldown - skillManager.GetCooldown(skillData.id);
+        cooldownSlider.value = maxCooldown - skillManager.GetCooldown(skillData.skillKey);
         cooldownText.text = $"{cooldown:F1}";
     }
 
@@ -83,7 +77,6 @@ public class SkillCoolButton : BaseAttackButton
         {
             skillManager.OnSkillCooldownChanged -= OnSkillCooldownChanged;
             skillManager.OnSkillCooldownEnded -= OnSkillCooldownEnded;
-            skillManager.OnSkillActivated -= OnSkillActivated;
         }
     }
 }

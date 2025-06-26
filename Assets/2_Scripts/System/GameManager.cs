@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private GameObject playerUnitPrefab;
     [SerializeField] private DataManager dataManager;
-    public IconManager iconManager;
+    public ResourceManager resourceManager;
     public SkillManager skillManager;
 
     private Unit playerUnit;
@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour
 
     private void InitializeGame()
     {
-        iconManager.LoadAllIcons();
+        resourceManager.LoadAllIcons();
         dataManager.Init();
 
         CreatePlayerUnit();
@@ -44,9 +44,9 @@ public class GameManager : MonoBehaviour
 
         playerUnit.Init();
         playerUnit.AddGold(100);
-        playerUnit.AddSkill(1);
-        playerUnit.AddSkill(6);
-        playerUnit.AddSkill(9);
+        playerUnit.AddSkill(SkillKey.Arrow);
+        playerUnit.AddSkill(SkillKey.FrontSpike);
+        playerUnit.AddSkill(SkillKey.Meteor);
 
         InputManager.Instance.EnablePlayerInput();
     }

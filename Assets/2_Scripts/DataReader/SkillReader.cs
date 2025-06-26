@@ -11,6 +11,7 @@ using UnityEditor;
 
 public enum SkillKey
 {
+    None = -1,
     Arrow,
     Dagger,
     Laser,
@@ -25,18 +26,16 @@ public enum SkillKey
 [Serializable]
 public class SkillData
 {
-    public int id;
-    public SkillKey type;
+    public SkillKey skillKey;
     public string name;
     public string description;
     public float cooldown;
     public float reqLevel;
     public List<IndicatorElement> elements;
 
-    public SkillData(int id, SkillKey type, string name, string description, float cooldown, float reqLevel, List<IndicatorElement> elements)
+    public SkillData(SkillKey skillKey, string name, string description, float cooldown, float reqLevel, List<IndicatorElement> elements)
     {
-        this.id = id;
-        this.type = type;
+        this.skillKey = skillKey;
         this.name = name;
         this.description = description;
         this.cooldown = cooldown;
@@ -53,8 +52,7 @@ public class SkillDataReader : BaseReader
 
     internal void SetData(List<GSTU_Cell> cells)
     {
-        int id = 0;
-        SkillKey type = SkillKey.Max;
+        SkillKey skillKey = SkillKey.Max;
         string name = string.Empty;
         string description = string.Empty;
         float cooldown = 0;
@@ -67,14 +65,9 @@ public class SkillDataReader : BaseReader
 
             switch (columnId)
             {
-                case "id":
-                    if (int.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out int parsedId))
-                        id = parsedId;
-                    break;
-
-                case "type":
-                    if (Enum.TryParse(cells[i].value, true, out SkillKey parsedType))
-                        type = parsedType;
+                case "skillkey":
+                    if (Enum.TryParse(cells[i].value, true, out SkillKey parsedSkillKey))
+                        skillKey = parsedSkillKey;
                     break;
 
                 case "name":
@@ -98,16 +91,16 @@ public class SkillDataReader : BaseReader
                 case "indicator":
                     if (!string.IsNullOrEmpty(cells[i].value))
                     {
-                        elements = DecodeIndicatorElement(id, cells[i].value);
+                        elements = DecodeIndicatorElement(skillKey, cells[i].value);
                     }
                     break;
             }
         }
 
-        skillDatas.Add(new SkillData(id, type, name, description, cooldown, reqLevel, elements));
+        skillDatas.Add(new SkillData(skillKey, name, description, cooldown, reqLevel, elements));
     }
 
-    private List<IndicatorElement> DecodeIndicatorElement(int skillId, string indicatorString)
+    private List<IndicatorElement> DecodeIndicatorElement(SkillKey skillKey, string indicatorString)
     {
         List<IndicatorElement> elements = new List<IndicatorElement>();
         
@@ -115,25 +108,25 @@ public class SkillDataReader : BaseReader
         string[] splits = indicatorString.Split(',');
         foreach (string str in splits)
         {
-            IndicatorElement element = DecodeSingleElement(str.Trim(), skillId, elements.Count);
+            IndicatorElement element = DecodeSingleElement(str.Trim(), skillKey, elements.Count);
             elements.Add(element);
         }
 
         return elements;
     }
 
-    private IndicatorElement DecodeSingleElement(string str, int skillId, int index)
+    private IndicatorElement DecodeSingleElement(string str, SkillKey skillKey, int index)
     {
         string[] splits = str.Split(':');
 
         if (splits.Length != 2)
-            return new IndicatorElement(skillId, index, SkillIndicatorType.Line);
+            return new IndicatorElement(skillKey, index, SkillIndicatorType.Line);
 
         Enum.TryParse(splits[0].Trim(), true, out SkillIndicatorType type);
         string[] values = splits[1].Trim().Split('/');
 
         if (values.Length != 2)
-            return new IndicatorElement(skillId, index, type);
+            return new IndicatorElement(skillKey, index, type);
 
         string firstValue = values[0].Trim();
         string secondValue = values[1].Trim();
@@ -143,10 +136,10 @@ public class SkillDataReader : BaseReader
 
         return type switch
         {
-            SkillIndicatorType.Line => new IndicatorElement(skillId, index, type, second, first, 0, 0),
-            SkillIndicatorType.Sector => new IndicatorElement(skillId, index, type, 0, 0, second, first),
-            SkillIndicatorType.Circle => new IndicatorElement(skillId, index, type, 0, 0, second, first),
-            _ => new IndicatorElement(skillId, index, type)
+            SkillIndicatorType.Line => new IndicatorElement(skillKey, index, type, second, first, 0, 0),
+            SkillIndicatorType.Sector => new IndicatorElement(skillKey, index, type, 0, 0, second, first),
+            SkillIndicatorType.Circle => new IndicatorElement(skillKey, index, type, 0, 0, second, first),
+            _ => new IndicatorElement(skillKey, index, type)
         };
     }
 }

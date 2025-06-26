@@ -87,6 +87,8 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 mousePos = Input.mousePosition;
         mousePos.z = 10f; // 카메라에서의 거리
-        return mainCamera.ScreenToWorldPoint(mousePos);
+        Vector3 worldPos = mainCamera.ScreenToWorldPoint(mousePos);
+        worldPos.y = 0f;
+        return worldPos;
     }
 }

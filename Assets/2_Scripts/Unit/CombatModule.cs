@@ -23,7 +23,7 @@ public class CombatModule
         curHp = maxHp;
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
         if (damage == 0)
             return;

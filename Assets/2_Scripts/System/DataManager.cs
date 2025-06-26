@@ -7,7 +7,7 @@ public class DataManager : MonoBehaviour
     public SkillDataReader skillDataReader;
 
     private static Dictionary<int, UnitData> unitDatas = new();
-    private static Dictionary<int, SkillData> skillDatas = new();
+    private static Dictionary<SkillKey, SkillData> skillDatas = new();
 
     public void Init()
     {
@@ -22,7 +22,7 @@ public class DataManager : MonoBehaviour
         for (int i = 0; i < skillDataReader.skillDatas.Count; i++)
         {
             SkillData skillData = skillDataReader.skillDatas[i];
-            skillDatas.Add(skillData.id, skillData);
+            skillDatas.Add(skillData.skillKey, skillData);
         }
     }
 
@@ -34,9 +34,9 @@ public class DataManager : MonoBehaviour
         return null;
     }
 
-    public static SkillData GetSkillData(int id)
+    public static SkillData GetSkillData(SkillKey skillKey)
     {
-        if (skillDatas.TryGetValue(id, out SkillData skillData))
+        if (skillDatas.TryGetValue(skillKey, out SkillData skillData))
             return skillData;
 
         return null;

@@ -51,13 +51,13 @@ public class AttackJoystick : MonoBehaviour
         }
     }
 
-    private void RefreshSkill(List<int> skillIds)
+    private void RefreshSkill(List<SkillKey> skillKeys)
     {
         int start = (int)SkillButtonType.Attack;
 
-        for (int i = 0; i < skillIds.Count; i++)
+        for (int i = 0; i < skillKeys.Count; i++)
         {
-            attackButtons[start + i].Init(skillIds[i]);
+            attackButtons[start + i].Init(skillKeys[i]);
         }
     }
 }

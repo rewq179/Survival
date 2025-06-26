@@ -29,16 +29,16 @@ public class Unit : MonoBehaviour
     }
 
     public void SetHp() => combatModule.SetHp(statModule);
-    public void TakeDamage(int damage) => combatModule.TakeDamage(damage);
+    public void TakeDamage(float damage) => combatModule.TakeDamage(damage);
 
     // PlayerSaveData
     public int Level => playerSaveData.level;
     public float CurExp => playerSaveData.exp;
     public float MaxExp => playerSaveData.GetRequiredExp(playerSaveData.level);
     public int Gold => playerSaveData.gold;
-    public List<int> SkillIds => playerSaveData.SkillIds;
+    public List<SkillKey> SkillKeys => playerSaveData.SkillKeys;
 
-    public event Action<List<int>> OnSkillChanged
+    public event Action<List<SkillKey>> OnSkillChanged
     {
         add => playerSaveData.OnSkillChanged += value;
         remove => playerSaveData.OnSkillChanged -= value;
@@ -62,8 +62,8 @@ public class Unit : MonoBehaviour
         remove => playerSaveData.OnGoldChanged -= value;
     }
 
-    public void AddSkill(int skillId) => playerSaveData.AddSkill(skillId);
-    public void RemoveSkill(int skillId) => playerSaveData.RemoveSkill(skillId);
+    public void AddSkill(SkillKey skillKey) => playerSaveData.AddSkill(skillKey);
+    public void RemoveSkill(SkillKey skillKey) => playerSaveData.RemoveSkill(skillKey);
     public void AddGold(int amount) => playerSaveData.AddGold(amount);
     public int AddExp(float amount) => playerSaveData.AddExp(amount);
 }

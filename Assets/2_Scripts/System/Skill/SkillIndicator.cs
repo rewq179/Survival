@@ -4,7 +4,7 @@ using System.Collections.Generic;
 [System.Serializable]
 public struct IndicatorElement
 {
-    public int skillId;
+    public SkillKey skillKey;
     public int index;
     public SkillIndicatorType type;
     public float length;
@@ -15,9 +15,9 @@ public struct IndicatorElement
 
     public bool IsMainIndicator => index == 0;
 
-    public IndicatorElement(int skillId, int index, SkillIndicatorType type, float length = 0, float width = 0, float angle = 0, float radius = 0)
+    public IndicatorElement(SkillKey skillKey, int index, SkillIndicatorType type, float length = 0, float width = 0, float angle = 0, float radius = 0)
     {
-        this.skillId = skillId;
+        this.skillKey = skillKey;
         this.index = index;
         this.type = type;
         this.length = length;
