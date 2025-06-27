@@ -30,7 +30,8 @@ MonoBehaviour:
       width: 0.5
       angle: 0
       radius: 0
-      maxDistance: 0.7
+      maxDistance: 0.8
+    launcherType: 0
   - skillKey: 1
     name: Dagger
     description: "\uD68C\uC218\uB418\uB294 \uCE7C\uC744 \uB358\uC9D1\uB2C8\uB2E4."
@@ -44,7 +45,8 @@ MonoBehaviour:
       width: 1
       angle: 0
       radius: 0
-      maxDistance: 1.4
+      maxDistance: 1.6
+    launcherType: 0
   - skillKey: 2
     name: Laser
     description: "\uB808\uC774\uC800\uB97C \uC3E9\uB2C8\uB2E4."
@@ -58,7 +60,8 @@ MonoBehaviour:
       width: 2.5
       angle: 0
       radius: 0
-      maxDistance: 3.5
+      maxDistance: 4
+    launcherType: 1
   - skillKey: 3
     name: Nova
     description: "\uB0A0\uC544\uAC00\uBA70 \uC9C0\uC18D\uC801\uC73C\uB85C \uD3ED\uBC1C\uC744
@@ -73,7 +76,7 @@ MonoBehaviour:
       width: 0.5
       angle: 0
       radius: 0
-      maxDistance: 0.7
+      maxDistance: 0.8
     - skillKey: 3
       index: 1
       type: 2
@@ -81,7 +84,8 @@ MonoBehaviour:
       width: 0
       angle: 360
       radius: 2.5
-      maxDistance: 3.5
+      maxDistance: 5
+    launcherType: 1
   - skillKey: 4
     name: FrontSpike
     description: "\uBD80\uCC44\uAF34 \uD615\uD0DC\uC758 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
@@ -95,7 +99,8 @@ MonoBehaviour:
       width: 0
       angle: 60
       radius: 6
-      maxDistance: 8.4
+      maxDistance: 12
+    launcherType: 1
   - skillKey: 5
     name: EnergyExplosion
     description: "\uB2E8\uBC1C\uC131 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
@@ -109,7 +114,8 @@ MonoBehaviour:
       width: 0
       angle: 360
       radius: 3.5
-      maxDistance: 4.9
+      maxDistance: 7
+    launcherType: 1
   - skillKey: 6
     name: LightningStrike
     description: "\uC9C0\uC18D\uC801\uC778 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
@@ -123,7 +129,8 @@ MonoBehaviour:
       width: 0
       angle: 360
       radius: 2.5
-      maxDistance: 3.5
+      maxDistance: 5
+    launcherType: 2
   - skillKey: 7
     name: Meteor
     description: "\uC9C0\uC18D\uC801\uC778 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
@@ -137,4 +144,5 @@ MonoBehaviour:
       width: 0
       angle: 360
       radius: 3.1
-      maxDistance: 4.3399997
+      maxDistance: 6.2
+    launcherType: 2

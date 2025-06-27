@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.Video;
+using System;
 
 public enum IconType
 {
@@ -15,10 +17,10 @@ public class ResourceManager : MonoBehaviour
     private string itemIconPath = "Icon/Item";
     private string skillEffectPath = "SkillEffect";
 
-    private Dictionary<string, Sprite> skillIcons = new Dictionary<string, Sprite>();
-    private Dictionary<string, Sprite> equipmentIcons = new Dictionary<string, Sprite>();
-    private Dictionary<string, Sprite> itemIcons = new Dictionary<string, Sprite>();
-    private Dictionary<string, GameObject> skillEffects = new Dictionary<string, GameObject>();
+    private Dictionary<string, Sprite> skillIcons = new();
+    private Dictionary<string, Sprite> equipmentIcons = new();
+    private Dictionary<string, Sprite> itemIcons = new();
+    private Dictionary<SkillKey, GameObject> skillEffects = new();
 
     public void LoadAllIcons()
     {
@@ -52,7 +54,7 @@ public class ResourceManager : MonoBehaviour
         GameObject[] effects = Resources.LoadAll<GameObject>(path);
         foreach (GameObject effect in effects)
         {
-            skillEffects[effect.name] = effect;
+            skillEffects[Enum.Parse<SkillKey>(effect.name)] = effect;
         }
     }
 
@@ -80,10 +82,10 @@ public class ResourceManager : MonoBehaviour
         return null;
     }
 
-    public GameObject GetSkillEffect(SkillLauncher launcher, string skillName)
+    public GameObject GetSkillEffect(Transform parent, SkillKey skillKey)
     {
-        if (skillEffects.TryGetValue(skillName, out GameObject effect))
-            return Instantiate(effect, launcher.transform, false);
+        if (skillEffects.TryGetValue(skillKey, out GameObject effect))
+            return Instantiate(effect, parent, false);
 
         return null;
     }

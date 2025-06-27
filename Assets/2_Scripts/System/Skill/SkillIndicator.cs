@@ -24,7 +24,7 @@ public struct IndicatorElement
         this.width = width;
         this.angle = angle;
         this.radius = radius;
-        maxDistance = radius > 0 ? radius * 1.4f : width * 1.4f;
+        maxDistance = radius > 0 ? radius * 2f : width * 1.6f;
     }
 }
 
@@ -58,7 +58,7 @@ public class SkillIndicator : MonoBehaviour
         this.mesh = mesh;
         isMainIndicator = indicatorElement.IsMainIndicator;
         this.isPlayerIndicator = isPlayerIndicator;
-        
+
         meshRenderer.material = indicatorMaterial;
         gameObject.SetActive(true);
     }
@@ -94,15 +94,7 @@ public class SkillIndicator : MonoBehaviour
                     break;
 
                 case SkillIndicatorType.Circle:
-                    Vector3 direction = mouse - start;
-                    Vector3 position;
-
-                    if (direction.magnitude > indicatorElement.maxDistance)
-                        position = start + direction.normalized * indicatorElement.maxDistance;
-                    else
-                        position = mouse;
-
-                    transform.position = position;
+                    transform.position = GetElementEndPoint(start, mouse, indicatorElement);
                     transform.rotation = Quaternion.identity;
                     break;
             }
@@ -128,7 +120,7 @@ public class SkillIndicator : MonoBehaviour
                     break;
             }
         }
-        
+
         meshFilter.mesh = mesh;
     }
 
@@ -202,7 +194,7 @@ public class SkillIndicator : MonoBehaviour
     {
         return CreateSectorMesh(360f, radius);
     }
-    
+
     public static Vector3 GetElementEndPoint(Vector3 startPoint, Vector3 mouse, IndicatorElement element)
     {
         Vector3 direction = (mouse - startPoint).normalized;
@@ -219,7 +211,10 @@ public class SkillIndicator : MonoBehaviour
                 return startPoint + direction * (element.radius * Mathf.Cos(halfAngleRad) * 2f);
 
             case SkillIndicatorType.Circle:
-                return startPoint + direction * element.radius * 2f;
+                if ((mouse - startPoint).magnitude > element.maxDistance)
+                    return startPoint + direction.normalized * element.maxDistance;
+                else
+                    return mouse;
 
             default:
                 return startPoint;

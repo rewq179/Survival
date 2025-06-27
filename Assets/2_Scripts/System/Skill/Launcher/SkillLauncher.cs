@@ -12,6 +12,7 @@ public enum SkillLauncherType
 public abstract class SkillLauncher : MonoBehaviour
 {
     public abstract SkillLauncherType Type { get; }
+    protected SkillKey skillKey;
     protected float duration;
     protected float range;
     protected bool isAffectCaster;
@@ -33,6 +34,7 @@ public abstract class SkillLauncher : MonoBehaviour
 
     public virtual void Initialize(SkillData skillData, Vector3 startPos, Vector3 dir, Unit caster, SkillParticleController particleController)
     {
+        skillKey = skillData.skillKey;
         startPosition = startPos;
         direction = dir.normalized;
         this.caster = caster;
@@ -41,8 +43,8 @@ public abstract class SkillLauncher : MonoBehaviour
         elapsedTime = 0f;
         range = skillData.elements[0].length;
 ;
-        transform.position = startPos;
         transform.rotation = Quaternion.LookRotation(direction);
+        transform.position = startPos;
         gameObject.SetActive(true);
 
         OnInitialize();
@@ -50,7 +52,6 @@ public abstract class SkillLauncher : MonoBehaviour
         if (particleController != null)
         {
             particleController.OnParticleFinished += OnParticleFinished;
-            particleController.gameObject.SetActive(true);
             particleController.Play();
         }
     }
@@ -60,11 +61,9 @@ public abstract class SkillLauncher : MonoBehaviour
         isActive = false;
         elapsedTime = 0f;
         skillEffects.Clear();
-
-        if (particleController != null)
-            particleController.OnParticleFinished -= OnParticleFinished;
-
         particleController = null;
+        transform.position = Vector3.zero;
+        transform.rotation = Quaternion.identity;
         gameObject.SetActive(false);
     }
 
@@ -112,6 +111,7 @@ public abstract class SkillLauncher : MonoBehaviour
         }
 
         OnDeactivate();
+        GameManager.Instance.skillManager.PushParticle(skillKey, particleController);
         GameManager.Instance.skillManager.PushLauncher(this);
     }
 

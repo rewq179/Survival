@@ -32,8 +32,10 @@ public class SkillData
     public float cooldown;
     public float reqLevel;
     public List<IndicatorElement> elements;
+    public SkillLauncherType launcherType;
 
-    public SkillData(SkillKey skillKey, string name, string description, float cooldown, float reqLevel, List<IndicatorElement> elements)
+    public SkillData(SkillKey skillKey, string name, string description, float cooldown, float reqLevel, 
+        List<IndicatorElement> elements, SkillLauncherType launcherType)
     {
         this.skillKey = skillKey;
         this.name = name;
@@ -41,6 +43,7 @@ public class SkillData
         this.cooldown = cooldown;
         this.reqLevel = reqLevel;
         this.elements = elements;
+        this.launcherType = launcherType;
     }
 }
 
@@ -58,6 +61,7 @@ public class SkillDataReader : BaseReader
         float cooldown = 0;
         float reqLevel = 0;
         List<IndicatorElement> elements = new List<IndicatorElement>();
+        SkillLauncherType launcherType = SkillLauncherType.Projectile;
 
         for (int i = 0; i < cells.Count; i++)
         {
@@ -94,10 +98,15 @@ public class SkillDataReader : BaseReader
                         elements = DecodeIndicatorElement(skillKey, cells[i].value);
                     }
                     break;
+
+                case "launchertype":
+                    if (Enum.TryParse(cells[i].value, true, out SkillLauncherType parsedLauncherType))
+                        launcherType = parsedLauncherType;
+                    break;
             }
         }
 
-        skillDatas.Add(new SkillData(skillKey, name, description, cooldown, reqLevel, elements));
+        skillDatas.Add(new SkillData(skillKey, name, description, cooldown, reqLevel, elements, launcherType));
     }
 
     private List<IndicatorElement> DecodeIndicatorElement(SkillKey skillKey, string indicatorString)

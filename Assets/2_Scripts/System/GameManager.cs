@@ -45,6 +45,7 @@ public class GameManager : MonoBehaviour
         playerUnit.Init();
         playerUnit.AddGold(100);
         playerUnit.AddSkill(SkillKey.Arrow);
+        playerUnit.AddSkill(SkillKey.Dagger);
         playerUnit.AddSkill(SkillKey.FrontSpike);
         playerUnit.AddSkill(SkillKey.Meteor);
 

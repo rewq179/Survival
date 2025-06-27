@@ -14,6 +14,8 @@ public class SkillParticleController : MonoBehaviour
     {
         isPlaying = false;
         OnParticleFinished = null;
+        transform.position = Vector3.zero;
+        transform.rotation = Quaternion.identity;
 
         mainParticle.Stop();
 
@@ -21,6 +23,8 @@ public class SkillParticleController : MonoBehaviour
         {
             particle.Stop();
         }
+
+        gameObject.SetActive(false);
     }
 
     public void Play()
@@ -29,6 +33,7 @@ public class SkillParticleController : MonoBehaviour
             return;
 
         isPlaying = true;
+        gameObject.SetActive(true);
 
         mainParticle.Play();
         StartCoroutine(CheckParticleFinished(mainParticle));
