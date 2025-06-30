@@ -4,6 +4,7 @@ using GoogleSheetsToUnity;
 using GoogleSheetsToUnity.ThirdPary;
 using TinyJSON;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public delegate void OnSpreedSheetLoaded(GstuSpreadSheet sheet);
 namespace GoogleSheetsToUnity
@@ -53,12 +54,12 @@ namespace GoogleSheetsToUnity
             
             if (Application.isPlaying)
             {
-                new Task(Read(new WWW(sb.ToString()), searchDetails.titleColumn, searchDetails.titleRow, callback));
+                new Task(Read(UnityWebRequest.Get(sb.ToString()), searchDetails.titleColumn, searchDetails.titleRow, callback));
             }
 #if UNITY_EDITOR
             else
             {
-                EditorCoroutineRunner.StartCoroutine(Read(new WWW(sb.ToString()), searchDetails.titleColumn, searchDetails.titleRow, callback));
+                EditorCoroutineRunner.StartCoroutine(Read(UnityWebRequest.Get(sb.ToString()), searchDetails.titleColumn, searchDetails.titleRow, callback));
             }
 #endif
         }
@@ -66,24 +67,33 @@ namespace GoogleSheetsToUnity
         /// <summary>
         /// Wait for the Web request to complete and then process the results
         /// </summary>
-        /// <param name="www"></param>
+        /// <param name="request"></param>
         /// <param name="titleColumn"></param>
         /// <param name="titleRow"></param>
         /// <param name="callback"></param>
         /// <returns></returns>
-        static IEnumerator Read(WWW www, string titleColumn, int titleRow, OnSpreedSheetLoaded callback)
+        static IEnumerator Read(UnityWebRequest request, string titleColumn, int titleRow, OnSpreedSheetLoaded callback)
         {
-            yield return www;
+            yield return request.SendWebRequest();
 
-            ValueRange rawData = JSON.Load(www.text).Make<ValueRange>();
-            GSTU_SpreadsheetResponce responce = new GSTU_SpreadsheetResponce(rawData);
-
-            GstuSpreadSheet spreadSheet = new GstuSpreadSheet(responce, titleColumn, titleRow);
-
-            if (callback != null)
+            if (request.result == UnityWebRequest.Result.Success)
             {
-                callback(spreadSheet);
+                ValueRange rawData = JSON.Load(request.downloadHandler.text).Make<ValueRange>();
+                GSTU_SpreadsheetResponce responce = new GSTU_SpreadsheetResponce(rawData);
+
+                GstuSpreadSheet spreadSheet = new GstuSpreadSheet(responce, titleColumn, titleRow);
+
+                if (callback != null)
+                {
+                    callback(spreadSheet);
+                }
             }
+            else
+            {
+                Debug.LogError($"Error downloading spreadsheet: {request.error}");
+            }
+
+            request.Dispose();
         }
     }
 }
