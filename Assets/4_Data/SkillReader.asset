@@ -98,7 +98,7 @@ MonoBehaviour:
       length: 0
       width: 0
       angle: 60
-      radius: 6
+      radius: 8
       maxDistance: 12
     launcherType: 1
   - skillKey: 5

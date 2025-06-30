@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 103cba8e71143194e8334231c09eb662
+timeCreated: 1523860952
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 116781
+  packageName: Polygonal - Creatures Pack
+  packageVersion: 1.0
+  assetPath: Assets/Polygonal Creatures Pack/Polygonal Dragon/Prefabs/Polygonal Dragon
+    Blue.prefab
+  uploadId: 241078

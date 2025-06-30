@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 781bc3df00766b9448110d57ea2fb92e
+timeCreated: 1521615305
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 116781
+  packageName: Polygonal - Creatures Pack
+  packageVersion: 1.0
+  assetPath: Assets/Polygonal Creatures Pack/Polygonal Dragon/Materials/Demo Ground.mat
+  uploadId: 241078

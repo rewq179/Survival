@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: da4a596d98a7b924eb9c41540c5d3f61
+timeCreated: 1523602149
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 116781
+  packageName: Polygonal - Creatures Pack
+  packageVersion: 1.0
+  assetPath: Assets/Polygonal Creatures Pack/Polygonal Dragon/Animators/Polygonal
+    Dragon.controller
+  uploadId: 241078
