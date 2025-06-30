@@ -15,19 +15,17 @@ public class UnitData
     public int id;
     public string name;
     public float hp;
-    public float maxHp;
     public float attack;
     public float moveSpd;
     public float cooldown;
     public float critChance;
     public float critMulti;
 
-    public UnitData(int id, string name, float hp, float maxHp, float attack, float moveSpd, float cooldown, float critChance, float critMulti)
+    public UnitData(int id, string name, float hp, float attack, float moveSpd, float cooldown, float critChance, float critMulti)
     {
         this.id = id;
         this.name = name;
         this.hp = hp;
-        this.maxHp = maxHp;
         this.attack = attack;
         this.moveSpd = moveSpd;
         this.cooldown = cooldown;
@@ -39,6 +37,8 @@ public class UnitData
 [CreateAssetMenu(fileName = "UnitReader", menuName = "Scriptable Object/UnitDataReader", order = int.MaxValue)]
 public class UnitDataReader : BaseReader
 {
+    public override string sheetName => "Unit";
+
     [SerializeField]
     public List<UnitData> unitDatas = new List<UnitData>();
 
@@ -47,7 +47,6 @@ public class UnitDataReader : BaseReader
         int id = 0;
         string name = string.Empty;
         float hp = 0;
-        float maxHp = 0;
         float attack = 0;
         float moveSpd = 0;
         float cooldown = 0;
@@ -80,15 +79,6 @@ public class UnitDataReader : BaseReader
                         if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedHp))
                         {
                             hp = parsedHp;
-                        }
-                        break;
-                    }
-
-                case "maxhp":
-                    {
-                        if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedMaxHp))
-                        {
-                            maxHp = parsedMaxHp;
                         }
                         break;
                     }
@@ -140,7 +130,7 @@ public class UnitDataReader : BaseReader
             }
         }
 
-        unitDatas.Add(new UnitData(id, name, hp, maxHp, attack, moveSpd, cooldown, critChance, critMulti));
+        unitDatas.Add(new UnitData(id, name, hp, attack, moveSpd, cooldown, critChance, critMulti));
     }
 }
 

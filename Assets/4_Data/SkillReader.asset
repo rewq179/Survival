@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: SkillReader
   m_EditorClassIdentifier: Assembly-CSharp::SkillDataReader
   sheetAddress: 15RA8mCckMbGIXxx5Ukfmtih0TxDTEGkXiAVyrHf8Blw
-  sheetName: Skill
   startRow: 2
   endRow: 9
   skillDatas:
@@ -98,8 +97,8 @@ MonoBehaviour:
       length: 0
       width: 0
       angle: 60
-      radius: 8
-      maxDistance: 12
+      radius: 8.2
+      maxDistance: 16.4
     launcherType: 1
   - skillKey: 5
     name: EnergyExplosion

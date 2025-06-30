@@ -50,6 +50,8 @@ public class SkillData
 [CreateAssetMenu(fileName = "SkillReader", menuName = "Scriptable Object/SkillDataReader", order = int.MaxValue)]
 public class SkillDataReader : BaseReader
 {
+    public override string sheetName => "Skill";
+
     [SerializeField]
     public List<SkillData> skillDatas = new List<SkillData>();
 

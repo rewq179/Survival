@@ -1,0 +1,154 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: SpawnGroupReader
+  m_EditorClassIdentifier: Assembly-CSharp::SpawnGroupDataReader
+  sheetAddress: 15RA8mCckMbGIXxx5Ukfmtih0TxDTEGkXiAVyrHf8Blw
+  startRow: 2
+  endRow: 18
+  spawnGroupDatas:
+  - groupID: 0
+    unitID: 1001
+    count: 5
+    repeat: 2
+    spawnInterval: 3
+    repeatInterval: 0.8
+    pattern: 0
+    startDelay: 0
+  - groupID: 1
+    unitID: 1001
+    count: 3
+    repeat: 0
+    spawnInterval: 2
+    repeatInterval: 0.5
+    pattern: 0
+    startDelay: 5
+  - groupID: 2
+    unitID: 1002
+    count: 4
+    repeat: 3
+    spawnInterval: 2
+    repeatInterval: 1
+    pattern: 0
+    startDelay: 0
+  - groupID: 3
+    unitID: 1001
+    count: 2
+    repeat: 1
+    spawnInterval: 4
+    repeatInterval: 0.6
+    pattern: 0
+    startDelay: 8
+  - groupID: 4
+    unitID: 1002
+    count: 6
+    repeat: 0
+    spawnInterval: 2
+    repeatInterval: 0.7
+    pattern: 0
+    startDelay: 0
+  - groupID: 5
+    unitID: 1003
+    count: 3
+    repeat: 0
+    spawnInterval: 1
+    repeatInterval: 1.2
+    pattern: 0
+    startDelay: 10
+  - groupID: 6
+    unitID: 1001
+    count: 3
+    repeat: 0
+    spawnInterval: 3
+    repeatInterval: 0.4
+    pattern: 0
+    startDelay: 15
+  - groupID: 7
+    unitID: 1003
+    count: 5
+    repeat: 0
+    spawnInterval: 2
+    repeatInterval: 0.9
+    pattern: 0
+    startDelay: 0
+  - groupID: 8
+    unitID: 1002
+    count: 4
+    repeat: 0
+    spawnInterval: 3
+    repeatInterval: 0.6
+    pattern: 0
+    startDelay: 12
+  - groupID: 9
+    unitID: 1004
+    count: 2
+    repeat: 0
+    spawnInterval: 1
+    repeatInterval: 1.5
+    pattern: 0
+    startDelay: 20
+  - groupID: 10
+    unitID: 1004
+    count: 4
+    repeat: 0
+    spawnInterval: 2
+    repeatInterval: 1
+    pattern: 0
+    startDelay: 0
+  - groupID: 11
+    unitID: 1003
+    count: 3
+    repeat: 0
+    spawnInterval: 3
+    repeatInterval: 0.8
+    pattern: 0
+    startDelay: 15
+  - groupID: 12
+    unitID: 1002
+    count: 2
+    repeat: 0
+    spawnInterval: 4
+    repeatInterval: 0.5
+    pattern: 0
+    startDelay: 25
+  - groupID: 13
+    unitID: 1005
+    count: 2
+    repeat: 0
+    spawnInterval: 1
+    repeatInterval: 2
+    pattern: 0
+    startDelay: 0
+  - groupID: 14
+    unitID: 1004
+    count: 3
+    repeat: 0
+    spawnInterval: 2
+    repeatInterval: 1.2
+    pattern: 0
+    startDelay: 15
+  - groupID: 15
+    unitID: 1003
+    count: 4
+    repeat: 2
+    spawnInterval: 2
+    repeatInterval: 0.7
+    pattern: 0
+    startDelay: 20
+  - groupID: 16
+    unitID: 1001
+    count: 6
+    repeat: 1
+    spawnInterval: 3
+    repeatInterval: 0.3
+    pattern: 0
+    startDelay: 30

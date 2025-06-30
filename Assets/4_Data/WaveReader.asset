@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: WaveReader
+  m_EditorClassIdentifier: Assembly-CSharp::WaveDataReader
+  sheetAddress: 15RA8mCckMbGIXxx5Ukfmtih0TxDTEGkXiAVyrHf8Blw
+  startRow: 2
+  endRow: 7
+  waveDatas:
+  - waveID: 0
+    duration: 0
+    difficulty: 1
+    spawnGroupIDs: 0000000001000000
+  - waveID: 0
+    duration: 0
+    difficulty: 1.2
+    spawnGroupIDs: 0200000003000000
+  - waveID: 0
+    duration: 0
+    difficulty: 1.5
+    spawnGroupIDs: 040000000500000006000000
+  - waveID: 0
+    duration: 0
+    difficulty: 1.8
+    spawnGroupIDs: 070000000800000009000000
+  - waveID: 0
+    duration: 0
+    difficulty: 2
+    spawnGroupIDs: 0a0000000b0000000c000000
+  - waveID: 0
+    duration: 0
+    difficulty: 2.5
+    spawnGroupIDs: 0d0000000e0000000f00000010000000

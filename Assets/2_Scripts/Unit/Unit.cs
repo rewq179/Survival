@@ -8,12 +8,25 @@ public class Unit : MonoBehaviour
     private BehaviourModule behaviourModule = new();
     private CombatModule combatModule = new();
     private PlayerSaveData playerSaveData = new();
+    private int unitID;
 
-    public void Init()
+    public int UnitID => unitID;
+
+    public void Reset()
     {
+        combatModule.Reset();
+        transform.position = Vector3.zero;
+        gameObject.SetActive(false);
+    }
+
+    public void Init(int unitID, Vector3 position)
+    {
+        this.unitID = unitID;
         InitStatModule();
         SetHp();
         playerSaveData.Init(this);
+        transform.position = position;
+        gameObject.SetActive(true);
     }
 
     // StatModule
@@ -21,6 +34,7 @@ public class Unit : MonoBehaviour
     private void InitStatModule() => statModule.Init(playerSaveData.level);
 
     // CombatModule
+    public bool IsDead => combatModule.IsDead;
     public float CurHp => combatModule.CurHp;
     public event Action<float> OnHpChanged
     {

@@ -1,10 +1,10 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class BaseReader : ScriptableObject
+public abstract class BaseReader : ScriptableObject
 {
-    [Header("시트의 주소")][SerializeField] public string sheetAddress = "";
-    [Header("스프레드 시트의 시트 이름")][SerializeField] public string sheetName = "";
+    public string sheetAddress = "15RA8mCckMbGIXxx5Ukfmtih0TxDTEGkXiAVyrHf8Blw";
+    public abstract string sheetName { get; }
     [Header("읽기 시작할 행 번호")][SerializeField] public int startRow = 2;
     [Header("읽을 마지막 행 번호")][SerializeField] public int endRow = -1;
 }

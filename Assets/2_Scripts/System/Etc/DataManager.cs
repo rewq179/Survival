@@ -4,10 +4,14 @@ using System.Collections.Generic;
 public class DataManager : MonoBehaviour
 {
     public UnitDataReader unitDataReader;
+    public SpawnGroupDataReader spawnGroupDataReader;
     public SkillDataReader skillDataReader;
+    public WaveDataReader waveDataReader;
 
     private static Dictionary<int, UnitData> unitDatas = new();
     private static Dictionary<SkillKey, SkillData> skillDatas = new();
+    private static Dictionary<int, SpawnGroupData> spawnGroupDatas = new();
+    private static Dictionary<int, WaveData> waveDatas = new();
 
     public void Init()
     {
@@ -24,6 +28,20 @@ public class DataManager : MonoBehaviour
             SkillData skillData = skillDataReader.skillDatas[i];
             skillDatas.Add(skillData.skillKey, skillData);
         }
+
+        spawnGroupDatas.Clear();
+        for (int i = 0; i < spawnGroupDataReader.spawnGroupDatas.Count; i++)
+        {
+            SpawnGroupData spawnGroupData = spawnGroupDataReader.spawnGroupDatas[i];
+            spawnGroupDatas.Add(spawnGroupData.groupID, spawnGroupData);
+        }
+
+        waveDatas.Clear();
+        for (int i = 0; i < waveDataReader.waveDatas.Count; i++)
+        {
+            WaveData waveData = waveDataReader.waveDatas[i];
+            waveDatas.Add(waveData.waveID, waveData);
+        }
     }
 
     public static UnitData GetUnitData(int id)
@@ -38,6 +56,22 @@ public class DataManager : MonoBehaviour
     {
         if (skillDatas.TryGetValue(skillKey, out SkillData skillData))
             return skillData;
+
+        return null;
+    }
+
+    public static SpawnGroupData GetSpawnGroupData(int groupID)
+    {
+        if (spawnGroupDatas.TryGetValue(groupID, out SpawnGroupData spawnGroupData))
+            return spawnGroupData;
+
+        return null;
+    }
+
+    public static WaveData GetWaveData(int waveID)
+    {
+        if (waveDatas.TryGetValue(waveID, out WaveData waveData))
+            return waveData;
 
         return null;
     }

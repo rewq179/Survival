@@ -10,8 +10,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private DataManager dataManager;
     public ResourceManager resourceManager;
     public SkillManager skillManager;
+    public SpawnManager spawnManager;
 
     private Unit playerUnit;
+    private int currentWave;
 
     private void Awake()
     {
@@ -42,20 +44,24 @@ public class GameManager : MonoBehaviour
         SetupUnit();
         SetupUI();
 
-        playerUnit.Init();
+        playerUnit.Init(1001, Vector3.zero);
         playerUnit.AddGold(100);
         playerUnit.AddSkill(SkillKey.Arrow);
         playerUnit.AddSkill(SkillKey.Dagger);
         playerUnit.AddSkill(SkillKey.FrontSpike);
         playerUnit.AddSkill(SkillKey.Meteor);
 
+        spawnManager.Init(currentWave);
         InputManager.Instance.EnablePlayerInput();
     }
 
     private void CreatePlayerUnit()
     {
         if (playerUnit == null)
+        {
             playerUnit = Instantiate(playerUnitPrefab, Vector3.zero, Quaternion.identity).GetComponent<Unit>();
+            spawnManager.SetPlayerTransform(playerUnit.transform);
+        }
     }
 
     private void SetUpSkillManager()
