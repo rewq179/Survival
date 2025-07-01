@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     public SkillManager skillManager;
     public SpawnManager spawnManager;
     public CameraManager cameraManager;
+    public DamageTextMgr damageTextMgr;
 
     private Unit playerUnit;
     private int currentWave;

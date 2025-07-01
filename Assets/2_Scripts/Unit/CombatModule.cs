@@ -43,6 +43,6 @@ public class CombatModule
 
     public void AttackTarget(Unit attacker, Unit target, SkillKey skillKey)
     {
-        
+        GameManager.Instance.damageTextMgr.ShowDamageText(target.transform.position, 10, Color.red);
     }
 }

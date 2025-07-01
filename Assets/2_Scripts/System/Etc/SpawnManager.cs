@@ -12,8 +12,7 @@ public class SpawnManager : MonoBehaviour
         Random,
     }
 
-    [Header("스폰 설정")]
-    private float spawnRadius = 6f;
+    private float SPAWN_RADIUS = 6f;
 
     // 웨이브 관리
     private List<WaveData> waveDatas = new();
@@ -295,15 +294,15 @@ public class SpawnManager : MonoBehaviour
     {
         Vector2 randomPoint = UnityEngine.Random.insideUnitCircle.normalized;
 
-        float x = playerPos.x + spawnRadius * randomPoint.x;
-        float z = playerPos.z + spawnRadius * randomPoint.y;
+        float x = playerPos.x + SPAWN_RADIUS * randomPoint.x;
+        float z = playerPos.z + SPAWN_RADIUS * randomPoint.y;
 
         return new Vector3(x, 0f, z);
     }
 
     private Vector3 GetRectangleSpawnPosition(Vector3 playerPos)
     {
-        float halfSize = spawnRadius * 0.5f;
+        float halfSize = SPAWN_RADIUS * 0.5f;
         float randomSide = UnityEngine.Random.Range(0f, 4f);
 
         float x, z;
@@ -338,7 +337,7 @@ public class SpawnManager : MonoBehaviour
     private Vector3 GetRandomSpawnPosition(Vector3 playerPos)
     {
         // 반지름 6인 원의 외각에 랜덤 배치 (0.8 ~ 1.0 배율)
-        float randomRadius = UnityEngine.Random.Range(0.8f, 1.0f) * spawnRadius;
+        float randomRadius = UnityEngine.Random.Range(0.8f, 1.0f) * SPAWN_RADIUS;
         Vector2 randomPoint = UnityEngine.Random.insideUnitCircle.normalized;
 
         float x = playerPos.x + randomRadius * randomPoint.x;

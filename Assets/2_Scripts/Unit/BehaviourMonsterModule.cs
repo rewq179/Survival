@@ -97,9 +97,10 @@ public class BehaviourMonsterModule : BehaviourModule
 
     private void AttackPlayer()
     {
-        if (!isAttacking)
-            isAttacking = true;
+        if (isAttacking)
+            return;
 
+        isAttacking = true;
         Vector3 direction = GetDirection();
 
         if (direction != Vector3.zero)
