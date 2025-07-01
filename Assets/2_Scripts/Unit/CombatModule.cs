@@ -40,4 +40,9 @@ public class CombatModule
         isDead = true;
         // 죽음 로직
     }
+
+    public void AttackTarget(Unit attacker, Unit target, SkillKey skillKey)
+    {
+        
+    }
 }

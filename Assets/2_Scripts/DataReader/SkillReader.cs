@@ -20,6 +20,7 @@ public enum SkillKey
     EnergyExplosion,
     LightningStrike,
     Meteor,
+    StingAttack,
     Max,
 }
 
@@ -34,7 +35,7 @@ public class SkillData
     public List<IndicatorElement> elements;
     public SkillLauncherType launcherType;
 
-    public SkillData(SkillKey skillKey, string name, string description, float cooldown, float reqLevel, 
+    public SkillData(SkillKey skillKey, string name, string description, float cooldown, float reqLevel,
         List<IndicatorElement> elements, SkillLauncherType launcherType)
     {
         this.skillKey = skillKey;
@@ -114,7 +115,7 @@ public class SkillDataReader : BaseReader
     private List<IndicatorElement> DecodeIndicatorElement(SkillKey skillKey, string indicatorString)
     {
         List<IndicatorElement> elements = new List<IndicatorElement>();
-        
+
         /// Line : 1.5 / 6, Circle : 2.5 / 360
         string[] splits = indicatorString.Split(',');
         foreach (string str in splits)

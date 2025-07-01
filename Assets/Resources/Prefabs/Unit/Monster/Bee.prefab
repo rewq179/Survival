@@ -2496,7 +2496,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4489866432029588}
@@ -2568,6 +2568,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9044eb9597e70a47ba698d18aa6fa98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animator: {fileID: 95212052626076970}
 --- !u!95 &95212052626076970
 Animator:
   serializedVersion: 7

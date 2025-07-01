@@ -436,11 +436,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e51032e36ecb4d4facc4db07c198eb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerUnitPrefab: {fileID: 6160173251280666463, guid: 057bea8c2316a6d479085c6d6f723dbb, type: 3}
+  playerUnitPrefab: {fileID: 3091725795815606636, guid: 057bea8c2316a6d479085c6d6f723dbb, type: 3}
   dataManager: {fileID: 267096342}
   resourceManager: {fileID: 170821100}
   skillManager: {fileID: 880473370}
   spawnManager: {fileID: 2143306119}
+  cameraManager: {fileID: 330585548}
 --- !u!4 &267096341
 Transform:
   m_ObjectHideFlags: 0
@@ -5797,7 +5798,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02d3eb6e7bfcb0040aa3003a5223c893, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unitPrefab: {fileID: 0}
 --- !u!224 &8331562224402740
 RectTransform:
   m_ObjectHideFlags: 0

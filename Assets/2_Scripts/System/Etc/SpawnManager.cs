@@ -14,7 +14,6 @@ public class SpawnManager : MonoBehaviour
 
     [Header("스폰 설정")]
     private float spawnRadius = 6f;
-    [SerializeField] private Unit unitPrefab;
 
     // 웨이브 관리
     private List<WaveData> waveDatas = new();

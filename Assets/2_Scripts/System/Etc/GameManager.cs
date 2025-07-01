@@ -11,9 +11,12 @@ public class GameManager : MonoBehaviour
     public ResourceManager resourceManager;
     public SkillManager skillManager;
     public SpawnManager spawnManager;
+    public CameraManager cameraManager;
 
     private Unit playerUnit;
     private int currentWave;
+
+    public Unit PlayerUnit => playerUnit;
 
     private void Awake()
     {
@@ -44,7 +47,6 @@ public class GameManager : MonoBehaviour
         SetupUnit();
         SetupUI();
 
-        playerUnit.Init(1001, Vector3.zero);
         playerUnit.AddGold(100);
         playerUnit.AddSkill(SkillKey.Arrow);
         playerUnit.AddSkill(SkillKey.Dagger);
@@ -61,7 +63,10 @@ public class GameManager : MonoBehaviour
         {
             playerUnit = Instantiate(playerUnitPrefab, Vector3.zero, Quaternion.identity).GetComponent<Unit>();
             spawnManager.SetPlayerTransform(playerUnit.transform);
+            cameraManager.SetTarget(playerUnit.transform);
         }
+        
+        playerUnit.Init(101, Vector3.zero);
     }
 
     private void SetUpSkillManager()

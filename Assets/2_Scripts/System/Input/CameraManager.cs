@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Video;
 
 public class CameraManager : MonoBehaviour
 {
@@ -10,6 +9,11 @@ public class CameraManager : MonoBehaviour
     private void LateUpdate()
     {
         MoveTarget();
+    }
+
+    public void SetTarget(Transform target)
+    {
+        this.target = target;
     }
 
     private void MoveTarget()

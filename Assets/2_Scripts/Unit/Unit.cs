@@ -4,11 +4,13 @@ using System.Collections.Generic;
 
 public class Unit : MonoBehaviour
 {
-    private StatModule statModule = new();
-    private BehaviourModule behaviourModule = new();
-    private CombatModule combatModule = new();
+    [SerializeField] private Animator animator;
+    private StatModule statModule;
+    private BehaviourModule behaviourModule;
     private PlayerSaveData playerSaveData = new();
+    private CombatModule combatModule;
     private int unitID;
+    private bool isPlayer;
 
     public int UnitID => unitID;
 
@@ -22,16 +24,44 @@ public class Unit : MonoBehaviour
     public void Init(int unitID, Vector3 position)
     {
         this.unitID = unitID;
-        InitStatModule();
+        isPlayer = unitID < 1000;
+        InitModule();
         SetHp();
         playerSaveData.Init(this);
         transform.position = position;
         gameObject.SetActive(true);
     }
 
+    private void InitModule()
+    {
+        if (statModule == null)
+            statModule = new StatModule();
+        if (behaviourModule == null)
+            behaviourModule = isPlayer ? new BehaviourPlayerModule() : new BehaviourMonsterModule();
+        if (combatModule == null)
+            combatModule = new CombatModule();
+        if (playerSaveData == null)
+            playerSaveData = new PlayerSaveData();
+
+        statModule.Init(playerSaveData.level);
+        behaviourModule.Init(this);
+    }
+
+    private void Update()
+    {
+        behaviourModule?.Update();
+    }
+
+    // 애니메이션
+    public void PlayAnimation(string name) => animator.Play(name);
+    public void SetTrigger(string name) => animator.SetTrigger(name);
+
     // StatModule
     public float MaxHp => statModule.MaxHp;
-    private void InitStatModule() => statModule.Init(playerSaveData.level);
+    public float MoveSpd => statModule.MoveSpd;
+
+    // BehaviourModule
+    public void OnAttackAnimationEnd() => behaviourModule.OnAttackAnimationEnd();
 
     // CombatModule
     public bool IsDead => combatModule.IsDead;
@@ -43,6 +73,11 @@ public class Unit : MonoBehaviour
     }
 
     public void SetHp() => combatModule.SetHp(statModule);
+    public void AttackTarget(Unit attacker, Unit target, SkillKey skillKey)
+    {
+        combatModule.AttackTarget(attacker, target, skillKey);
+    }
+
     public void TakeDamage(float damage) => combatModule.TakeDamage(damage);
 
     // PlayerSaveData
