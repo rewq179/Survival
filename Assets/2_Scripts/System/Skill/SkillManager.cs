@@ -15,7 +15,7 @@ public class SkillManager : MonoBehaviour
     private Dictionary<SkillKey, float> skillCooldownTimes = new();
 
     // 스킬 인디케이터
-    [SerializeField] private GameObject indicatorPrefab;
+    [SerializeField] private SkillIndicator indicatorPrefab;
     [SerializeField] private Material indicatorMaterial;
     private List<SkillIndicator> activeIndicators = new();
     private Dictionary<SkillKey, List<SkillIndicator>> indicatorGroups = new();
@@ -32,16 +32,17 @@ public class SkillManager : MonoBehaviour
 
     // 스킬 인스턴스 관리
     [Header("스킬 런처 프리팹")]
-    [SerializeField] private ProjectileLauncher projectileLauncherPrefab;
-    [SerializeField] private InstantAOELauncher instantAOELauncherPrefab;
-    [SerializeField] private PersistentAOELauncher persistentAOELauncherPrefab;
+    [SerializeField] private SkillLauncher skillLauncherPrefab;
     private List<SkillLauncher> activeLaunchers = new();
-    private Dictionary<SkillLauncherType, Stack<SkillLauncher>> launcherPools = new();
+    private Stack<SkillLauncher> launcherPools = new();
     private Dictionary<SkillKey, Stack<SkillParticleController>> particlePools = new();
 
-    private void Awake()
+    private void Start()
     {
-        InitializeMeshPools();
+        for (SkillIndicatorType i = 0; i < SkillIndicatorType.Max; i++)
+        {
+            meshPools.Add(i, new Stack<Mesh>());
+        }
     }
 
     private void Update()
@@ -130,7 +131,7 @@ public class SkillManager : MonoBehaviour
         if (currentCooldowns.ContainsKey(skillKey) && currentCooldowns[skillKey] <= 0f)
         {
             RemoveIndicatorsByskillKey(skillKey);
-            CreateIndicator(skillKey, playerController.transform.position, true);
+            ShowIndicator(skillKey, playerController.transform.position, true);
         }
     }
 
@@ -164,9 +165,12 @@ public class SkillManager : MonoBehaviour
             activeCooldownSkills.Add(skillKey);
 
         SkillData skillData = DataManager.GetSkillData(skillKey);
-        CreateSkillLauncher(skillData, startPosition, targetPosition);
+        Unit caster = playerController.GetComponent<Unit>();
+        CreateSkillLauncher(skillData, startPosition, targetPosition, caster);
         RemoveIndicatorsByskillKey(skillKey);
     }
+
+    #region Indicator
 
     private void UpdateIndicator()
     {
@@ -220,34 +224,32 @@ public class SkillManager : MonoBehaviour
         {
             if (activeIndicators[i].Element.skillKey == skillKey)
             {
-                RemoveActiveIndicator(i);
+                RemoveIndicator(i);
             }
         }
     }
 
-    public void CreateIndicator(SkillKey skillKey, Vector3 start, bool isPlayerIndicator)
+    public void ShowIndicator(SkillKey skillKey, Vector3 start, bool isPlayerIndicator)
     {
         SkillData skillData = DataManager.GetSkillData(skillKey);
 
-        if (skillData.elements.Count > 1) // 복합 인디케이터
+        if (skillData.indicatorElements.Count > 1) // 복합 인디케이터
         {
-            CreateMultipleIndicators(skillData, start, isPlayerIndicator);
+            ShowMultipleIndicators(skillData, start, isPlayerIndicator);
         }
 
         else // 단일 인디케이터
         {
-            SkillIndicator indicator = PopIndicator();
-            indicator.Init(skillData.elements[0], indicatorMaterial, PopMesh(skillData.elements[0]), isPlayerIndicator);
+            SkillIndicator indicator = CreateIndicator(skillData.indicatorElements[0], isPlayerIndicator);
             indicator.DrawIndicator(start, Vector3.zero);
         }
     }
 
-    private void CreateMultipleIndicators(SkillData skillData, Vector3 start, bool isPlayerIndicator)
+    private void ShowMultipleIndicators(SkillData skillData, Vector3 start, bool isPlayerIndicator)
     {
-        for (int i = 0; i < skillData.elements.Count; i++)
+        for (int i = 0; i < skillData.indicatorElements.Count; i++)
         {
-            SkillIndicator indicator = PopIndicator();
-            indicator.Init(skillData.elements[i], indicatorMaterial, PopMesh(skillData.elements[i]), isPlayerIndicator);
+            SkillIndicator indicator = CreateIndicator(skillData.indicatorElements[i], isPlayerIndicator);
 
             if (i == 0)
             {
@@ -256,27 +258,16 @@ public class SkillManager : MonoBehaviour
 
             else
             {
-                Vector3 previousEndPoint = SkillIndicator.GetElementEndPoint(start, Vector3.zero, skillData.elements[i - 1]);
+                Vector3 previousEndPoint = SkillIndicator.GetElementEndPoint(start, Vector3.zero, skillData.indicatorElements[i - 1]);
                 indicator.DrawIndicator(previousEndPoint, Vector3.zero);
             }
         }
     }
 
-    private void RemoveActiveIndicator(int index)
+    private SkillIndicator CreateIndicator(IndicatorElement element, bool isPlayerIndicator)
     {
-        if (activeIndicators.Count <= index)
-            return;
-
-        SkillIndicator indicator = activeIndicators[index];
-        activeIndicators.RemoveAt(index);
-        PushMesh(indicator.Element.type, indicator.Mesh);
-        PushIndicator(indicator);
-    }
-
-    private SkillIndicator PopIndicator()
-    {
-        if (!indicatorPool.TryPop(out SkillIndicator indicator))
-            indicator = Instantiate(indicatorPrefab, transform).GetComponent<SkillIndicator>();
+        SkillIndicator indicator = PopIndicator();
+        indicator.Init(element, indicatorMaterial, PopMesh(element), isPlayerIndicator);
 
         activeIndicators.Add(indicator);
         SkillKey skillKey = indicator.Element.skillKey;
@@ -288,40 +279,15 @@ public class SkillManager : MonoBehaviour
         return indicator;
     }
 
-    private void PushIndicator(SkillIndicator indicator)
+    private void RemoveIndicator(int index)
     {
-        indicator.Reset();
-        indicatorPool.Push(indicator);
-    }
+        if (activeIndicators.Count <= index)
+            return;
 
-    #region Mesh
-
-    private void InitializeMeshPools()
-    {
-        Array types = Enum.GetValues(typeof(SkillIndicatorType));
-        foreach (SkillIndicatorType type in types)
-        {
-            meshPools[type] = new Stack<Mesh>();
-        }
-    }
-
-    private Mesh PopMesh(IndicatorElement element)
-    {
-        if (meshPools[element.type].TryPop(out Mesh mesh))
-            return mesh;
-
-        return element.type switch
-        {
-            SkillIndicatorType.Line => SkillIndicator.CreateLineMesh(element.length, element.width),
-            SkillIndicatorType.Sector => SkillIndicator.CreateSectorMesh(element.angle, element.radius),
-            SkillIndicatorType.Circle => SkillIndicator.CreateCircleMesh(element.radius),
-            _ => null,
-        };
-    }
-
-    private void PushMesh(SkillIndicatorType type, Mesh mesh)
-    {
-        meshPools[type].Push(mesh);
+        SkillIndicator indicator = activeIndicators[index];
+        activeIndicators.RemoveAt(index);
+        PushMesh(indicator.Element.type, indicator.Mesh);
+        PushIndicator(indicator);
     }
 
     #endregion
@@ -339,7 +305,7 @@ public class SkillManager : MonoBehaviour
         }
     }
 
-    private void CreateSkillLauncher(SkillData skillData, Vector3 startPos, Vector3 targetPos)
+    private SkillLauncher CreateSkillLauncher(SkillData skillData, Vector3 startPos, Vector3 targetPos, Unit caster, Unit target = null)
     {
         SkillLauncherType type = skillData.launcherType;
         targetPos.y = 0f;
@@ -350,46 +316,105 @@ public class SkillManager : MonoBehaviour
             SkillLauncherType.Projectile => startPos,
             SkillLauncherType.InstantAOE => startPos,
             SkillLauncherType.PersistentAOE => targetPos,
+            SkillLauncherType.InstantAttack => startPos,
             _ => Vector3.zero,
         };
 
         // 런처 생성
         Vector3 direction = (targetPos - startPos).normalized;
-        SkillLauncher launcher = PopSkillLauncher(type);
-        SkillParticleController particle = PopParticle(skillData.skillKey, launcher.transform);
-        launcher.Initialize(skillData, startPos, direction, playerController.GetComponent<Unit>(), particle);
-        AddSkillEffects(launcher, skillData.skillKey);
-    }
-
-    private SkillLauncher PopSkillLauncher(SkillLauncherType launcherType)
-    {
-        SkillLauncher launcher = null;
-        if (launcherPools.TryGetValue(launcherType, out Stack<SkillLauncher> pool) && pool.Count > 0)
-            launcher = pool.Pop();
-
-        else
-        {
-            launcher = launcherType switch
-            {
-                SkillLauncherType.Projectile => Instantiate(projectileLauncherPrefab, Vector3.zero, Quaternion.identity),
-                SkillLauncherType.InstantAOE => Instantiate(instantAOELauncherPrefab, Vector3.zero, Quaternion.identity),
-                SkillLauncherType.PersistentAOE => Instantiate(persistentAOELauncherPrefab, Vector3.zero, Quaternion.identity),
-                _ => null,
-            };
-        }
-
+        SkillLauncher launcher = PopSkillLauncher();
         activeLaunchers.Add(launcher);
+        SkillParticleController particle = PopParticle(skillData.skillKey, launcher.transform);
+        launcher.Initialize(skillData, startPos, direction, particle, caster, target);
         return launcher;
     }
 
-    public void PushLauncher(SkillLauncher launcher)
+    public void RemoveLauncher(SkillLauncher launcher)
     {
-        if (!launcherPools.ContainsKey(launcher.Type))
-            launcherPools[launcher.Type] = new Stack<SkillLauncher>();
-
-        launcher.Reset();
+        PushLauncher(launcher);
         activeLaunchers.Remove(launcher);
-        launcherPools[launcher.Type].Push(launcher);
+    }
+
+    /// <summary>
+    /// 몬스터 공격용
+    /// </summary>
+    public void ExecuteMonsterAttack(SkillKey skillKey, Unit caster, Unit target)
+    {
+        SkillData skillData = DataManager.GetSkillData(skillKey);
+
+        // 몬스터 위치에서 공격 실행
+        Vector3 startPos = caster.transform.position;
+        Vector3 targetPos = target.transform.position;
+        CreateSkillLauncher(skillData, startPos, targetPos, caster, target);
+    }
+
+    /// <summary>
+    /// 몬스터 공격용 임시 런처 (GameObject 없이 동작)
+    /// </summary>
+    private class TempSkillLauncher
+    {
+        public Unit Caster { get; }
+        public Vector3 Position { get; }
+        public bool IsAffectCaster => false;
+
+        public TempSkillLauncher(Unit caster, Vector3 position)
+        {
+            Caster = caster;
+            Position = position;
+        }
+
+        public void Deactivate() { }
+    }
+
+    #endregion
+
+    #region Object Pool
+
+    private void PushIndicator(SkillIndicator indicator)
+    {
+        indicator.Reset();
+        indicatorPool.Push(indicator);
+    }
+
+    private SkillIndicator PopIndicator()
+    {
+        if (indicatorPool.TryPop(out SkillIndicator indicator))
+            return indicator;
+
+        return Instantiate(indicatorPrefab, transform);
+    }
+
+    private void PushMesh(SkillIndicatorType type, Mesh mesh)
+    {
+        meshPools[type].Push(mesh);
+    }
+
+    private Mesh PopMesh(IndicatorElement element)
+    {
+        if (meshPools[element.type].TryPop(out Mesh mesh))
+            return mesh;
+
+        return element.type switch
+        {
+            SkillIndicatorType.Line => SkillIndicator.CreateLineMesh(element.length, element.width),
+            SkillIndicatorType.Sector => SkillIndicator.CreateSectorMesh(element.angle, element.radius),
+            SkillIndicatorType.Circle => SkillIndicator.CreateCircleMesh(element.radius),
+            _ => null,
+        };
+    }
+
+    private void PushLauncher(SkillLauncher launcher)
+    {
+        launcher.Reset();
+        launcherPools.Push(launcher);
+    }
+
+    private SkillLauncher PopSkillLauncher()
+    {
+        if (launcherPools.TryPop(out SkillLauncher launcher))
+            return launcher;
+
+        return Instantiate(skillLauncherPrefab, Vector3.zero, Quaternion.identity);
     }
 
     private SkillParticleController PopParticle(SkillKey skillKey, Transform parent)
@@ -401,55 +426,20 @@ public class SkillManager : MonoBehaviour
             return particle;
         }
 
-        return GameManager.Instance.resourceManager.GetSkillEffect(parent, skillKey).GetComponent<SkillParticleController>();
+        return GameManager.Instance.resourceManager.GetSkillEffect(parent, skillKey);
     }
 
     public void PushParticle(SkillKey skillKey, SkillParticleController particle)
     {
+        if (particle == null)
+            return;
+
         if (!particlePools.ContainsKey(skillKey))
             particlePools[skillKey] = new Stack<SkillParticleController>();
 
         particle.Reset();
         particle.transform.SetParent(transform);
         particlePools[skillKey].Push(particle);
-    }
-
-    private void AddSkillEffects(SkillLauncher launcher, SkillKey skillKey)
-    {
-        SkillData skillData = DataManager.GetSkillData(skillKey);
-
-        switch (skillData.skillKey)
-        {
-            case SkillKey.Arrow:
-                launcher.AddEffect(new DirectDamageEffect(30f));
-                break;
-
-            case SkillKey.Dagger:
-                launcher.AddEffect(new DirectDamageEffect(25f));
-                break;
-
-            case SkillKey.Laser:
-                launcher.AddEffect(new DirectDamageEffect(40f));
-                launcher.AddEffect(new TrailExplosionEffect(1.5f, 10f, 0.2f));
-                break;
-
-            case SkillKey.Nova:
-                launcher.AddEffect(new DirectDamageEffect(35f));
-                break;
-
-            case SkillKey.EnergyExplosion:
-                launcher.AddEffect(new DirectDamageEffect(45f));
-                break;
-
-            case SkillKey.LightningStrike:
-                launcher.AddEffect(new PeriodicDamageEffect(15f, 1f));
-                break;
-
-            case SkillKey.Meteor:
-                launcher.AddEffect(new PeriodicDamageEffect(20f, 0.5f));
-                launcher.AddEffect(new FinalExplosionEffect(4f, 30f));
-                break;
-        }
     }
 
     #endregion

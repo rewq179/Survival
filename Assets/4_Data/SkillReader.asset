@@ -14,52 +14,64 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SkillDataReader
   sheetAddress: 15RA8mCckMbGIXxx5Ukfmtih0TxDTEGkXiAVyrHf8Blw
   startRow: 2
-  endRow: 9
+  endRow: 10
   skillDatas:
   - skillKey: 0
     name: Arrow
     description: "\uD654\uC0B4\uC744 \uB0A0\uB9BD\uB2C8\uB2E4."
     cooldown: 2
     reqLevel: 0
-    elements:
+    indicatorElements:
     - skillKey: 0
       index: 0
       type: 0
-      length: 10
-      width: 0.5
+      moveSpeed: 15
+      length: 12
+      width: 0.4
       angle: 0
       radius: 0
-      maxDistance: 0.8
+      maxDistance: 0.64000005
+    skillElements:
+    - damage: 12
+      interval: 0
     launcherType: 0
   - skillKey: 1
     name: Dagger
     description: "\uD68C\uC218\uB418\uB294 \uCE7C\uC744 \uB358\uC9D1\uB2C8\uB2E4."
     cooldown: 4
     reqLevel: 0
-    elements:
+    indicatorElements:
     - skillKey: 1
       index: 0
       type: 0
-      length: 7
-      width: 1
+      moveSpeed: 18
+      length: 9
+      width: 0.8
       angle: 0
       radius: 0
-      maxDistance: 1.6
+      maxDistance: 1.2800001
+    skillElements:
+    - damage: 10
+      interval: 0
     launcherType: 0
   - skillKey: 2
     name: Laser
     description: "\uB808\uC774\uC800\uB97C \uC3E9\uB2C8\uB2E4."
     cooldown: 5
     reqLevel: 0
-    elements:
+    indicatorElements:
     - skillKey: 2
       index: 0
       type: 0
+      moveSpeed: 100
       length: 7
       width: 2.5
       angle: 0
       radius: 0
       maxDistance: 4
+    skillElements:
+    - damage: 20
+      interval: 0
     launcherType: 1
   - skillKey: 3
     name: Nova
@@ -67,10 +79,11 @@ MonoBehaviour:
       \uC77C\uC73C\uD0B5\uB2C8\uB2E4."
     cooldown: 5
     reqLevel: 0
-    elements:
+    indicatorElements:
     - skillKey: 3
       index: 0
       type: 0
+      moveSpeed: 0
       length: 10
       width: 0.5
       angle: 0
@@ -79,69 +92,108 @@ MonoBehaviour:
     - skillKey: 3
       index: 1
       type: 2
+      moveSpeed: 0
       length: 0
       width: 0
       angle: 360
-      radius: 2.5
-      maxDistance: 5
+      radius: 25
+      maxDistance: 50
+    skillElements:
+    - damage: 10
+      interval: 0
     launcherType: 1
   - skillKey: 4
     name: FrontSpike
     description: "\uBD80\uCC44\uAF34 \uD615\uD0DC\uC758 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
     cooldown: 4
     reqLevel: 0
-    elements:
+    indicatorElements:
     - skillKey: 4
       index: 0
       type: 1
+      moveSpeed: 0
       length: 0
       width: 0
       angle: 60
       radius: 8.2
       maxDistance: 16.4
+    skillElements:
+    - damage: 22
+      interval: 0
     launcherType: 1
   - skillKey: 5
     name: EnergyExplosion
     description: "\uB2E8\uBC1C\uC131 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
     cooldown: 7.5
     reqLevel: 0
-    elements:
+    indicatorElements:
     - skillKey: 5
       index: 0
       type: 2
+      moveSpeed: 0
       length: 0
       width: 0
       angle: 360
       radius: 3.5
       maxDistance: 7
+    skillElements:
+    - damage: 45
+      interval: 0
     launcherType: 1
   - skillKey: 6
     name: LightningStrike
     description: "\uC9C0\uC18D\uC801\uC778 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
     cooldown: 10
     reqLevel: 0
-    elements:
+    indicatorElements:
     - skillKey: 6
       index: 0
       type: 2
+      moveSpeed: 0
       length: 0
       width: 0
       angle: 360
       radius: 2.5
       maxDistance: 5
+    skillElements:
+    - damage: 18
+      interval: 0.5
     launcherType: 2
   - skillKey: 7
     name: Meteor
     description: "\uC9C0\uC18D\uC801\uC778 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
     cooldown: 12
     reqLevel: 0
-    elements:
+    indicatorElements:
     - skillKey: 7
       index: 0
       type: 2
+      moveSpeed: 0
       length: 0
       width: 0
       angle: 360
       radius: 3.1
       maxDistance: 6.2
+    skillElements:
+    - damage: 20
+      interval: 0.5
     launcherType: 2
+  - skillKey: 8
+    name: StingAttack
+    description: "\uC989\uC2DC \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
+    cooldown: 0.5
+    reqLevel: 0
+    indicatorElements:
+    - skillKey: 8
+      index: 0
+      type: 3
+      moveSpeed: 0
+      length: 0
+      width: 0
+      angle: 0
+      radius: 0
+      maxDistance: 0
+    skillElements:
+    - damage: 10
+      interval: 0
+    launcherType: 3

@@ -48,7 +48,7 @@ public class PlayerSaveData
         OnExpChanged?.Invoke(exp);
         if (levelUpCount > 0)
         {
-            unit.SetHp();
+            unit.UpdateHp();
             OnLevelChanged?.Invoke(level);
         }
 

@@ -6,15 +6,14 @@ public enum SkillLauncherType
     Projectile,
     InstantAOE,
     PersistentAOE,
+    InstantAttack,
     Max,
 }
 
-public abstract class SkillLauncher : MonoBehaviour
+public class SkillLauncher : MonoBehaviour
 {
-    public abstract SkillLauncherType Type { get; }
     protected SkillKey skillKey;
     protected float duration;
-    protected float range;
     protected bool isAffectCaster;
 
     protected Vector3 startPosition;
@@ -29,32 +28,8 @@ public abstract class SkillLauncher : MonoBehaviour
     public bool IsActive => isActive;
     public Vector3 Position => transform.position;
     public Unit Caster => caster;
-    public float Range => range;
     public bool IsAffectCaster => isAffectCaster;
-
-    public virtual void Initialize(SkillData skillData, Vector3 startPos, Vector3 dir, Unit caster, SkillParticleController particleController)
-    {
-        skillKey = skillData.skillKey;
-        startPosition = startPos;
-        direction = dir.normalized;
-        this.caster = caster;
-        this.particleController = particleController;
-        isActive = true;
-        elapsedTime = 0f;
-        range = skillData.elements[0].length;
-;
-        transform.rotation = Quaternion.LookRotation(direction);
-        transform.position = startPos;
-        gameObject.SetActive(true);
-
-        OnInitialize();
-
-        if (particleController != null)
-        {
-            particleController.OnParticleFinished += OnParticleFinished;
-            particleController.Play();
-        }
-    }
+    public Vector3 Direction => direction;
 
     public void Reset()
     {
@@ -74,11 +49,12 @@ public abstract class SkillLauncher : MonoBehaviour
 
         elapsedTime += Time.deltaTime;
 
-        UpdateMovement();
-
-        foreach (var effect in skillEffects)
+        for (int i = skillEffects.Count - 1; i >= 0; i--)
         {
-            effect.OnUpdate(Time.deltaTime);
+            if (skillEffects[i] != null)
+            {
+                skillEffects[i].OnUpdate(Time.deltaTime);
+            }
         }
 
         if (particleController == null && duration > 0f && elapsedTime >= duration)
@@ -87,20 +63,73 @@ public abstract class SkillLauncher : MonoBehaviour
         }
     }
 
-    protected abstract void UpdateMovement();
-    protected virtual void OnInitialize() { }
-    protected virtual void OnDeactivate() { }
+    public virtual void Initialize(SkillData skillData, Vector3 startPos, Vector3 dir, SkillParticleController particleController,
+        Unit caster, Unit fixedTarget = null)
+    {
+        skillKey = skillData.skillKey;
+        startPosition = startPos;
+        direction = dir.normalized;
+        this.caster = caster;
+        this.particleController = particleController;
+        isActive = true;
+        elapsedTime = 0f;
+        isAffectCaster = false;
+        transform.rotation = Quaternion.LookRotation(direction);
+        transform.position = startPos;
+        gameObject.SetActive(true);
 
-    public virtual void Deactivate()
+        // 스킬 데이터 기반으로 효과들 자동 추가
+        SetupSkillEffects(skillData, fixedTarget);
+
+        if (particleController != null)
+        {
+            particleController.OnParticleFinished += OnParticleFinished;
+            particleController.Play();
+        }
+    }
+
+    private void SetupSkillEffects(SkillData skillData, Unit fixedTarget)
+    {
+        skillEffects.Clear();
+
+        for (int i = 0; i < skillData.skillElements.Count; i++)
+        {
+            switch (skillData.launcherType)
+            {
+                case SkillLauncherType.Projectile:
+                    skillEffects.Add(new ProjectileMovementEffect(skillData, i));
+                    break;
+
+                case SkillLauncherType.InstantAOE:
+                    skillEffects.Add(new AOEDamageEffect(skillData, i));
+                    break;
+
+                case SkillLauncherType.PersistentAOE:
+                    skillEffects.Add(new PeriodicDamageEffect(skillData, i));
+                    break;
+
+                case SkillLauncherType.InstantAttack:
+                    skillEffects.Add(new InstantAttackEffect(skillData, i, fixedTarget));
+                    break;
+            }
+
+            skillEffects[i].OnInitialize(this);
+        }
+    }
+
+    public void Deactivate()
     {
         if (!isActive)
             return;
 
         isActive = false;
 
-        foreach (ISkillEffect effect in skillEffects)
+        for (int i = skillEffects.Count - 1; i >= 0; i--)
         {
-            effect.OnDestroy();
+            if (skillEffects[i] != null)
+            {
+                skillEffects[i].OnDestroy();
+            }
         }
 
         // 파티클 정지 및 이벤트 구독 해제
@@ -110,47 +139,12 @@ public abstract class SkillLauncher : MonoBehaviour
             particleController.Stop();
         }
 
-        OnDeactivate();
         GameManager.Instance.skillManager.PushParticle(skillKey, particleController);
-        GameManager.Instance.skillManager.PushLauncher(this);
-    }
-
-    public void AddEffect(ISkillEffect effect)
-    {
-        skillEffects.Add(effect);
-        effect.OnInitialize(this);
+        GameManager.Instance.skillManager.RemoveLauncher(this);
     }
 
     private void OnParticleFinished()
     {
         Deactivate();
-    }
-
-    public virtual void OnHitTarget(Unit target)
-    {
-        if (target == null || target == caster)
-            return;
-
-        foreach (var effect in skillEffects)
-        {
-            effect.OnHit(target);
-        }
-    }
-
-    public List<Unit> GetHitTargets(float radius, bool isAffectCaster)
-    {
-        Collider[] colliders = Physics.OverlapSphere(transform.position, radius, GameValue.UNIT_LAYERS);
-
-        List<Unit> hitTargets = new();
-        foreach (Collider col in colliders)
-        {
-            Unit target = col.GetComponent<Unit>();
-            if (target != null && (isAffectCaster || target != caster))
-            {
-                hitTargets.Add(target);
-            }
-        }
-
-        return hitTargets;
     }
 }

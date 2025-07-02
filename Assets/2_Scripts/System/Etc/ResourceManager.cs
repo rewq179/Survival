@@ -30,7 +30,7 @@ public class ResourceManager : MonoBehaviour
     private Dictionary<string, Sprite> skillIcons = new();
     private Dictionary<string, Sprite> equipmentIcons = new();
     private Dictionary<string, Sprite> itemIcons = new();
-    private Dictionary<SkillKey, GameObject> skillEffects = new();
+    private Dictionary<SkillKey, SkillParticleController> skillEffects = new();
     private Dictionary<int, Unit> unitPrefabs = new Dictionary<int, Unit>();
 
     public void LoadAllIcons()
@@ -64,8 +64,8 @@ public class ResourceManager : MonoBehaviour
 
     private void LoadSkillEffectsFromPath(string path)
     {
-        GameObject[] effects = Resources.LoadAll<GameObject>(path);
-        foreach (GameObject effect in effects)
+        SkillParticleController[] effects = Resources.LoadAll<SkillParticleController>(path);
+        foreach (SkillParticleController effect in effects)
         {
             skillEffects[Enum.Parse<SkillKey>(effect.name)] = effect;
         }
@@ -107,9 +107,9 @@ public class ResourceManager : MonoBehaviour
         return null;
     }
 
-    public GameObject GetSkillEffect(Transform parent, SkillKey skillKey)
+    public SkillParticleController GetSkillEffect(Transform parent, SkillKey skillKey)
     {
-        if (skillEffects.TryGetValue(skillKey, out GameObject effect))
+        if (skillEffects.TryGetValue(skillKey, out SkillParticleController effect))
             return Instantiate(effect, parent, false);
 
         return null;

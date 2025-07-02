@@ -2333,11 +2333,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d0bc936a1a7011408312b614b8348aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  indicatorPrefab: {fileID: 8145354025032384117, guid: a2191091ff4484c4ab1fbbe3fccb3add, type: 3}
+  indicatorPrefab: {fileID: 5778962347182750908, guid: a2191091ff4484c4ab1fbbe3fccb3add, type: 3}
   indicatorMaterial: {fileID: 2100000, guid: a8374ca2b54970944be55f48c1223249, type: 2}
-  projectileLauncherPrefab: {fileID: 5736700484530924378, guid: 0dcfec0595213404ba43120c83a8fd37, type: 3}
-  instantAOELauncherPrefab: {fileID: 8545124471310312822, guid: c4b7eca07b26697499bd7938c56f67a8, type: 3}
-  persistentAOELauncherPrefab: {fileID: 6895450010505295904, guid: 63484772eb7a4b445954c9f061afc7d3, type: 3}
+  skillLauncherPrefab: {fileID: 6623709548528215559, guid: 3202d541954e38d4383f54cf7006f96c, type: 3}
 --- !u!4 &880473371
 Transform:
   m_ObjectHideFlags: 0

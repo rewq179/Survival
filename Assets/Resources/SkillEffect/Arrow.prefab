@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 432229256211906080}
   - component: {fileID: 5641084316541034689}
   - component: {fileID: 2637007205915893103}
+  - component: {fileID: 212490571992077627}
   m_Layer: 0
   m_Name: Arrow
   m_TagString: Untagged
@@ -4920,6 +4921,27 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!135 &212490571992077627
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 692721096954561017}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.1
+  m_Center: {x: 0, y: 0, z: -0.1}
 --- !u!1 &5686646097213776635
 GameObject:
   m_ObjectHideFlags: 0

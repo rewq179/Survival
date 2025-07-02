@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.Video;
 
 /// <summary>
 /// 스킬 효과 인터페이스
@@ -13,139 +14,222 @@ public interface ISkillEffect
 }
 
 /// <summary>
-/// 직접 데미지 효과
+/// 발사체 이동 효과
 /// </summary>
-public class DirectDamageEffect : ISkillEffect
+public class ProjectileMovementEffect : ISkillEffect
 {
     private float damage;
+    private float moveSpeed;
+    private float maxRange;
+    private Vector3 startPosition;
+    private Vector3 direction;
+    private bool isHit;
     private SkillLauncher launcher;
 
-    public DirectDamageEffect(float damage)
+    public ProjectileMovementEffect(SkillData skillData, int index)
     {
-        this.damage = damage;
+        damage = skillData.skillElements[index].damage;
+        IndicatorElement element = skillData.indicatorElements[index];
+        moveSpeed = element.moveSpeed;
+        maxRange = element.length;
     }
 
-    public void OnInitialize(SkillLauncher launcher) => this.launcher = launcher;
-    public void OnUpdate(float deltaTime) { }
+    public void OnInitialize(SkillLauncher launcher)
+    {
+        this.launcher = launcher;
+        startPosition = launcher.Position;
+        direction = launcher.transform.forward;
+    }
+
+    public void OnUpdate(float deltaTime)
+    {
+        if (isHit)
+            return;
+
+        float moveDistance = moveSpeed * deltaTime;
+        launcher.transform.position += direction * moveDistance;
+
+        // 최대 거리 체크
+        float currentDistance = (launcher.Position - startPosition).sqrMagnitude;
+        if (currentDistance >= maxRange * maxRange)
+        {
+            launcher.Deactivate();
+            return;
+        }
+
+        // 충돌 체크
+        if (Physics.Raycast(launcher.Position, direction, out RaycastHit hit, moveDistance, GameValue.UNIT_LAYERS))
+        {
+            OnHit(hit.collider.GetComponent<Unit>());
+        }
+    }
 
     public void OnHit(Unit target)
     {
+        if (target == null)
+            return;
+
         target.TakeDamage(damage);
+        isHit = true;
+        launcher.transform.position = target.transform.position;
+        launcher.Deactivate();
     }
 
+    public void OnDestroy() { }
+}
+
+/// <summary>
+/// 범위 데미지 효과
+/// </summary>
+public class AOEDamageEffect : ISkillEffect
+{
+    protected SkillLauncher launcher;
+    protected SkillIndicatorType type;
+    protected float radius;
+    protected float maxDistance;
+    protected float length;
+    protected float width;
+    protected float angle;
+    protected float damage;
+
+    public AOEDamageEffect(SkillData skillData, int index)
+    {
+        damage = skillData.skillElements[index].damage;
+
+        IndicatorElement element = skillData.indicatorElements[index];
+        type = element.type;
+        radius = element.radius;
+        length = element.length;
+        width = element.width;
+        angle = element.angle;
+
+        maxDistance = type switch
+        {
+            SkillIndicatorType.Line => length * length,
+            SkillIndicatorType.Sector => radius * radius,
+            SkillIndicatorType.Circle => radius * radius,
+            _ => 0f,
+        };
+    }
+
+    public void OnInitialize(SkillLauncher launcher)
+    {
+        this.launcher = launcher;
+
+        List<Unit> targets = GetHitTargets(launcher.Position, launcher.Direction, launcher.IsAffectCaster);
+        foreach (Unit target in targets)
+        {
+            OnHit(target);
+        }
+    }
+
+    protected List<Unit> GetHitTargets(Vector3 position, Vector3 direction, bool isAffectCaster)
+    {
+        Collider[] colliders = Physics.OverlapSphere(position, radius, GameValue.UNIT_LAYERS);
+
+        List<Unit> hitTargets = new();
+        foreach (Collider col in colliders)
+        {
+            Unit target = col.GetComponent<Unit>();
+            if (target == null || (!isAffectCaster && target == launcher.Caster))
+                continue;
+
+            if (IsTargetInSkillArea(position, direction, target.transform.position))
+            {
+                hitTargets.Add(target);
+            }
+        }
+
+        return hitTargets;
+    }
+
+    protected bool IsTargetInSkillArea(Vector3 position, Vector3 direction, Vector3 targetPosition)
+    {
+        float sqrDistance = (targetPosition - position).sqrMagnitude;
+
+        return type switch
+        {
+            SkillIndicatorType.Line => false,
+            SkillIndicatorType.Sector => IsTargetInSectorArea(position, direction, targetPosition, sqrDistance),
+            SkillIndicatorType.Circle => IsTargetInCircleArea(sqrDistance),
+            _ => true,
+        };
+    }
+
+    private bool IsTargetInSectorArea(Vector3 position, Vector3 direction, Vector3 targetPosition, float sqrDistance)
+    {
+        if (sqrDistance > maxDistance)
+            return false;
+
+        float angle = Vector3.Angle(direction, (targetPosition - position).normalized);
+        return angle <= this.angle * 0.5f;
+    }
+
+    private bool IsTargetInCircleArea(float sqrDistance)
+    {
+        return sqrDistance <= maxDistance;
+    }
+
+    public virtual void OnUpdate(float deltaTime) { }
+    public virtual void OnHit(Unit target) { target.TakeDamage(damage); }
     public void OnDestroy() { }
 }
 
 /// <summary>
 /// 주기적 데미지 효과
 /// </summary>
-public class PeriodicDamageEffect : ISkillEffect
+public class PeriodicDamageEffect : AOEDamageEffect
 {
-    private float damage;
     private float interval;
     private float lastDamageTime;
-    private SkillLauncher launcher;
 
-    public PeriodicDamageEffect(float damage, float interval)
+    public PeriodicDamageEffect(SkillData skillData, int index) : base(skillData, index)
     {
-        this.damage = damage;
-        this.interval = interval;
+        interval = skillData.skillElements[index].interval;
     }
 
-    public void OnInitialize(SkillLauncher launcher) => this.launcher = launcher;
-
-    public void OnUpdate(float deltaTime)
+    public override void OnUpdate(float deltaTime)
     {
         if (Time.time - lastDamageTime >= interval)
         {
-            List<Unit> targets = launcher.GetHitTargets(launcher.Range, launcher.IsAffectCaster);
+            List<Unit> targets = GetHitTargets(launcher.Position, launcher.Direction, launcher.IsAffectCaster);
             foreach (Unit target in targets)
             {
-                target.TakeDamage(damage);
+                OnHit(target);
             }
 
             lastDamageTime = Time.time;
         }
     }
-
-    public void OnHit(Unit target) { }
-    public void OnDestroy() { }
 }
 
 /// <summary>
-/// 주변 폭발 효과 (발사체용)
+/// 즉시 공격 효과
 /// </summary>
-public class TrailExplosionEffect : ISkillEffect
+public class InstantAttackEffect : ISkillEffect
 {
-    private float explosionRadius;
-    private float explosionDamage;
-    private float interval;
-    private float lastExplosionTime;
+    private float damage;
+    private Unit target;
     private SkillLauncher launcher;
 
-    public TrailExplosionEffect(float radius, float damage, float interval)
+    public InstantAttackEffect(SkillData skillData, int index, Unit target)
     {
-        explosionRadius = radius;
-        explosionDamage = damage;
-        this.interval = interval;
+        damage = skillData.skillElements[index].damage;
+        this.target = target;
     }
 
-    public void OnInitialize(SkillLauncher launcher) => this.launcher = launcher;
-
-    public void OnUpdate(float deltaTime)
+    public void OnInitialize(SkillLauncher launcher)
     {
-        if (Time.time - lastExplosionTime >= interval)
-        {
-            CreateExplosion();
-            lastExplosionTime = Time.time;
-        }
+        this.launcher = launcher;
+        OnHit(target);
     }
 
-    private void CreateExplosion()
-    {
-        Collider[] hits = Physics.OverlapSphere(launcher.Position, explosionRadius, GameValue.UNIT_LAYERS);
-        foreach (var hit in hits)
-        {
-            if (hit.TryGetComponent(out Unit unit) && unit != launcher.Caster)
-            {
-                unit.TakeDamage(explosionDamage);
-            }
-        }
-    }
-
-    public void OnHit(Unit target) { }
-    public void OnDestroy() { }
-}
-
-/// <summary>
-/// 최종 폭발 효과
-/// </summary>
-public class FinalExplosionEffect : ISkillEffect
-{
-    private float explosionRadius;
-    private float explosionDamage;
-    private SkillLauncher launcher;
-
-    public FinalExplosionEffect(float radius, float damage)
-    {
-        explosionRadius = radius;
-        explosionDamage = damage;
-    }
-
-    public void OnInitialize(SkillLauncher launcher) => this.launcher = launcher;
     public void OnUpdate(float deltaTime) { }
-    public void OnHit(Unit target) { }
-
-    public void OnDestroy()
+    public void OnHit(Unit target)
     {
-        // 런처가 파괴될 때 최종 폭발
-        Collider[] hits = Physics.OverlapSphere(launcher.Position, explosionRadius, GameValue.UNIT_LAYERS);
-        foreach (var hit in hits)
-        {
-            if (hit.TryGetComponent(out Unit unit) && unit != launcher.Caster)
-            {
-                unit.TakeDamage(explosionDamage);
-            }
-        }
+        target.TakeDamage(damage);
+        launcher.Deactivate();
     }
+
+    public void OnDestroy() { }
 }

@@ -11,7 +11,9 @@ public abstract class BehaviourModule
     {
         owner.PlayAnimation(skillKey.ToString());
         target.PlayAnimation("Take Damage");
-        owner.AttackTarget(owner, target, skillKey);
+        
+        // 스킬 매니저를 통해 공격 실행
+        GameManager.Instance.skillManager.ExecuteMonsterAttack(skillKey, owner, target);
     }
 
     public virtual void OnAttackAnimationEnd()

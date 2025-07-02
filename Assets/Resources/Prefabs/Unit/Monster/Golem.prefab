@@ -2092,7 +2092,7 @@ GameObject:
   - component: {fileID: 4188072599102264}
   - component: {fileID: -4978803034697102049}
   - component: {fileID: 95499044264112252}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Golem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2140,6 +2140,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9044eb9597e70a47ba698d18aa6fa98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animator: {fileID: 0}
 --- !u!95 &95499044264112252
 Animator:
   serializedVersion: 7

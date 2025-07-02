@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters;
 
 [System.Serializable]
 public struct IndicatorElement
@@ -7,6 +8,7 @@ public struct IndicatorElement
     public SkillKey skillKey;
     public int index;
     public SkillIndicatorType type;
+    public float moveSpeed;
     public float length;
     public float width;
     public float angle;
@@ -15,15 +17,25 @@ public struct IndicatorElement
 
     public bool IsMainIndicator => index == 0;
 
-    public IndicatorElement(SkillKey skillKey, int index, SkillIndicatorType type, float length = 0, float width = 0, float angle = 0, float radius = 0)
+    public IndicatorElement(SkillKey skillKey, int index, float speed = 0, float length = 0, float width = 0, float angle = 0, float radius = 0)
     {
         this.skillKey = skillKey;
         this.index = index;
-        this.type = type;
+        this.moveSpeed = speed;
         this.length = length;
         this.width = width;
         this.angle = angle;
         this.radius = radius;
+
+        if (length > 0)
+            type = SkillIndicatorType.Line;
+        else if (angle == 0)
+            type = SkillIndicatorType.InstantAttack;
+        else if (angle < 360)
+            type = SkillIndicatorType.Sector;
+        else
+            type = SkillIndicatorType.Circle;
+
         maxDistance = radius > 0 ? radius * 2f : width * 1.6f;
     }
 }
@@ -32,7 +44,9 @@ public enum SkillIndicatorType
 {
     Line,
     Sector,
-    Circle
+    Circle,
+    InstantAttack,
+    Max,
 }
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]

@@ -268,7 +268,7 @@ public class SpawnManager : MonoBehaviour
         return enemy;
     }
 
-    private void RemoveEnemy(Unit enemy)
+    public void RemoveEnemy(Unit enemy)
     {
         activeEnemies.Remove(enemy);
         OnEnemyDied?.Invoke(enemy);
@@ -361,10 +361,15 @@ public class SpawnManager : MonoBehaviour
 
     private void PushEnemy(Unit enemy)
     {
+        enemy.Reset();
+
         if (enemyPools.TryGetValue(enemy.UnitID, out Stack<Unit> pool))
-        {
-            enemy.Reset();
             pool.Push(enemy);
+
+        else
+        {
+            enemyPools[enemy.UnitID] = new Stack<Unit>();
+            enemyPools[enemy.UnitID].Push(enemy);
         }
     }
 

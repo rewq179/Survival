@@ -26,7 +26,6 @@ public class Unit : MonoBehaviour
         this.unitID = unitID;
         isPlayer = unitID < 1000;
         InitModule();
-        SetHp();
         playerSaveData.Init(this);
         transform.position = position;
         gameObject.SetActive(true);
@@ -44,6 +43,7 @@ public class Unit : MonoBehaviour
             playerSaveData = new PlayerSaveData();
 
         statModule.Init(playerSaveData.level);
+        combatModule.Init(this);
         behaviourModule.Init(this);
     }
 
@@ -72,12 +72,7 @@ public class Unit : MonoBehaviour
         remove => combatModule.OnHpChanged -= value;
     }
 
-    public void SetHp() => combatModule.SetHp(statModule);
-    public void AttackTarget(Unit attacker, Unit target, SkillKey skillKey)
-    {
-        combatModule.AttackTarget(attacker, target, skillKey);
-    }
-
+    public void UpdateHp() => combatModule.UpdateHp();
     public void TakeDamage(float damage) => combatModule.TakeDamage(damage);
 
     // PlayerSaveData

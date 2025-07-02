@@ -1392,7 +1392,7 @@ GameObject:
   - component: {fileID: 4757290950984400}
   - component: {fileID: 2790861270531435123}
   - component: {fileID: 95648004031611356}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: TreasureChest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1446,6 +1446,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9044eb9597e70a47ba698d18aa6fa98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animator: {fileID: 0}
 --- !u!95 &95648004031611356
 Animator:
   serializedVersion: 7

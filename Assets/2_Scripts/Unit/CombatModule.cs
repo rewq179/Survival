@@ -3,6 +3,8 @@ using System;
 
 public class CombatModule
 {
+    private DamageTextMgr damageTextMgr;
+    private Unit owner;
     private float maxHp;
     private float curHp;
     private bool isDead;
@@ -17,9 +19,17 @@ public class CombatModule
         isDead = false;
     }
 
-    public void SetHp(StatModule statModule)
+    public void Init(Unit owner)
     {
-        maxHp = statModule.MaxHp;
+        this.owner = owner;
+        damageTextMgr = GameManager.Instance.damageTextMgr;
+        maxHp = owner.MaxHp;
+        curHp = maxHp;
+    }
+
+    public void UpdateHp()
+    {
+        maxHp = owner.MaxHp;
         curHp = maxHp;
     }
 
@@ -28,6 +38,7 @@ public class CombatModule
         if (damage == 0)
             return;
 
+        damageTextMgr.ShowDamageText(owner.transform.position, (int)damage, Color.red);
         curHp = Mathf.Clamp(curHp - damage, 0, maxHp);
         OnHpChanged?.Invoke(curHp);
 
@@ -38,11 +49,6 @@ public class CombatModule
     public void OnDead()
     {
         isDead = true;
-        // 죽음 로직
-    }
-
-    public void AttackTarget(Unit attacker, Unit target, SkillKey skillKey)
-    {
-        GameManager.Instance.damageTextMgr.ShowDamageText(target.transform.position, 10, Color.red);
+        GameManager.Instance.spawnManager.RemoveEnemy(owner);
     }
 }

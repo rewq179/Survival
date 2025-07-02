@@ -24,6 +24,19 @@ public enum SkillKey
     Max,
 }
 
+[System.Serializable]
+public struct SkillElement
+{
+    public float damage;
+    public float interval;
+
+    public SkillElement(float damage, float interval)
+    {
+        this.damage = damage;
+        this.interval = interval;
+    }
+}
+
 [Serializable]
 public class SkillData
 {
@@ -32,18 +45,20 @@ public class SkillData
     public string description;
     public float cooldown;
     public float reqLevel;
-    public List<IndicatorElement> elements;
+    public List<IndicatorElement> indicatorElements;
+    public List<SkillElement> skillElements;
     public SkillLauncherType launcherType;
 
     public SkillData(SkillKey skillKey, string name, string description, float cooldown, float reqLevel,
-        List<IndicatorElement> elements, SkillLauncherType launcherType)
+        List<IndicatorElement> indicators, List<SkillElement> skills, SkillLauncherType launcherType)
     {
         this.skillKey = skillKey;
         this.name = name;
         this.description = description;
         this.cooldown = cooldown;
         this.reqLevel = reqLevel;
-        this.elements = elements;
+        this.indicatorElements = indicators;
+        this.skillElements = skills;
         this.launcherType = launcherType;
     }
 }
@@ -64,6 +79,7 @@ public class SkillDataReader : BaseReader
         float cooldown = 0;
         float reqLevel = 0;
         List<IndicatorElement> elements = new List<IndicatorElement>();
+        List<SkillElement> skills = new List<SkillElement>();
         SkillLauncherType launcherType = SkillLauncherType.Projectile;
 
         for (int i = 0; i < cells.Count; i++)
@@ -102,6 +118,13 @@ public class SkillDataReader : BaseReader
                     }
                     break;
 
+                case "skill":
+                    if (!string.IsNullOrEmpty(cells[i].value))
+                    {
+                        skills = DecodeSkillElement(skillKey, cells[i].value);
+                    }
+                    break;
+
                 case "launchertype":
                     if (Enum.TryParse(cells[i].value, true, out SkillLauncherType parsedLauncherType))
                         launcherType = parsedLauncherType;
@@ -109,7 +132,7 @@ public class SkillDataReader : BaseReader
             }
         }
 
-        skillDatas.Add(new SkillData(skillKey, name, description, cooldown, reqLevel, elements, launcherType));
+        skillDatas.Add(new SkillData(skillKey, name, description, cooldown, reqLevel, elements, skills, launcherType));
     }
 
     private List<IndicatorElement> DecodeIndicatorElement(SkillKey skillKey, string indicatorString)
@@ -120,39 +143,113 @@ public class SkillDataReader : BaseReader
         string[] splits = indicatorString.Split(',');
         foreach (string str in splits)
         {
-            IndicatorElement element = DecodeSingleElement(str.Trim(), skillKey, elements.Count);
+            IndicatorElement element = DecodeSingleIndicatorElement(str.Trim(), skillKey, elements.Count);
             elements.Add(element);
         }
 
         return elements;
     }
 
-    private IndicatorElement DecodeSingleElement(string str, SkillKey skillKey, int index)
+    private IndicatorElement DecodeSingleIndicatorElement(string str, SkillKey skillKey, int index)
     {
-        string[] splits = str.Split(':');
-
-        if (splits.Length != 2)
-            return new IndicatorElement(skillKey, index, SkillIndicatorType.Line);
-
-        Enum.TryParse(splits[0].Trim(), true, out SkillIndicatorType type);
-        string[] values = splits[1].Trim().Split('/');
-
-        if (values.Length != 2)
-            return new IndicatorElement(skillKey, index, type);
-
-        string firstValue = values[0].Trim();
-        string secondValue = values[1].Trim();
-
-        float.TryParse(firstValue, NumberStyles.Any, CultureInfo.InvariantCulture, out float first);
-        float.TryParse(secondValue, NumberStyles.Any, CultureInfo.InvariantCulture, out float second);
-
-        return type switch
+        float speed = 0f;
+        float length = 0f;
+        float width = 0f;
+        float angle = 0f;
+        float radius = 0f;
+        
+        // Length : 12 / Width : 0.4
+        string[] splits = str.Split('/');
+        foreach (string part in splits)
         {
-            SkillIndicatorType.Line => new IndicatorElement(skillKey, index, type, second, first, 0, 0),
-            SkillIndicatorType.Sector => new IndicatorElement(skillKey, index, type, 0, 0, second, first),
-            SkillIndicatorType.Circle => new IndicatorElement(skillKey, index, type, 0, 0, second, first),
-            _ => new IndicatorElement(skillKey, index, type)
-        };
+            string trimmedPart = part.Trim();
+            string[] keyValue = trimmedPart.Split(':');
+            
+            if (keyValue.Length != 2)
+                continue;
+                
+            string key = keyValue[0].Trim().ToLowerInvariant();
+            string value = keyValue[1].Trim();
+            
+            if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedValue))
+            {
+                switch (key)
+                {
+                    case "length":
+                        length = parsedValue;
+                        break;
+                        
+                    case "width":
+                        width = parsedValue;
+                        break;
+                        
+                    case "angle":
+                        angle = parsedValue;
+                        break;
+                        
+                    case "radius":
+                        radius = parsedValue;
+                        break;
+                        
+                    case "movespeed":
+                        speed = parsedValue;
+                        break;
+                }
+            }
+        }
+        
+        return new IndicatorElement(skillKey, index, speed, length, width, angle, radius);
+    }
+
+    private List<SkillElement> DecodeSkillElement(SkillKey skillKey, string skillString)
+    {
+        List<SkillElement> elements = new List<SkillElement>();
+        
+        // DMG : 12 / Int : 0.5
+        string[] splits = skillString.Split(',');
+        foreach (string str in splits)
+        {
+            SkillElement element = DecodeSingleSkillElement(str.Trim(), skillKey, elements.Count);
+            elements.Add(element);
+        }
+
+        return elements;
+    }
+
+    private SkillElement DecodeSingleSkillElement(string str, SkillKey skillKey, int index)
+    {
+        float damage = 0f;
+        float interval = 0f;
+        
+        // Dmg : 12 / Int : 0.5
+        string[] splits = str.Split('/');
+        foreach (string part in splits)
+        {
+            string trimmedPart = part.Trim();
+            string[] keyValue = trimmedPart.Split(':');
+            
+            if (keyValue.Length != 2)
+                continue;
+                
+            string key = keyValue[0].Trim().ToLowerInvariant();
+            string value = keyValue[1].Trim();
+            
+            if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedValue))
+            {
+                switch (key)
+                {
+                    case "dmg":
+                        damage = parsedValue;
+                        break;
+                        
+                    case "interval":
+                        interval = parsedValue;
+                        break;
+                }
+            }
+        }
+        
+        return new SkillElement(damage, interval);
     }
 }
 
