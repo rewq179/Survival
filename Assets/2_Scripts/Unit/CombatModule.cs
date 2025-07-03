@@ -6,10 +6,11 @@ public class CombatModule
     private DamageTextMgr damageTextMgr;
     private Unit owner;
     private float maxHp;
+    private float maxInvHp;
     private float curHp;
     private bool isDead;
 
-    public event Action<float> OnHpChanged;
+    public event Action<float, float> OnHpChanged;
 
     public float CurHp => curHp;
     public bool IsDead => isDead;
@@ -23,13 +24,13 @@ public class CombatModule
     {
         this.owner = owner;
         damageTextMgr = GameManager.Instance.damageTextMgr;
-        maxHp = owner.MaxHp;
-        curHp = maxHp;
+        UpdateHp();
     }
 
     public void UpdateHp()
     {
         maxHp = owner.MaxHp;
+        maxInvHp = 1f / maxHp;
         curHp = maxHp;
     }
 
@@ -39,8 +40,9 @@ public class CombatModule
             return;
 
         damageTextMgr.ShowDamageText(owner.transform.position, (int)damage, Color.red);
+        float preHp = curHp;
         curHp = Mathf.Clamp(curHp - damage, 0, maxHp);
-        OnHpChanged?.Invoke(curHp);
+        OnHpChanged?.Invoke(preHp * maxInvHp, curHp * maxInvHp);
 
         if (curHp <= 0)
             OnDead();

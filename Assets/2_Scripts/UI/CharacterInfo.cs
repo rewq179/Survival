@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class CharacterInfo : MonoBehaviour
 {
-    [SerializeField] private Slider hpBar;
+    [SerializeField] private HealthBarUI healthBar;
     [SerializeField] private TextMeshProUGUI hpText;
     [SerializeField] private Slider expBar;
     [SerializeField] private Image profileImage;
@@ -44,17 +44,18 @@ public class CharacterInfo : MonoBehaviour
 
     private void UpdateAllUI()
     {
-        UpdateHpUI(unit.CurHp);
+        healthBar.Init(unit.CurHp, unit.MaxHp);
+        hpText.text = $"{unit.CurHp}/{unit.MaxHp}";
+
         UpdateExpUI(unit.CurExp);
         UpdateLevelUI(unit.Level);
         SetName(string.Empty);
     }
 
-    private void UpdateHpUI(float hp)
+    private void UpdateHpUI(float prevRatio, float nextRatio)
     {
-        hpBar.maxValue = unit.MaxHp;
-        hpBar.value = hp;
-        hpText.text = $"{hpBar.value}/{hpBar.maxValue}";
+        healthBar.UpdateHealthBar(prevRatio, nextRatio);
+        hpText.text = $"{unit.CurHp}/{unit.MaxHp}";
     }
 
     private void UpdateExpUI(float exp)

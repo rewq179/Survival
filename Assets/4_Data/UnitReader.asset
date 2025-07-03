@@ -14,45 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UnitDataReader
   sheetAddress: 15RA8mCckMbGIXxx5Ukfmtih0TxDTEGkXiAVyrHf8Blw
   startRow: 2
-  endRow: 6
-  unitDatas:
-  - id: 1001
-    name: "\uBC8C"
-    hp: 5
-    attack: 1
-    moveSpd: 5.5
-    cooldown: 0
-    critChance: 0
-    critMulti: 1
-  - id: 1002
-    name: "\uBC15\uC950"
-    hp: 8
-    attack: 2
-    moveSpd: 6
-    cooldown: 0
-    critChance: 0
-    critMulti: 1
-  - id: 1003
-    name: "\uB291\uB300"
-    hp: 10
-    attack: 3
-    moveSpd: 7
-    cooldown: 0
-    critChance: 0
-    critMulti: 1
-  - id: 1004
-    name: "\uB098\uBB34 \uC815\uB839"
-    hp: 17
-    attack: 4
-    moveSpd: 4.5
-    cooldown: 0
-    critChance: 0
-    critMulti: 1
-  - id: 1005
-    name: "\uACE8\uB818"
-    hp: 22
-    attack: 5
-    moveSpd: 4
-    cooldown: 0
-    critChance: 0
-    critMulti: 1
+  endRow: 7
+  unitDatas: []

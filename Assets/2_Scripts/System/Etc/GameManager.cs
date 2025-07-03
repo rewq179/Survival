@@ -67,7 +67,7 @@ public class GameManager : MonoBehaviour
             cameraManager.SetTarget(playerUnit.transform);
         }
         
-        playerUnit.Init(101, Vector3.zero);
+        playerUnit.Init(100, Vector3.zero);
     }
 
     private void SetUpSkillManager()
@@ -93,11 +93,5 @@ public class GameManager : MonoBehaviour
     private void OnGamePause()
     {
         InputManager.Instance.DisablePlayerInput();
-    }
-
-    public void Test()
-    {
-        playerUnit.AddExp(10);
-        playerUnit.TakeDamage(UnityEngine.Random.Range(-10, 10));
     }
 }

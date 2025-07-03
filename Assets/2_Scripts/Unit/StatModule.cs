@@ -16,12 +16,13 @@ public class StatModule
     public float CritChance => critChance;
     public float CritMulti => critMulti;
 
-    public void Init(int level)
+    public void Init(UnitData unitData)
     {
-        maxHp = 20 + level * 10;
-        attack = 1 + level * 1;
-        moveSpd = 3;
-        critChance = 0f;
-        critMulti = 1f;
+        maxHp = unitData.hp;
+        attack = unitData.attack;
+        moveSpd = unitData.moveSpd;
+        cooldown = unitData.cooldown;
+        critChance = unitData.critChance;
+        critMulti = unitData.critMulti;
     }
 }

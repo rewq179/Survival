@@ -4,21 +4,34 @@ using System.Collections.Generic;
 
 public class Unit : MonoBehaviour
 {
+    [Header("Components")]
     [SerializeField] private Animator animator;
+    [SerializeField] private HealthBarBase healthBar;
+
+    // 모듈
     private StatModule statModule;
     private BehaviourModule behaviourModule;
-    private PlayerSaveData playerSaveData = new();
     private CombatModule combatModule;
+
+    // 기본 정보
+    private PlayerSaveData playerSaveData = new();
     private int unitID;
     private bool isPlayer;
+
+    // 기타
+    private Camera mainCam;
 
     public int UnitID => unitID;
 
     public void Reset()
     {
+        if (healthBar != null)
+            OnHpChanged -= healthBar.UpdateHealthBar;
+
         combatModule.Reset();
         transform.position = Vector3.zero;
         gameObject.SetActive(false);
+        healthBar?.ShowHealthBar(false);
     }
 
     public void Init(int unitID, Vector3 position)
@@ -26,8 +39,10 @@ public class Unit : MonoBehaviour
         this.unitID = unitID;
         isPlayer = unitID < 1000;
         InitModule();
+        InitHealthBar();
         playerSaveData.Init(this);
         transform.position = position;
+        mainCam = Camera.main;
         gameObject.SetActive(true);
     }
 
@@ -42,14 +57,29 @@ public class Unit : MonoBehaviour
         if (playerSaveData == null)
             playerSaveData = new PlayerSaveData();
 
-        statModule.Init(playerSaveData.level);
+        statModule.Init(DataManager.GetUnitData(unitID));
         combatModule.Init(this);
         behaviourModule.Init(this);
+    }
+
+    private void InitHealthBar()
+    {
+        if (healthBar != null)
+        {
+            healthBar.Init(CurHp, MaxHp);
+            OnHpChanged += healthBar.UpdateHealthBar;
+        }
     }
 
     private void Update()
     {
         behaviourModule?.Update();
+    }
+
+    private void LateUpdate()
+    {
+        if (healthBar != null)
+            healthBar.transform.rotation = Quaternion.LookRotation(mainCam.transform.forward);
     }
 
     // 애니메이션
@@ -66,7 +96,7 @@ public class Unit : MonoBehaviour
     // CombatModule
     public bool IsDead => combatModule.IsDead;
     public float CurHp => combatModule.CurHp;
-    public event Action<float> OnHpChanged
+    public event Action<float, float> OnHpChanged
     {
         add => combatModule.OnHpChanged += value;
         remove => combatModule.OnHpChanged -= value;

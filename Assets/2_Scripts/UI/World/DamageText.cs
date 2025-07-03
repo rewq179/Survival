@@ -5,7 +5,7 @@ using System.Collections;
 public class DamageText : MonoBehaviour
 {
     [SerializeField] private TextMeshPro damageText; // 3D용
-
+    private AnimationCurve curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
     private DamageTextMgr manager;
 
     // 애니메이션 설정
@@ -58,7 +58,7 @@ public class DamageText : MonoBehaviour
         {
             currentTime += Time.deltaTime;
             float progress = currentTime * fadeInvTime;
-            float ease = Easing.GetCubicOut(progress);
+            float ease = curve.Evaluate(progress);
 
             // 위치 조정
             float x = Mathf.Lerp(startPos.x, endPos.x, ease);
