@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.Video;
 using System;
 
 public enum IconType
@@ -16,15 +15,17 @@ public enum MonsterType
     Bat = 1002,        // 박쥐
     Wolf = 1003,       // 늑대
     Treant = 1004,     // 나무 정령
-    Golem = 1005       // 골렘
+    Golem = 1005,      // 골렘
+    Dragon = 1006      // 드래곤
 }
 
-public class ResourceManager : MonoBehaviour
+public class ResourceMgr : MonoBehaviour
 {
     private string skillIconPath = "Icon/Skill";
     private string equipmentIconPath = "Icon/Equipment";
     private string itemIconPath = "Icon/Item";
     private string skillEffectPath = "SkillEffect";
+    private string collectibleItemPath = "CollectibleItem";
     private string unitPrefabPath = "Prefabs/Unit/Monster";
 
     private Dictionary<string, Sprite> skillIcons = new();
@@ -32,6 +33,7 @@ public class ResourceManager : MonoBehaviour
     private Dictionary<string, Sprite> itemIcons = new();
     private Dictionary<SkillKey, SkillParticleController> skillEffects = new();
     private Dictionary<int, Unit> unitPrefabs = new Dictionary<int, Unit>();
+    private Dictionary<CollectibleType, CollectibleItem> collectibleItemPrefabs = new();
 
     public void LoadAllIcons()
     {
@@ -40,8 +42,9 @@ public class ResourceManager : MonoBehaviour
         LoadIconsFromPath(skillIconPath, skillIcons);
         LoadIconsFromPath(equipmentIconPath, equipmentIcons);
         LoadIconsFromPath(itemIconPath, itemIcons);
-        LoadSkillEffectsFromPath(skillEffectPath);
-        LoadUnitPrefabsFromPath(unitPrefabPath);
+        LoadSkillEffectsFromPath();
+        LoadUnitPrefabsFromPath();
+        LoadCollectibleItemPrefabsFromPath();
     }
 
     private void ClearCache()
@@ -51,6 +54,7 @@ public class ResourceManager : MonoBehaviour
         itemIcons.Clear();
         skillEffects.Clear();
         unitPrefabs.Clear();
+        collectibleItemPrefabs.Clear();
     }
 
     private void LoadIconsFromPath(string path, Dictionary<string, Sprite> iconDictionary)
@@ -62,24 +66,33 @@ public class ResourceManager : MonoBehaviour
         }
     }
 
-    private void LoadSkillEffectsFromPath(string path)
+    private void LoadSkillEffectsFromPath()
     {
-        SkillParticleController[] effects = Resources.LoadAll<SkillParticleController>(path);
+        SkillParticleController[] effects = Resources.LoadAll<SkillParticleController>(skillEffectPath);
         foreach (SkillParticleController effect in effects)
         {
             skillEffects[Enum.Parse<SkillKey>(effect.name)] = effect;
         }
     }
 
-    private void LoadUnitPrefabsFromPath(string path)
+    private void LoadUnitPrefabsFromPath()
     {
-        Unit[] units = Resources.LoadAll<Unit>(path);
+        Unit[] units = Resources.LoadAll<Unit>(unitPrefabPath);
         foreach (Unit unit in units)
         {
             if (Enum.TryParse(unit.name, out MonsterType type))
             {
                 unitPrefabs[(int)type] = unit;
             }
+        }
+    }
+
+    private void LoadCollectibleItemPrefabsFromPath()
+    {
+        CollectibleItem[] items = Resources.LoadAll<CollectibleItem>(collectibleItemPath);
+        foreach (CollectibleItem item in items)
+        {
+            collectibleItemPrefabs[Enum.Parse<CollectibleType>(item.name)] = item;
         }
     }
 
@@ -119,6 +132,14 @@ public class ResourceManager : MonoBehaviour
     {
         if (unitPrefabs.TryGetValue(unitID, out Unit prefab))
             return prefab;
+
+        return null;
+    }
+
+    public CollectibleItem GetCollectibleItem(CollectibleType type)
+    {
+        if (collectibleItemPrefabs.TryGetValue(type, out CollectibleItem prefab))
+            return Instantiate(prefab);
 
         return null;
     }

@@ -22,6 +22,7 @@ public class Unit : MonoBehaviour
     private Camera mainCam;
 
     public int UnitID => unitID;
+    public bool IsPlayer => isPlayer;
 
     public void Reset()
     {
@@ -103,6 +104,8 @@ public class Unit : MonoBehaviour
     }
 
     public void UpdateHp() => combatModule.UpdateHp();
+    public void TakeHealRate(float healRate) => combatModule.TakeHeal(MaxHp * healRate);
+    public void TakeHeal(float healAmount) => combatModule.TakeHeal(healAmount);
     public void TakeDamage(float damage) => combatModule.TakeDamage(damage);
 
     // PlayerSaveData

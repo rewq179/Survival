@@ -4,6 +4,9 @@ using System;
 public class CombatModule
 {
     private DamageTextMgr damageTextMgr;
+    private RewardMgr rewardManager;
+    private SpawnManager spawnManager;
+
     private Unit owner;
     private float maxHp;
     private float maxInvHp;
@@ -24,6 +27,8 @@ public class CombatModule
     {
         this.owner = owner;
         damageTextMgr = GameManager.Instance.damageTextMgr;
+        rewardManager = GameManager.Instance.rewardMgr;
+        spawnManager = GameManager.Instance.spawnManager;
         UpdateHp();
     }
 
@@ -34,23 +39,41 @@ public class CombatModule
         curHp = maxHp;
     }
 
+    public void TakeHeal(float healAmount)
+    {
+        if (healAmount == 0)
+            return;
+
+        damageTextMgr.ShowDamageText(owner.transform.position, (int)healAmount, Color.green);
+        SetHp(curHp + healAmount);
+    }
+
     public void TakeDamage(float damage)
     {
         if (damage == 0)
             return;
 
         damageTextMgr.ShowDamageText(owner.transform.position, (int)damage, Color.red);
-        float preHp = curHp;
-        curHp = Mathf.Clamp(curHp - damage, 0, maxHp);
-        OnHpChanged?.Invoke(preHp * maxInvHp, curHp * maxInvHp);
+        SetHp(curHp - damage);
 
         if (curHp <= 0)
             OnDead();
     }
 
+    private void SetHp(float hp)
+    {
+        float prevHp = curHp;
+        curHp = Mathf.Clamp(hp, 0, maxHp);
+        OnHpChanged?.Invoke(prevHp * maxInvHp, curHp * maxInvHp);
+    }
+
     public void OnDead()
     {
         isDead = true;
-        GameManager.Instance.spawnManager.RemoveEnemy(owner);
+
+        if (!owner.IsPlayer)
+            rewardManager.CreateItem(owner);
+
+        spawnManager.RemoveEnemy(owner);
     }
 }

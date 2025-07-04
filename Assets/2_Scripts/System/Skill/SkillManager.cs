@@ -426,7 +426,7 @@ public class SkillManager : MonoBehaviour
             return particle;
         }
 
-        return GameManager.Instance.resourceManager.GetSkillEffect(parent, skillKey);
+        return GameManager.Instance.resourceMgr.GetSkillEffect(parent, skillKey);
     }
 
     public void PushParticle(SkillKey skillKey, SkillParticleController particle)

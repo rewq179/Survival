@@ -24934,7 +24934,7 @@ GameObject:
   - component: {fileID: 1425089820019533571}
   m_Layer: 0
   m_Name: PlayerUnit
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -25083,6 +25083,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 6055822198638736112}
+  healthBar: {fileID: 0}
 --- !u!1 &3095888084906784569
 GameObject:
   m_ObjectHideFlags: 0

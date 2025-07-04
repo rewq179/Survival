@@ -20,8 +20,11 @@ public class UnitData
     public float cooldown;
     public float critChance;
     public float critMulti;
+    public float exp;
+    public int gold;
 
-    public UnitData(int id, string name, float hp, float attack, float moveSpd, float cooldown, float critChance, float critMulti)
+    public UnitData(int id, string name, float hp, float attack, float moveSpd, float cooldown, 
+        float critChance, float critMulti, float exp, int gold)
     {
         this.id = id;
         this.name = name;
@@ -31,6 +34,8 @@ public class UnitData
         this.cooldown = cooldown;
         this.critChance = critChance;
         this.critMulti = critMulti;
+        this.exp = exp;
+        this.gold = gold;
     }
 }
 
@@ -52,6 +57,8 @@ public class UnitDataReader : BaseReader
         float cooldown = 0;
         float critChance = 0;
         float critMulti = 0;
+        float exp = 0;
+        int gold = 0;
 
         for (int i = 0; i < cells.Count; i++)
         {
@@ -127,10 +134,28 @@ public class UnitDataReader : BaseReader
                         }
                         break;
                     }
+
+                case "exp":
+                    {
+                        if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedExpReward))
+                        {
+                            exp = parsedExpReward;
+                        }
+                        break;
+                    }
+
+                case "gold":
+                    {
+                        if (int.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out int parsedGoldReward))
+                        {
+                            gold = parsedGoldReward;
+                        }
+                        break;
+                    }
             }
         }
 
-        unitDatas.Add(new UnitData(id, name, hp, attack, moveSpd, cooldown, critChance, critMulti));
+        unitDatas.Add(new UnitData(id, name, hp, attack, moveSpd, cooldown, critChance, critMulti, exp, gold));
     }
 }
 

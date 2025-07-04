@@ -8,11 +8,12 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private GameObject playerUnitPrefab;
     [SerializeField] private DataManager dataManager;
-    public ResourceManager resourceManager;
+    public ResourceMgr resourceMgr;
     public SkillManager skillManager;
     public SpawnManager spawnManager;
     public CameraManager cameraManager;
     public DamageTextMgr damageTextMgr;
+    public RewardMgr rewardMgr;
 
     private Unit playerUnit;
     private int currentWave;
@@ -40,15 +41,14 @@ public class GameManager : MonoBehaviour
 
     private void InitializeGame()
     {
-        resourceManager.LoadAllIcons();
+        resourceMgr.LoadAllIcons();
         dataManager.Init();
 
         CreatePlayerUnit();
-        SetUpSkillManager();
-        SetupUnit();
-        SetupUI();
+        skillManager.Init(playerUnit);
+        rewardMgr.Init(playerUnit);
+        UIMgr.Instance.Init(playerUnit);
 
-        playerUnit.AddGold(100);
         playerUnit.AddSkill(SkillKey.Arrow);
         playerUnit.AddSkill(SkillKey.Dagger);
         playerUnit.AddSkill(SkillKey.FrontSpike);
@@ -70,28 +70,13 @@ public class GameManager : MonoBehaviour
         playerUnit.Init(100, Vector3.zero);
     }
 
-    private void SetUpSkillManager()
-    {
-        skillManager.Init(playerUnit);
-    }
-
-    private void SetupUnit()
-    {
-        // 유닛 컴포넌트 초기화
-
-        // 예: 스탯, 애니메이션, 컨트롤러 등
-    }
-
-    private void SetupUI()
-    {
-        UIMgr.Instance.characterInfo.Init(playerUnit);
-        UIMgr.Instance.attackJoystick.Init(playerUnit);
-
-        // 예: 체력바, 스킬 아이콘, 인벤토리 등
-    }
-
     private void OnGamePause()
     {
         InputManager.Instance.DisablePlayerInput();
+    }
+
+    public void Test()
+    {
+        rewardMgr.CreateCollectibleItem(CollectibleType.Magnet, playerUnit.transform.position, 0.6f);
     }
 }

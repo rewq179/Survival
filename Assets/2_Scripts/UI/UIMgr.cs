@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 public class UIMgr : MonoBehaviour
 {
@@ -6,6 +7,7 @@ public class UIMgr : MonoBehaviour
     
     public CharacterInfo characterInfo;
     public AttackJoystick attackJoystick;
+    public TopBar topBar;
 
     private void Awake()
     {
@@ -19,5 +21,12 @@ public class UIMgr : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    public void Init(Unit playerUnit)
+    {
+        characterInfo.Init(playerUnit);
+        attackJoystick.Init(playerUnit);
+        topBar.Init(playerUnit);
     }
 }
