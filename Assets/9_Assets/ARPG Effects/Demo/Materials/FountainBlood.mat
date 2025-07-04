@@ -15,10 +15,10 @@ Material:
   - _EMISSION
   - _NORMALMAP
   m_InvalidKeywords: []
-  m_LightmapFlags: 1
+  m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 2000
   stringTagMap:
     RenderType: Opaque
   disabledShaderPasses:
@@ -90,7 +90,7 @@ Material:
     - _AlphaToMask: 0
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
-    - _BumpScale: 0.8
+    - _BumpScale: 0.2
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
@@ -103,7 +103,7 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.871
     - _GlossyReflections: 1
-    - _Metallic: 1
+    - _Metallic: 0.6
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
@@ -121,11 +121,11 @@ Material:
     m_Colors:
     - _BaseColor: {r: 0.5943396, g: 0.1597988, b: 0.1597988, a: 1}
     - _Color: {r: 0.5943396, g: 0.15979877, b: 0.15979877, a: 1}
-    - _EmissionColor: {r: 0.5, g: 0.096698105, b: 0.096698105, a: 1}
+    - _EmissionColor: {r: 0.21404114, g: 0.009518018, b: 0.009518018, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
---- !u!114 &7723771088037882111
+--- !u!114 &213677930837819618
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
