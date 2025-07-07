@@ -51,7 +51,7 @@ public class AttackJoystick : MonoBehaviour
         }
     }
 
-    private void RefreshSkill(Dictionary<SkillKey, int> skillKeys)
+    private void RefreshSkill(Dictionary<SkillKey, List<SubSkillKey>> skillKeys)
     {
         int start = (int)SkillButtonType.Attack;
 

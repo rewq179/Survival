@@ -113,10 +113,10 @@ public class Unit : MonoBehaviour
     public float CurExp => playerSaveData.exp;
     public float MaxExp => playerSaveData.GetRequiredExp(playerSaveData.level);
     public int Gold => playerSaveData.gold;
-    public Dictionary<SkillKey, int> Skills => playerSaveData.Skills;
+    public Dictionary<SkillKey, List<SubSkillKey>> Skills => playerSaveData.Skills;
     public bool HasSkill(SkillKey skillKey) => playerSaveData.HasSkill(skillKey);
 
-    public event Action<Dictionary<SkillKey, int>> OnSkillChanged
+    public event Action<Dictionary<SkillKey, List<SubSkillKey>>> OnSkillChanged
     {
         add => playerSaveData.OnSkillChanged += value;
         remove => playerSaveData.OnSkillChanged -= value;
@@ -142,7 +142,7 @@ public class Unit : MonoBehaviour
 
     public void AddSkill(SkillKey skillKey) => playerSaveData.AddSkill(skillKey);
     public void RemoveSkill(SkillKey skillKey) => playerSaveData.RemoveSkill(skillKey);
-    public void LevelUpSkill(SkillKey skillKey) => playerSaveData.LevelUpSkill(skillKey);
+    public void LevelUpSkill(SkillKey skillKey, SubSkillKey subSkillKey) => playerSaveData.LevelUpSkill(skillKey, subSkillKey);
     public void AddGold(int amount) => playerSaveData.AddGold(amount);
     public int AddExp(float amount) => playerSaveData.AddExp(amount);
 }

@@ -6,10 +6,12 @@ public class DataManager : MonoBehaviour
     public UnitDataReader unitDataReader;
     public SpawnGroupDataReader spawnGroupDataReader;
     public SkillDataReader skillDataReader;
+    public SubSkillDataReader subSkillDataReader;
     public WaveDataReader waveDataReader;
 
     private static Dictionary<int, UnitData> unitDatas = new();
     private static Dictionary<SkillKey, SkillData> skillDatas = new();
+    private static Dictionary<SubSkillKey, SubSkillData> subSkillDatas = new();
     private static Dictionary<int, SpawnGroupData> spawnGroupDatas = new();
     private static Dictionary<int, WaveData> waveDatas = new();
 
@@ -27,6 +29,13 @@ public class DataManager : MonoBehaviour
         {
             SkillData skillData = skillDataReader.skillDatas[i];
             skillDatas.Add(skillData.skillKey, skillData);
+        }
+
+        subSkillDatas.Clear();
+        for (int i = 0; i < subSkillDataReader.subSkillDatas.Count; i++)
+        {
+            SubSkillData subSkillData = subSkillDataReader.subSkillDatas[i];
+            subSkillDatas.Add(subSkillData.subSkillKey, subSkillData);
         }
 
         spawnGroupDatas.Clear();
@@ -48,7 +57,7 @@ public class DataManager : MonoBehaviour
     {
         if (unitDatas.TryGetValue(id, out UnitData unitData))
             return unitData;
-            
+
         return null;
     }
 
@@ -56,6 +65,15 @@ public class DataManager : MonoBehaviour
     {
         if (skillDatas.TryGetValue(skillKey, out SkillData skillData))
             return skillData;
+
+        return null;
+
+    }
+
+    public static SubSkillData GetSubSkillData(SubSkillKey subSkillKey)
+    {
+        if (subSkillDatas.TryGetValue(subSkillKey, out SubSkillData subSkillData))
+            return subSkillData;
 
         return null;
     }

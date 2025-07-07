@@ -517,6 +517,7 @@ MonoBehaviour:
   unitDataReader: {fileID: 11400000, guid: 91087702a3a983f49bcc988cf1deddad, type: 2}
   spawnGroupDataReader: {fileID: 11400000, guid: f0669d6a860ea924d869087aa6c87b3f, type: 2}
   skillDataReader: {fileID: 11400000, guid: c8a0d3e542c49c947b8aab98514e9298, type: 2}
+  subSkillDataReader: {fileID: 11400000, guid: 2ad8e467b429c7040b01f36820b68f07, type: 2}
   waveDataReader: {fileID: 11400000, guid: 0ccf7f79a9063804cbf338947227de0b, type: 2}
 --- !u!1 &292290903
 GameObject:

@@ -81,7 +81,8 @@ public class ResourceMgr : MonoBehaviour
         SkillParticleController[] effects = Resources.LoadAll<SkillParticleController>(skillEffectPath);
         foreach (SkillParticleController effect in effects)
         {
-            skillEffects[Enum.Parse<SkillKey>(effect.name)] = effect;
+            if (Enum.TryParse(effect.name, out SkillKey skillKey))
+                skillEffects[skillKey] = effect;
         }
     }
 

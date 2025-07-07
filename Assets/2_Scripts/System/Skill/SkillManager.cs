@@ -5,7 +5,7 @@ using System.Collections;
 
 public class SkillManager : MonoBehaviour
 {
-    private Dictionary<SkillKey, int> playerSkills = new();
+    private Dictionary<SkillKey, List<SubSkillKey>> playerSkills = new();
 
     // 쿨타임 관리
     private List<SkillKey> activeCooldownSkills = new();
@@ -26,7 +26,7 @@ public class SkillManager : MonoBehaviour
 
     // 이벤트
     public event Action<SkillKey, float> OnSkillCooldownChanged;
-    public event Action<Dictionary<SkillKey, int>> OnSkillListChanged;
+    public event Action<Dictionary<SkillKey, List<SubSkillKey>>> OnSkillListChanged;
     public event Action<SkillKey> OnSkillCooldownEnded;
 
     // 스킬 인스턴스 관리
@@ -79,7 +79,7 @@ public class SkillManager : MonoBehaviour
         playerController = unit.GetComponentInChildren<PlayerController>();
     }
 
-    public void InitializeSkills(Dictionary<SkillKey, int> newSkillKeys)
+    public void InitializeSkills(Dictionary<SkillKey, List<SubSkillKey>> newSkillKeys)
     {
         playerSkills.Clear();
         activeCooldownSkills.Clear();

@@ -20,7 +20,8 @@ public class SelectionPanel : MonoBehaviour
 
     // 상수
     private const int SELECTION_COUNT = 3;
-    private const float BASE_WEIGHT = 1f;
+    private const float ACTIVE_WEIGHT = 1.2f;
+    private const float PASSIVE_WEIGHT = 0.7f;
     private const float LEVEL_UP_WEIGHT = 0.5f;
 
     private const float FADE_IN_DURATION = 0.3f;
@@ -57,20 +58,20 @@ public class SelectionPanel : MonoBehaviour
         }
         skills.Clear();
 
-        for (SkillKey skillKey = 0; skillKey < SkillKey.Monster; skillKey++)
+        for (SkillKey skillKey = 0; skillKey < SkillKey.StingAttack; skillKey++)
         {
-            skills.Add(CreateSelectionData(skillKey));
+            skills.Add(CreateSelectionData(skillKey, SubSkillKey.None));
         }
     }
 
-    private SelectionData CreateSelectionData(SkillKey skillKey)
+    private SelectionData CreateSelectionData(SkillKey skillKey, SubSkillKey subSkillKey)
     {
         SkillData skillData = DataManager.GetSkillData(skillKey);
         Sprite icon = GameManager.Instance.resourceMgr.GetSkillIcon(skillKey);
         bool isLevelUp = GameManager.Instance.PlayerUnit.HasSkill(skillKey);
 
         SelectionData data = PopSelectionData();
-        data.Init(skillKey, skillData.name, skillData.description, icon, isLevelUp);
+        data.Init(skillKey, skillData.skillType, subSkillKey, skillData.name, skillData.description, icon, isLevelUp);
         return data;
     }
 
@@ -95,7 +96,9 @@ public class SelectionPanel : MonoBehaviour
         {
             // 가중치: 기본 1, 레벨업 가능시 0.5 추가
             SelectionData picked = RandomPickerByWeight.PickOne(
-                availableSkills, data => BASE_WEIGHT + (data.isLevelUp ? LEVEL_UP_WEIGHT : 0f)
+                availableSkills, data => 
+                    + (data.skillType == SkillType.Active ? ACTIVE_WEIGHT : PASSIVE_WEIGHT)
+                    + (data.isLevelUp ? LEVEL_UP_WEIGHT : 0f)
             );
 
             selectedSkills.Add(picked);
@@ -106,7 +109,7 @@ public class SelectionPanel : MonoBehaviour
     private void SelectSkill(SelectionData data)
     {
         if (data.isLevelUp)
-            GameManager.Instance.PlayerUnit.LevelUpSkill(data.skillKey);
+            GameManager.Instance.PlayerUnit.LevelUpSkill(data.skillKey, data.subSkillKey);
 
         else
             GameManager.Instance.PlayerUnit.AddSkill(data.skillKey);

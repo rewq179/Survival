@@ -54,7 +54,13 @@ public class SelectionSlot : MonoBehaviour
         iconImage.sprite = data.icon;
         nameText.text = data.name;
 
-        string desc = data.description;
+        float value = 0;
+        if (data.skillType == SkillType.Passive)
+            value = DataManager.GetSkillData(data.skillKey).baseValue;
+        else if (data.subSkillKey != SubSkillKey.None)
+            value = DataManager.GetSubSkillData(data.subSkillKey).baseValue;
+
+        string desc = DescMgr.GetSubSkillDescription(data.description, value);
         if (data.isLevelUp)
             desc += "\n\n<color=yellow>레벨업!</color>";
         else

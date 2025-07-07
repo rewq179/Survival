@@ -8,15 +8,17 @@ public class PlayerSaveData
     public int level;
     public float exp;
     public int gold;
-    private Dictionary<SkillKey, int> skills = new();
+    private Dictionary<SkillKey, List<SubSkillKey>> skills = new();
+    private Dictionary<SubSkillKey, int> subSkills = new();
 
-    public Dictionary<SkillKey, int> Skills => skills;
+    public Dictionary<SkillKey, List<SubSkillKey>> Skills => skills;
+    public Dictionary<SubSkillKey, int> SubSkills => subSkills;
 
     // 델리게이트/이벤트
     public event Action<int> OnLevelChanged;
     public event Action<float> OnExpChanged;
     public event Action<int> OnGoldChanged;
-    public event Action<Dictionary<SkillKey, int>> OnSkillChanged;
+    public event Action<Dictionary<SkillKey, List<SubSkillKey>>> OnSkillChanged;
 
     public bool HasSkill(SkillKey skillKey) => skills.ContainsKey(skillKey);
 
@@ -52,7 +54,7 @@ public class PlayerSaveData
         {
             unit.UpdateHp();
             OnLevelChanged?.Invoke(level);
-            
+
             // 레벨업 시 스킬 선택 UI 표시
             if (UIMgr.Instance != null && UIMgr.Instance.selectionPanel != null)
             {
@@ -67,7 +69,7 @@ public class PlayerSaveData
     {
         if (!skills.ContainsKey(skillKey))
         {
-            skills.Add(skillKey, 0);
+            skills.Add(skillKey, new());
             OnSkillChanged?.Invoke(skills);
         }
     }
@@ -80,13 +82,17 @@ public class PlayerSaveData
         }
     }
 
-    public void LevelUpSkill(SkillKey skillKey)
+    public void LevelUpSkill(SkillKey skillKey, SubSkillKey subSkillKey)
     {
-        if (skills.ContainsKey(skillKey))
-        {
-            skills[skillKey]++;
-            OnSkillChanged?.Invoke(skills);
-        }
+        if (skills.TryGetValue(skillKey, out List<SubSkillKey> mains))
+            mains.Add(subSkillKey);
+        else
+            skills.Add(skillKey, new() { subSkillKey });
+
+        if (subSkills.TryGetValue(subSkillKey, out int level))
+            level++;
+        else
+            subSkills.Add(subSkillKey, 1);
     }
 
     public void AddGold(int amount)

@@ -50,9 +50,6 @@ public class GameManager : MonoBehaviour
         UIMgr.Instance.Init(playerUnit);
 
         playerUnit.AddSkill(SkillKey.Arrow);
-        playerUnit.AddSkill(SkillKey.Dagger);
-        playerUnit.AddSkill(SkillKey.FrontSpike);
-        playerUnit.AddSkill(SkillKey.Meteor);
 
         spawnManager.Init(currentWave);
         InputManager.Instance.EnablePlayerInput();
