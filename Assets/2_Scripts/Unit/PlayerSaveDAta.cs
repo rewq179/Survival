@@ -8,15 +8,17 @@ public class PlayerSaveData
     public int level;
     public float exp;
     public int gold;
-    private List<SkillKey> skillKeys = new();
+    private Dictionary<SkillKey, int> skills = new();
 
-    public List<SkillKey> SkillKeys => skillKeys;
+    public Dictionary<SkillKey, int> Skills => skills;
 
     // 델리게이트/이벤트
     public event Action<int> OnLevelChanged;
     public event Action<float> OnExpChanged;
     public event Action<int> OnGoldChanged;
-    public event Action<List<SkillKey>> OnSkillChanged;
+    public event Action<Dictionary<SkillKey, int>> OnSkillChanged;
+
+    public bool HasSkill(SkillKey skillKey) => skills.ContainsKey(skillKey);
 
     public void Init(Unit unit)
     {
@@ -50,6 +52,12 @@ public class PlayerSaveData
         {
             unit.UpdateHp();
             OnLevelChanged?.Invoke(level);
+            
+            // 레벨업 시 스킬 선택 UI 표시
+            if (UIMgr.Instance != null && UIMgr.Instance.selectionPanel != null)
+            {
+                UIMgr.Instance.selectionPanel.ShowSkillSelection();
+            }
         }
 
         return levelUpCount;
@@ -57,18 +65,27 @@ public class PlayerSaveData
 
     public void AddSkill(SkillKey skillKey)
     {
-        if (!skillKeys.Contains(skillKey))
+        if (!skills.ContainsKey(skillKey))
         {
-            skillKeys.Add(skillKey);
-            OnSkillChanged?.Invoke(skillKeys);
+            skills.Add(skillKey, 0);
+            OnSkillChanged?.Invoke(skills);
         }
     }
 
     public void RemoveSkill(SkillKey skillKey)
     {
-        if (skillKeys.Remove(skillKey))
+        if (skills.Remove(skillKey))
         {
-            OnSkillChanged?.Invoke(skillKeys);
+            OnSkillChanged?.Invoke(skills);
+        }
+    }
+
+    public void LevelUpSkill(SkillKey skillKey)
+    {
+        if (skills.ContainsKey(skillKey))
+        {
+            skills[skillKey]++;
+            OnSkillChanged?.Invoke(skills);
         }
     }
 

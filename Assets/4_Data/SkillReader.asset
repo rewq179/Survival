@@ -178,13 +178,13 @@ MonoBehaviour:
     - damage: 20
       interval: 0.5
     launcherType: 2
-  - skillKey: 8
+  - skillKey: 9
     name: StingAttack
     description: "\uC989\uC2DC \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
     cooldown: 0.5
     reqLevel: 0
     indicatorElements:
-    - skillKey: 8
+    - skillKey: 9
       index: 0
       type: 3
       moveSpeed: 0

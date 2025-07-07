@@ -2,11 +2,10 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Collections;
-using UnityEngine.Video;
 
 public class SkillManager : MonoBehaviour
 {
-    private List<SkillKey> playerSkills = new();
+    private Dictionary<SkillKey, int> playerSkills = new();
 
     // 쿨타임 관리
     private List<SkillKey> activeCooldownSkills = new();
@@ -27,7 +26,7 @@ public class SkillManager : MonoBehaviour
 
     // 이벤트
     public event Action<SkillKey, float> OnSkillCooldownChanged;
-    public event Action<List<SkillKey>> OnSkillListChanged;
+    public event Action<Dictionary<SkillKey, int>> OnSkillListChanged;
     public event Action<SkillKey> OnSkillCooldownEnded;
 
     // 스킬 인스턴스 관리
@@ -75,25 +74,25 @@ public class SkillManager : MonoBehaviour
 
     public void Init(Unit unit)
     {
-        InitializeSkills(unit.SkillKeys);
+        InitializeSkills(unit.Skills);
         unit.OnSkillChanged += InitializeSkills;
         playerController = unit.GetComponentInChildren<PlayerController>();
     }
 
-    public void InitializeSkills(List<SkillKey> newSkillKeys)
+    public void InitializeSkills(Dictionary<SkillKey, int> newSkillKeys)
     {
         playerSkills.Clear();
         activeCooldownSkills.Clear();
         currentCooldowns.Clear();
         previousCooldowns.Clear();
         skillCooldownTimes.Clear();
-        playerSkills.AddRange(newSkillKeys);
 
-        foreach (SkillKey skillKey in playerSkills)
+        foreach (var skill in newSkillKeys)
         {
-            skillCooldownTimes[skillKey] = GetSkillCooldown(skillKey);
-            currentCooldowns[skillKey] = 0f;
-            previousCooldowns[skillKey] = 0f;
+            skillCooldownTimes[skill.Key] = GetSkillCooldown(skill.Key);
+            currentCooldowns[skill.Key] = 0f;
+            previousCooldowns[skill.Key] = 0f;
+            playerSkills[skill.Key] = skill.Value;
         }
 
         OnSkillListChanged?.Invoke(playerSkills);

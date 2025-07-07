@@ -28,7 +28,7 @@ public class ResourceMgr : MonoBehaviour
     private string collectibleItemPath = "CollectibleItem";
     private string unitPrefabPath = "Prefabs/Unit/Monster";
 
-    private Dictionary<string, Sprite> skillIcons = new();
+    private Dictionary<SkillKey, Sprite> skillIcons = new();
     private Dictionary<string, Sprite> equipmentIcons = new();
     private Dictionary<string, Sprite> itemIcons = new();
     private Dictionary<SkillKey, SkillParticleController> skillEffects = new();
@@ -39,7 +39,7 @@ public class ResourceMgr : MonoBehaviour
     {
         ClearCache();
 
-        LoadIconsFromPath(skillIconPath, skillIcons);
+        LoadSkillIconsFromPath();
         LoadIconsFromPath(equipmentIconPath, equipmentIcons);
         LoadIconsFromPath(itemIconPath, itemIcons);
         LoadSkillEffectsFromPath();
@@ -63,6 +63,16 @@ public class ResourceMgr : MonoBehaviour
         foreach (Sprite sprite in sprites)
         {
             iconDictionary[sprite.name] = sprite;
+        }
+    }
+
+    private void LoadSkillIconsFromPath()
+    {
+        Sprite[] sprites = Resources.LoadAll<Sprite>(skillIconPath);
+        foreach (Sprite sprite in sprites)
+        {
+            if (Enum.TryParse(sprite.name, out SkillKey skillKey))
+                skillIcons[skillKey] = sprite;
         }
     }
 
@@ -96,9 +106,9 @@ public class ResourceMgr : MonoBehaviour
         }
     }
 
-    public Sprite GetSkillIcon(string iconName)
+    public Sprite GetSkillIcon(SkillKey skillKey)
     {
-        if (skillIcons.TryGetValue(iconName, out Sprite sprite))
+        if (skillIcons.TryGetValue(skillKey, out Sprite sprite))
             return sprite;
 
         return null;

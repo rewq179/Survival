@@ -4,10 +4,12 @@ using TMPro;
 public class UIMgr : MonoBehaviour
 {
     public static UIMgr Instance { get; private set; }
-    
+
+    [Header("UI Components")]
     public CharacterInfo characterInfo;
     public AttackJoystick attackJoystick;
     public TopBar topBar;
+    public SelectionPanel selectionPanel;
 
     private void Awake()
     {
@@ -28,5 +30,6 @@ public class UIMgr : MonoBehaviour
         characterInfo.Init(playerUnit);
         attackJoystick.Init(playerUnit);
         topBar.Init(playerUnit);
+        // selectionPanel.Init();
     }
 }

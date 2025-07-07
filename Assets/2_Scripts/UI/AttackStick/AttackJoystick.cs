@@ -28,7 +28,7 @@ public class AttackJoystick : MonoBehaviour
 
         this.unit = unit;
         skillManager = GameManager.Instance.skillManager;
-        
+
         UnsubscribeFromEvents();
         SubscribeToEvents();
 
@@ -51,13 +51,15 @@ public class AttackJoystick : MonoBehaviour
         }
     }
 
-    private void RefreshSkill(List<SkillKey> skillKeys)
+    private void RefreshSkill(Dictionary<SkillKey, int> skillKeys)
     {
         int start = (int)SkillButtonType.Attack;
 
-        for (int i = 0; i < skillKeys.Count; i++)
+        int index = 0;
+        foreach (var skill in skillKeys)
         {
-            attackButtons[start + i].Init(skillKeys[i]);
+            attackButtons[start + index].Init(skill.Key);
+            index++;
         }
     }
 }

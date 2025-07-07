@@ -20,6 +20,8 @@ public enum SkillKey
     EnergyExplosion,
     LightningStrike,
     Meteor,
+
+    Monster,            // 몬스터의 스킬 영역
     StingAttack,
     Max,
 }

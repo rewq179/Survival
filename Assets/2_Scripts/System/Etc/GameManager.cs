@@ -70,13 +70,22 @@ public class GameManager : MonoBehaviour
         playerUnit.Init(100, Vector3.zero);
     }
 
-    private void OnGamePause()
+    public void OnGameResume()
     {
+        Time.timeScale = 1f;
+        InputManager.Instance.EnablePlayerInput();
+    }
+
+    public void OnGamePause()
+    {
+        Time.timeScale = 0f;
         InputManager.Instance.DisablePlayerInput();
     }
 
     public void Test()
     {
-        rewardMgr.CreateCollectibleItem(CollectibleType.Magnet, playerUnit.transform.position, 0.6f);
+        // rewardMgr.CreateCollectibleItem(CollectibleType.Magnet, playerUnit.transform.position, 0.6f);
+
+        UIMgr.Instance.selectionPanel.ShowSkillSelection();
     }
 }

@@ -26,7 +26,7 @@ public class BaseAttackButton : MonoBehaviour
     public virtual void Init(SkillKey skillKey)
     {
         skillData = DataManager.GetSkillData(skillKey);
-        skillIcon.sprite = GameManager.Instance.resourceMgr.GetSkillIcon(skillData.name);
+        skillIcon.sprite = GameManager.Instance.resourceMgr.GetSkillIcon(skillKey);
         gameObject.SetActive(true);
     }
 
