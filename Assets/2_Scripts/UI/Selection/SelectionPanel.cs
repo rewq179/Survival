@@ -11,10 +11,13 @@ public class SelectionPanel : MonoBehaviour
     [SerializeField] private GameObject panel;
     [SerializeField] private CanvasGroup canvasGroup;
 
-    private Vector2 slotStartPosition = new Vector2(0, -Screen.height * 0.3f);
+
+    // 데이터
+    private Unit playerUnit;
     private List<SelectionData> skills = new();
     private List<SelectionData> selectedSkills = new();
     private Stack<SelectionData> skillPool = new();
+    private Vector2 slotStartPosition = new Vector2(0, -Screen.height * 0.3f);
     private Vector2[] startPos = new Vector2[SELECTION_COUNT];
     private Vector2[] targetPos = new Vector2[SELECTION_COUNT];
 
@@ -22,7 +25,7 @@ public class SelectionPanel : MonoBehaviour
     private const int SELECTION_COUNT = 3;
     private const float ACTIVE_WEIGHT = 1.2f;
     private const float PASSIVE_WEIGHT = 0.7f;
-    private const float LEVEL_UP_WEIGHT = 0.5f;
+    private const float SUB_WEIGHT = 0.5f;
 
     private const float FADE_IN_DURATION = 0.3f;
     private const float FADE_IN_INV_DURATION = 1 / FADE_IN_DURATION;
@@ -32,8 +35,9 @@ public class SelectionPanel : MonoBehaviour
     private const float MOVE_INV_DURATION = 1 / MOVE_DURATION;
     private const float SLOT_DIFF = 600f;
 
-    private void Start()
+    public void Init(Unit unit)
     {
+        playerUnit = unit;
         SetActive(false);
     }
 
@@ -60,31 +64,36 @@ public class SelectionPanel : MonoBehaviour
 
         for (SkillKey skillKey = 0; skillKey < SkillKey.StingAttack; skillKey++)
         {
-            skills.Add(CreateSelectionData(skillKey, SubSkillKey.None));
+            if (playerUnit.HasSkill(skillKey))
+            {
+                List<SkillKey> subSkills = DataMgr.GetSubSkillKeysByMain(skillKey);
+                foreach (SkillKey key in subSkills)
+                {
+                    skills.Add(CreateSelectionDataBySub(key));
+                }
+            }
+
+            else if (!DataMgr.IsSubSkill(skillKey))
+            {
+                skills.Add(CreateSelectionDataByMain(skillKey));
+            }
         }
     }
 
-    private SelectionData CreateSelectionData(SkillKey skillKey, SubSkillKey subSkillKey)
+    private SelectionData CreateSelectionDataByMain(SkillKey key)
     {
-        SkillData skillData = DataManager.GetSkillData(skillKey);
-        Sprite icon = GameManager.Instance.resourceMgr.GetSkillIcon(skillKey);
-        bool isLevelUp = GameManager.Instance.PlayerUnit.HasSkill(skillKey);
-
+        SkillData skillData = DataMgr.GetSkillData(key);
         SelectionData data = PopSelectionData();
-        data.Init(skillKey, skillData.skillType, subSkillKey, skillData.name, skillData.description, icon, isLevelUp);
+        data.Init(key, skillData.skillType, skillData.name, skillData.description, GameManager.Instance.resourceMgr.GetSkillIcon(key));
         return data;
     }
 
-    private void RemoveSelectionData(SkillKey skillKey)
+    private SelectionData CreateSelectionDataBySub(SkillKey key)
     {
-        for (int i = skills.Count - 1; i >= 0; i--)
-        {
-            if (skills[i].skillKey == skillKey)
-            {
-                PushSelectionData(skills[i]);
-                skills.RemoveAt(i);
-            }
-        }
+        SubSkillData skillData = DataMgr.GetSubSkillData(key);
+        SelectionData data = PopSelectionData();
+        data.Init(key, SkillType.Sub, skillData.name, skillData.description, GameManager.Instance.resourceMgr.GetSkillIcon(key));
+        return data;
     }
 
     private void GetRandomSkills(int count)
@@ -94,25 +103,35 @@ public class SelectionPanel : MonoBehaviour
 
         for (int i = 0; i < count && availableSkills.Count > 0; i++)
         {
-            // 가중치: 기본 1, 레벨업 가능시 0.5 추가
             SelectionData picked = RandomPickerByWeight.PickOne(
-                availableSkills, data => 
-                    + (data.skillType == SkillType.Active ? ACTIVE_WEIGHT : PASSIVE_WEIGHT)
-                    + (data.isLevelUp ? LEVEL_UP_WEIGHT : 0f)
-            );
+                availableSkills, data => GetWeight(data));
 
             selectedSkills.Add(picked);
             availableSkills.Remove(picked);
         }
     }
 
+    private float GetWeight(SelectionData data)
+    {
+        return data.skillType switch
+        {
+            SkillType.Active => ACTIVE_WEIGHT,
+            SkillType.Passive => PASSIVE_WEIGHT,
+            SkillType.Sub => SUB_WEIGHT,
+            _ => 0f
+        };
+    }
+
     private void SelectSkill(SelectionData data)
     {
-        if (data.isLevelUp)
-            GameManager.Instance.PlayerUnit.LevelUpSkill(data.skillKey, data.subSkillKey);
+        if (data.skillType == SkillType.Sub)
+        {
+            SubSkillData subSkillData = DataMgr.GetSubSkillData(data.skillKey);
+            playerUnit.LevelUpSkill(subSkillData.parentSkillKey, data.skillKey);
+        }
 
         else
-            GameManager.Instance.PlayerUnit.AddSkill(data.skillKey);
+            playerUnit.AddSkill(data.skillKey);
 
         StartCoroutine(HideSelectionCoroutine());
     }
@@ -177,7 +196,7 @@ public class SelectionPanel : MonoBehaviour
     }
 
     private IEnumerator SetGoalPos()
-    {   
+    {
         for (int i = 0; i < selectedSkills.Count; i++)
         {
             startPos[i] = selectionSlots[i].Rect.anchoredPosition;

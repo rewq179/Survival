@@ -51,13 +51,16 @@ public class AttackJoystick : MonoBehaviour
         }
     }
 
-    private void RefreshSkill(Dictionary<SkillKey, List<SubSkillKey>> skillKeys)
+    private void RefreshSkill(Dictionary<SkillKey, List<SkillKey>> skillKeys)
     {
         int start = (int)SkillButtonType.Attack;
 
         int index = 0;
         foreach (var skill in skillKeys)
         {
+            if (!DataMgr.IsActiveSkill(skill.Key))
+                continue;
+                
             attackButtons[start + index].Init(skill.Key);
             index++;
         }

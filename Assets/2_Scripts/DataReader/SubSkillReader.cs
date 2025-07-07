@@ -9,55 +9,6 @@ using System.Globalization;
 using UnityEditor;
 #endif
 
-public enum SubSkillKey
-{
-    None = -1,
-
-    // Arrow 서브 스킬
-    Arrow_Cooldown,
-    Arrow_ProjectileCount,
-    Arrow_DamageInc,
-    Arrow_Ricochet,
-
-    // Dagger 서브 스킬
-    Dagger_Cooldown,
-    Dagger_ProjectileCount,
-    Dagger_DamageInc,
-    Dagger_Piercing,
-
-    // FrontSpike 서브 스킬
-    FrontSpike_Cooldown,
-    FrontSpike_DamageInc,
-
-    // EnergyExplosion 서브 스킬
-    EnergyExplosion_Cooldown,
-    EnergyExplosion_DamageInc,
-    EnergyExplosion_Radius,
-
-    // Meteor 서브 스킬
-    Meteor_Cooldown,
-    Meteor_DamageInc,
-    Meteor_Radius,
-    Meteor_Duration,
-    Meteor_DamageTick,
-
-    // 패시브 스킬 서브 스킬
-    HealthInc,
-    MoveSpeedInc,
-    DefenseInc,
-    MagnetRangeInc,
-    ExpGainInc,
-    GoldGainInc,
-    CriticalChance,
-    CriticalDamage,
-    AllSkillRangeInc,
-    AllSkillCooldownDec,
-    AllSkillDamageInc,
-    AllSkillDurationInc,
-
-    Max,
-}
-
 public enum SubSkillType
 {Cooldown,               // 쿨다운 감소
     ProjectileCount,        // 투사체 개수 증가
@@ -86,7 +37,7 @@ public enum SubSkillType
 [Serializable]
 public class SubSkillData
 {
-    public SubSkillKey subSkillKey;
+    public SkillKey skillKey;
     public SkillKey parentSkillKey;
     public string name;
     public string description;
@@ -95,9 +46,9 @@ public class SubSkillData
     public int maxLevel;
     public SubSkillType type;
 
-    public void Init(SubSkillKey subSkillKey, SkillKey parentSkillKey, string name, string description, float baseValue, float perLevelValue, int maxLevel, SubSkillType type)
+    public void Init(SkillKey skillKey, SkillKey parentSkillKey, string name, string description, float baseValue, float perLevelValue, int maxLevel, SubSkillType type)
     {
-        this.subSkillKey = subSkillKey;
+        this.skillKey = skillKey;
         this.parentSkillKey = parentSkillKey;
         this.name = name;
         this.description = description;
@@ -119,7 +70,7 @@ public class SubSkillDataReader : BaseReader
 
     internal void SetData(List<GSTU_Cell> cells)
     {
-        SubSkillKey subSkillKey = SubSkillKey.Max;
+        SkillKey skillKey = SkillKey.Max;
         SkillKey parentSkillKey = SkillKey.Max;
         string name = string.Empty;
         string description = string.Empty;
@@ -134,9 +85,9 @@ public class SubSkillDataReader : BaseReader
 
             switch (columnId)
             {
-                case "subskillkey":
-                    if (Enum.TryParse(cells[i].value, true, out SubSkillKey parsedSubSkillKey))
-                        subSkillKey = parsedSubSkillKey;
+                case "skillkey":
+                    if (Enum.TryParse(cells[i].value, true, out SkillKey parsedSkillKey))
+                        skillKey = parsedSkillKey;
                     break;
 
                 case "parentskillkey":
@@ -175,7 +126,7 @@ public class SubSkillDataReader : BaseReader
         }
 
         SubSkillData data = new SubSkillData();
-        data.Init(subSkillKey, parentSkillKey, name, description, baseValue, perLevelValue, maxLevel, type);
+        data.Init(skillKey, parentSkillKey, name, description, baseValue, perLevelValue, maxLevel, type);
         subSkillDatas.Add(data);
     }
 }

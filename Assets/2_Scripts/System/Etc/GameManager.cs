@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     [SerializeField] private GameObject playerUnitPrefab;
-    [SerializeField] private DataManager dataManager;
+    [SerializeField] private DataMgr dataManager;
     public ResourceMgr resourceMgr;
     public SkillManager skillManager;
     public SpawnManager spawnManager;

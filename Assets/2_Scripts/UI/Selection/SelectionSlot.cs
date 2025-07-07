@@ -50,18 +50,25 @@ public class SelectionSlot : MonoBehaviour
 
     private void UpdateUI()
     {
-        titleText.text = data.type == SelectionSlotType.Skill ? "Skill" : "Item";
+        titleText.text = data.skillType switch
+        {
+            SkillType.Active => "액티브",
+            SkillType.Passive => "패시브",
+            SkillType.Sub => "서브",
+            _ => "아이템"
+        };
+
         iconImage.sprite = data.icon;
         nameText.text = data.name;
 
         float value = 0;
         if (data.skillType == SkillType.Passive)
-            value = DataManager.GetSkillData(data.skillKey).baseValue;
-        else if (data.subSkillKey != SubSkillKey.None)
-            value = DataManager.GetSubSkillData(data.subSkillKey).baseValue;
+            value = DataMgr.GetSkillData(data.skillKey).baseValue;
+        else if (data.skillType == SkillType.Sub)
+            value = DataMgr.GetSubSkillData(data.skillKey).baseValue;
 
         string desc = DescMgr.GetSubSkillDescription(data.description, value);
-        if (data.isLevelUp)
+        if (data.skillType == SkillType.Sub)
             desc += "\n\n<color=yellow>레벨업!</color>";
         else
             desc += "\n\n<color=green>새로 획득!</color>";

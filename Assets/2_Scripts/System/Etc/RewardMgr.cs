@@ -55,7 +55,7 @@ public class RewardMgr : MonoBehaviour
         Vector3 position = unit.transform.position;
 
         // 고정 드랍
-        UnitData data = DataManager.GetUnitData(unit.UnitID);
+        UnitData data = DataMgr.GetUnitData(unit.UnitID);
         CreateCollectibleItem(CollectibleType.Exp, position, data.exp);
         CreateCollectibleItem(CollectibleType.Gold, position, data.gold);
 

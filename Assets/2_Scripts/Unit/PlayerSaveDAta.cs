@@ -8,17 +8,17 @@ public class PlayerSaveData
     public int level;
     public float exp;
     public int gold;
-    private Dictionary<SkillKey, List<SubSkillKey>> skills = new();
-    private Dictionary<SubSkillKey, int> subSkills = new();
+    private Dictionary<SkillKey, List<SkillKey>> skills = new();
+    private Dictionary<SkillKey, List<SkillKey>> subSkills = new();
 
-    public Dictionary<SkillKey, List<SubSkillKey>> Skills => skills;
-    public Dictionary<SubSkillKey, int> SubSkills => subSkills;
+    public Dictionary<SkillKey, List<SkillKey>> Skills => skills;
+    public Dictionary<SkillKey, List<SkillKey>> SubSkills => subSkills;
 
     // 델리게이트/이벤트
     public event Action<int> OnLevelChanged;
     public event Action<float> OnExpChanged;
     public event Action<int> OnGoldChanged;
-    public event Action<Dictionary<SkillKey, List<SubSkillKey>>> OnSkillChanged;
+    public event Action<Dictionary<SkillKey, List<SkillKey>>> OnSkillChanged;
 
     public bool HasSkill(SkillKey skillKey) => skills.ContainsKey(skillKey);
 
@@ -67,32 +67,27 @@ public class PlayerSaveData
 
     public void AddSkill(SkillKey skillKey)
     {
-        if (!skills.ContainsKey(skillKey))
-        {
-            skills.Add(skillKey, new());
-            OnSkillChanged?.Invoke(skills);
-        }
+        skills.Add(skillKey, new());
+        OnSkillChanged?.Invoke(skills);
     }
 
     public void RemoveSkill(SkillKey skillKey)
     {
-        if (skills.Remove(skillKey))
-        {
-            OnSkillChanged?.Invoke(skills);
-        }
+        skills.Remove(skillKey);
+        OnSkillChanged?.Invoke(skills);
     }
 
-    public void LevelUpSkill(SkillKey skillKey, SubSkillKey subSkillKey)
+    public void LevelUpSkill(SkillKey parentKey, SkillKey skillKey)
     {
-        if (skills.TryGetValue(skillKey, out List<SubSkillKey> mains))
-            mains.Add(subSkillKey);
+        if (skills.TryGetValue(parentKey, out List<SkillKey> mains))
+            mains.Add(skillKey);
         else
-            skills.Add(skillKey, new() { subSkillKey });
+            skills.Add(parentKey, new() { skillKey });
 
-        if (subSkills.TryGetValue(subSkillKey, out int level))
-            level++;
+        if (subSkills.TryGetValue(parentKey, out List<SkillKey> subs))
+            subs.Add(skillKey);
         else
-            subSkills.Add(subSkillKey, 1);
+            subSkills.Add(parentKey, new() { skillKey });
     }
 
     public void AddGold(int amount)

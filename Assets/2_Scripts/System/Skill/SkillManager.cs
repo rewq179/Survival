@@ -5,7 +5,7 @@ using System.Collections;
 
 public class SkillManager : MonoBehaviour
 {
-    private Dictionary<SkillKey, List<SubSkillKey>> playerSkills = new();
+    private Dictionary<SkillKey, List<SkillKey>> playerSkills = new();
 
     // 쿨타임 관리
     private List<SkillKey> activeCooldownSkills = new();
@@ -26,7 +26,7 @@ public class SkillManager : MonoBehaviour
 
     // 이벤트
     public event Action<SkillKey, float> OnSkillCooldownChanged;
-    public event Action<Dictionary<SkillKey, List<SubSkillKey>>> OnSkillListChanged;
+    public event Action<Dictionary<SkillKey, List<SkillKey>>> OnSkillListChanged;
     public event Action<SkillKey> OnSkillCooldownEnded;
 
     // 스킬 인스턴스 관리
@@ -79,7 +79,7 @@ public class SkillManager : MonoBehaviour
         playerController = unit.GetComponentInChildren<PlayerController>();
     }
 
-    public void InitializeSkills(Dictionary<SkillKey, List<SubSkillKey>> newSkillKeys)
+    public void InitializeSkills(Dictionary<SkillKey, List<SkillKey>> newSkillKeys)
     {
         playerSkills.Clear();
         activeCooldownSkills.Clear();
@@ -106,7 +106,7 @@ public class SkillManager : MonoBehaviour
         return currentCooldowns[skillKey];
     }
 
-    private float GetSkillCooldown(SkillKey skillKey) => DataManager.GetSkillData(skillKey).cooldown;
+    private float GetSkillCooldown(SkillKey skillKey) => DataMgr.GetSkillData(skillKey).cooldown;
     private float GetCurrentCooldown(SkillKey skillKey)
     {
         if (!currentCooldowns.ContainsKey(skillKey))
@@ -163,7 +163,7 @@ public class SkillManager : MonoBehaviour
         if (!activeCooldownSkills.Contains(skillKey))
             activeCooldownSkills.Add(skillKey);
 
-        SkillData skillData = DataManager.GetSkillData(skillKey);
+        SkillData skillData = DataMgr.GetSkillData(skillKey);
         Unit caster = playerController.GetComponent<Unit>();
         CreateSkillLauncher(skillData, startPosition, targetPosition, caster);
         RemoveIndicatorsByskillKey(skillKey);
@@ -230,7 +230,7 @@ public class SkillManager : MonoBehaviour
 
     public void ShowIndicator(SkillKey skillKey, Vector3 start, bool isPlayerIndicator)
     {
-        SkillData skillData = DataManager.GetSkillData(skillKey);
+        SkillData skillData = DataMgr.GetSkillData(skillKey);
 
         if (skillData.indicatorElements.Count > 1) // 복합 인디케이터
         {
@@ -339,7 +339,7 @@ public class SkillManager : MonoBehaviour
     /// </summary>
     public void ExecuteMonsterAttack(SkillKey skillKey, Unit caster, Unit target)
     {
-        SkillData skillData = DataManager.GetSkillData(skillKey);
+        SkillData skillData = DataMgr.GetSkillData(skillKey);
 
         // 몬스터 위치에서 공격 실행
         Vector3 startPos = caster.transform.position;

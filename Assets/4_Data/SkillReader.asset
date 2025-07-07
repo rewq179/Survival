@@ -17,6 +17,7 @@ MonoBehaviour:
   endRow: 19
   skillDatas:
   - skillKey: 0
+    skillType: 0
     name: Arrow
     description: "\uD654\uC0B4\uC744 \uB0A0\uB9BD\uB2C8\uB2E4."
     cooldown: 2
@@ -35,13 +36,14 @@ MonoBehaviour:
     - damage: 12
       interval: 0
     launcherType: 0
-  - skillKey: 1
+  - skillKey: 5
+    skillType: 0
     name: Dagger
     description: "\uD68C\uC218\uB418\uB294 \uCE7C\uC744 \uB358\uC9D1\uB2C8\uB2E4."
     cooldown: 4
     baseValue: 0
     indicatorElements:
-    - skillKey: 1
+    - skillKey: 5
       index: 0
       type: 0
       moveSpeed: 18
@@ -54,13 +56,14 @@ MonoBehaviour:
     - damage: 10
       interval: 0
     launcherType: 0
-  - skillKey: 2
+  - skillKey: 10
+    skillType: 0
     name: FrontSpike
     description: "\uBD80\uCC44\uAF34 \uD615\uD0DC\uC758 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
     cooldown: 4
     baseValue: 0
     indicatorElements:
-    - skillKey: 2
+    - skillKey: 10
       index: 0
       type: 1
       moveSpeed: 0
@@ -73,13 +76,14 @@ MonoBehaviour:
     - damage: 22
       interval: 0
     launcherType: 1
-  - skillKey: 3
+  - skillKey: 13
+    skillType: 0
     name: EnergyExplosion
     description: "\uB2E8\uBC1C\uC131 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
     cooldown: 7.5
     baseValue: 0
     indicatorElements:
-    - skillKey: 3
+    - skillKey: 13
       index: 0
       type: 2
       moveSpeed: 0
@@ -92,13 +96,14 @@ MonoBehaviour:
     - damage: 45
       interval: 0
     launcherType: 1
-  - skillKey: 4
+  - skillKey: 17
+    skillType: 0
     name: Meteor
     description: "\uC9C0\uC18D\uC801\uC778 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
     cooldown: 12
     baseValue: 0
     indicatorElements:
-    - skillKey: 4
+    - skillKey: 17
       index: 0
       type: 2
       moveSpeed: 0
@@ -111,13 +116,14 @@ MonoBehaviour:
     - damage: 20
       interval: 0.5
     launcherType: 2
-  - skillKey: 5
+  - skillKey: 23
+    skillType: 1
     name: "\uCCB4\uB825 \uC99D\uAC00"
     description: "\uCD5C\uB300 \uCCB4\uB825 +{P0}"
     cooldown: 0
     baseValue: 0.15
     indicatorElements:
-    - skillKey: 5
+    - skillKey: 23
       index: 0
       type: 3
       moveSpeed: 0
@@ -130,13 +136,14 @@ MonoBehaviour:
     - damage: 0
       interval: 0
     launcherType: 0
-  - skillKey: 6
+  - skillKey: 25
+    skillType: 1
     name: "\uC774\uB3D9 \uC18D\uB3C4 \uC99D\uAC00"
     description: "\uC774\uB3D9 \uC18D\uB3C4 +{P0}"
     cooldown: 0
     baseValue: 0.1
     indicatorElements:
-    - skillKey: 6
+    - skillKey: 25
       index: 0
       type: 3
       moveSpeed: 0
@@ -149,13 +156,14 @@ MonoBehaviour:
     - damage: 0
       interval: 0
     launcherType: 0
-  - skillKey: 7
+  - skillKey: 27
+    skillType: 1
     name: "\uBC29\uC5B4\uB825 \uC99D\uAC00"
     description: "\uBC1B\uB294 \uD53C\uD574 -{P0}"
     cooldown: 0
     baseValue: 0.1
     indicatorElements:
-    - skillKey: 7
+    - skillKey: 48
       index: 0
       type: 3
       moveSpeed: 0
@@ -168,13 +176,14 @@ MonoBehaviour:
     - damage: 0
       interval: 0
     launcherType: 0
-  - skillKey: 8
+  - skillKey: 29
+    skillType: 1
     name: "\uC790\uC11D \uBC94\uC704 \uC99D\uAC00"
     description: "\uC544\uC774\uD15C \uC790\uC11D \uBC94\uC704 +{P0}"
     cooldown: 0
     baseValue: 0.2
     indicatorElements:
-    - skillKey: 8
+    - skillKey: 29
       index: 0
       type: 3
       moveSpeed: 0
@@ -187,13 +196,14 @@ MonoBehaviour:
     - damage: 0
       interval: 0
     launcherType: 0
-  - skillKey: 9
+  - skillKey: 31
+    skillType: 1
     name: "\uACBD\uD5D8\uCE58 \uD68D\uB4DD \uC99D\uAC00"
     description: "\uACBD\uD5D8\uCE58 \uD68D\uB4DD\uB7C9 +{P0}"
     cooldown: 0
     baseValue: 0.15
     indicatorElements:
-    - skillKey: 9
+    - skillKey: 31
       index: 0
       type: 3
       moveSpeed: 0
@@ -206,13 +216,14 @@ MonoBehaviour:
     - damage: 0
       interval: 0
     launcherType: 0
-  - skillKey: 10
+  - skillKey: 33
+    skillType: 1
     name: "\uACE8\uB4DC \uD68D\uB4DD \uC99D\uAC00"
     description: "\uACE8\uB4DC \uD68D\uB4DD\uB7C9 +{P0}"
     cooldown: 0
     baseValue: 0.2
     indicatorElements:
-    - skillKey: 10
+    - skillKey: 33
       index: 0
       type: 3
       moveSpeed: 0
@@ -225,13 +236,14 @@ MonoBehaviour:
     - damage: 0
       interval: 0
     launcherType: 0
-  - skillKey: 11
+  - skillKey: 35
+    skillType: 1
     name: "\uCE58\uBA85\uD0C0 \uD655\uB960"
     description: "\uCE58\uBA85\uD0C0 \uD655\uB960 +{P0}"
     cooldown: 0
     baseValue: 0.05
     indicatorElements:
-    - skillKey: 11
+    - skillKey: 35
       index: 0
       type: 3
       moveSpeed: 0
@@ -244,13 +256,14 @@ MonoBehaviour:
     - damage: 0
       interval: 0
     launcherType: 0
-  - skillKey: 12
+  - skillKey: 37
+    skillType: 1
     name: "\uCE58\uBA85\uD0C0 \uD53C\uD574"
     description: "\uCE58\uBA85\uD0C0 \uD53C\uD574 +{P0}"
     cooldown: 0
     baseValue: 0.2
     indicatorElements:
-    - skillKey: 12
+    - skillKey: 37
       index: 0
       type: 3
       moveSpeed: 0
@@ -263,13 +276,14 @@ MonoBehaviour:
     - damage: 0
       interval: 0
     launcherType: 0
-  - skillKey: 13
+  - skillKey: 39
+    skillType: 1
     name: "\uC2A4\uD0AC \uBC94\uC704 \uC99D\uAC00"
     description: "\uBAA8\uB4E0 \uC2A4\uD0AC \uBC94\uC704 +{P0}"
     cooldown: 0
     baseValue: 0.1
     indicatorElements:
-    - skillKey: 13
+    - skillKey: 39
       index: 0
       type: 3
       moveSpeed: 0
@@ -282,13 +296,14 @@ MonoBehaviour:
     - damage: 0
       interval: 0
     launcherType: 0
-  - skillKey: 14
+  - skillKey: 41
+    skillType: 1
     name: "\uC2A4\uD0AC \uCFE8\uB2E4\uC6B4 \uAC10\uC18C"
     description: "\uBAA8\uB4E0 \uC2A4\uD0AC \uCFE8\uB2E4\uC6B4 -{P0}"
     cooldown: 0
     baseValue: 0.05
     indicatorElements:
-    - skillKey: 14
+    - skillKey: 41
       index: 0
       type: 3
       moveSpeed: 0
@@ -301,13 +316,14 @@ MonoBehaviour:
     - damage: 0
       interval: 0
     launcherType: 0
-  - skillKey: 15
+  - skillKey: 43
+    skillType: 1
     name: "\uC2A4\uD0AC \uB370\uBBF8\uC9C0 \uC99D\uAC00"
     description: "\uBAA8\uB4E0 \uC2A4\uD0AC \uB370\uBBF8\uC9C0 +{P0}"
     cooldown: 0
     baseValue: 0.1
     indicatorElements:
-    - skillKey: 15
+    - skillKey: 43
       index: 0
       type: 3
       moveSpeed: 0
@@ -320,13 +336,14 @@ MonoBehaviour:
     - damage: 0
       interval: 0
     launcherType: 0
-  - skillKey: 16
+  - skillKey: 45
+    skillType: 1
     name: "\uC2A4\uD0AC \uC9C0\uC18D\uC2DC\uAC04 \uC99D\uAC00"
     description: "\uBAA8\uB4E0 \uC2A4\uD0AC \uC9C0\uC18D\uC2DC\uAC04 +{P0}"
     cooldown: 0
     baseValue: 0.2
     indicatorElements:
-    - skillKey: 16
+    - skillKey: 45
       index: 0
       type: 3
       moveSpeed: 0
@@ -339,7 +356,8 @@ MonoBehaviour:
     - damage: 0
       interval: 0
     launcherType: 0
-  - skillKey: 17
+  - skillKey: 47
+    skillType: 0
     name: "\uCC0C\uB974\uAE30 \uACF5\uACA9"
     description: "\uC989\uC2DC \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
     cooldown: 0.5

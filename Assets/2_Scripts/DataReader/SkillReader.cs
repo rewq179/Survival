@@ -12,29 +12,65 @@ using UnityEditor;
 public enum SkillKey
 {
     None = -1,
+
+    // 액티브
     Arrow,
+    Arrow_Cooldown,
+    Arrow_ProjectileCount,
+    Arrow_DamageInc,
+    Arrow_Ricochet,
+
     Dagger,
+    Dagger_Cooldown,
+    Dagger_ProjectileCount,
+    Dagger_DamageInc,
+    Dagger_Piercing,
+
     FrontSpike,
+    FrontSpike_Cooldown,
+    FrontSpike_DamageInc,
+
     EnergyExplosion,
+    EnergyExplosion_Cooldown,
+    EnergyExplosion_DamageInc,
+    EnergyExplosion_Radius,
+
     Meteor,
+    Meteor_Cooldown,
+    Meteor_DamageInc,
+    Meteor_Radius,
+    Meteor_Duration,
+    Meteor_DamageTick,
 
     // 패시브
     Health,
+    Health_Inc,
     MoveSpeed,
-    DefenseInc,
+    MoveSpeed_Inc,
+    Defense,
+    Defense_Inc,
     MagnetRange,
+    MagnetRange_Inc,
     ExpGain,
+    ExpGain_Inc,
     GoldGain,
+    GoldGain_Inc,
     CriticalChance,
+    CriticalChance_Inc,
     CriticalDamage,
+    CriticalDamage_Inc,
     AllSkillRange,
+    AllSkillRange_Inc,
     AllSkillCooldown,
+    AllSkillCooldown_Dec,
     AllSkillDamage,
+    AllSkillDamage_Inc,
     AllSkillDuration,
+    AllSkillDuration_Inc,
 
     // 몬스터
     StingAttack,
-    
+
     Max,
 }
 
@@ -42,6 +78,7 @@ public enum SkillType
 {
     Active,
     Passive,
+    Sub,
     Max,
 }
 

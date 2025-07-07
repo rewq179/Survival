@@ -30,6 +30,6 @@ public class UIMgr : MonoBehaviour
         characterInfo.Init(playerUnit);
         attackJoystick.Init(playerUnit);
         topBar.Init(playerUnit);
-        // selectionPanel.Init();
+        selectionPanel.Init(playerUnit);
     }
 }

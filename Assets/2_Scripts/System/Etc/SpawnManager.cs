@@ -77,13 +77,13 @@ public class SpawnManager : MonoBehaviour
         waveDatas.Clear();
         activeWaves.Clear();
 
-        WaveData waveData = DataManager.GetWaveData(wave);
+        WaveData waveData = DataMgr.GetWaveData(wave);
         waveDatas.Add(waveData);
 
         List<int> spawnGroupIDs = waveData.spawnGroupIDs;
         foreach (int groupID in spawnGroupIDs)
         {
-            spawnGroupDatas.Add(DataManager.GetSpawnGroupData(groupID));
+            spawnGroupDatas.Add(DataMgr.GetSpawnGroupData(groupID));
         }
 
         StartNextWave();

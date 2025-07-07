@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class DataManager : MonoBehaviour
+public class DataMgr : MonoBehaviour
 {
     public UnitDataReader unitDataReader;
     public SpawnGroupDataReader spawnGroupDataReader;
@@ -11,7 +11,10 @@ public class DataManager : MonoBehaviour
 
     private static Dictionary<int, UnitData> unitDatas = new();
     private static Dictionary<SkillKey, SkillData> skillDatas = new();
-    private static Dictionary<SubSkillKey, SubSkillData> subSkillDatas = new();
+    private static HashSet<SkillKey> activeSkillKeys = new();
+    private static HashSet<SkillKey> passiveSkillKeys = new();
+    private static Dictionary<SkillKey, SubSkillData> subSkillDatas = new();
+    private static Dictionary<SkillKey, List<SkillKey>> subSkillDatasByMain = new();
     private static Dictionary<int, SpawnGroupData> spawnGroupDatas = new();
     private static Dictionary<int, WaveData> waveDatas = new();
 
@@ -25,17 +28,30 @@ public class DataManager : MonoBehaviour
         }
 
         skillDatas.Clear();
+        activeSkillKeys.Clear();
+        passiveSkillKeys.Clear();
         for (int i = 0; i < skillDataReader.skillDatas.Count; i++)
         {
-            SkillData skillData = skillDataReader.skillDatas[i];
-            skillDatas.Add(skillData.skillKey, skillData);
+            SkillData data = skillDataReader.skillDatas[i];
+            skillDatas.Add(data.skillKey, data);
+
+            if (data.skillType == SkillType.Active)
+                activeSkillKeys.Add(data.skillKey);
+            else if (data.skillType == SkillType.Passive)
+                passiveSkillKeys.Add(data.skillKey);
         }
 
         subSkillDatas.Clear();
+        subSkillDatasByMain.Clear();
         for (int i = 0; i < subSkillDataReader.subSkillDatas.Count; i++)
         {
-            SubSkillData subSkillData = subSkillDataReader.subSkillDatas[i];
-            subSkillDatas.Add(subSkillData.subSkillKey, subSkillData);
+            SubSkillData data = subSkillDataReader.subSkillDatas[i];
+            subSkillDatas.Add(data.skillKey, data);
+
+            if (subSkillDatasByMain.TryGetValue(data.parentSkillKey, out List<SkillKey> keys))
+                keys.Add(data.skillKey);
+            else
+                subSkillDatasByMain.Add(data.parentSkillKey, new List<SkillKey>() { data.skillKey });
         }
 
         spawnGroupDatas.Clear();
@@ -61,18 +77,40 @@ public class DataManager : MonoBehaviour
         return null;
     }
 
+    public static bool IsActiveSkill(SkillKey skillKey)
+    {
+        return activeSkillKeys.Contains(skillKey);
+    }
+
+    public static bool IsPassiveSkill(SkillKey skillKey)
+    {
+        return passiveSkillKeys.Contains(skillKey);
+    }
+
+    public static bool IsSubSkill(SkillKey skillKey)
+    {
+        return subSkillDatas.ContainsKey(skillKey);
+    }
+
     public static SkillData GetSkillData(SkillKey skillKey)
     {
         if (skillDatas.TryGetValue(skillKey, out SkillData skillData))
             return skillData;
 
         return null;
-
     }
 
-    public static SubSkillData GetSubSkillData(SubSkillKey subSkillKey)
+    public static List<SkillKey> GetSubSkillKeysByMain(SkillKey skillKey)
     {
-        if (subSkillDatas.TryGetValue(subSkillKey, out SubSkillData subSkillData))
+        if (subSkillDatasByMain.TryGetValue(skillKey, out List<SkillKey> subSkillKeys))
+            return subSkillKeys;
+
+        return null;
+    }
+
+    public static SubSkillData GetSubSkillData(SkillKey skillKey)
+    {
+        if (subSkillDatas.TryGetValue(skillKey, out SubSkillData subSkillData))
             return subSkillData;
 
         return null;
