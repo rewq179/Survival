@@ -16,9 +16,9 @@ public class SkillCoolButton : BaseAttackButton
         cooldownText.text = string.Empty;
     }
 
-    public override void Init(SkillKey skillKey)
+    public override void Init(Unit unit, SkillKey skillKey)
     {
-        base.Init(skillKey);
+        base.Init(unit, skillKey);
 
         maxCooldown = skillData.cooldown;
         cooldownSlider.maxValue = maxCooldown;
@@ -31,11 +31,8 @@ public class SkillCoolButton : BaseAttackButton
         if (skillManager == null)
             skillManager = GameManager.Instance.skillManager;
 
-        if (skillManager != null)
-        {
-            skillManager.OnSkillCooldownChanged += OnSkillCooldownChanged;
-            skillManager.OnSkillCooldownEnded += OnSkillCooldownEnded;
-        }
+        playerUnit.OnSkillCooldownChanged += OnSkillCooldownChanged;
+        playerUnit.OnSkillCooldownEnded += OnSkillCooldownEnded;
     }
 
     private void OnSkillCooldownChanged(SkillKey skillKey, float cooldown)
@@ -55,12 +52,12 @@ public class SkillCoolButton : BaseAttackButton
         base.OnClick();
 
         if (skillManager != null)
-            skillManager.UseSkill(skillData.skillKey);
+            skillManager.UseSkill(skillData.skillKey, playerUnit);
     }
 
     public void UpdateCooldown(float cooldown)
     {
-        cooldownSlider.value = maxCooldown - skillManager.GetCooldown(skillData.skillKey);
+        cooldownSlider.value = maxCooldown - cooldown;
         cooldownText.text = $"{cooldown:F1}";
     }
 
@@ -73,10 +70,10 @@ public class SkillCoolButton : BaseAttackButton
 
     private void OnDestroy()
     {
-        if (skillManager != null)
+        if (playerUnit != null)
         {
-            skillManager.OnSkillCooldownChanged -= OnSkillCooldownChanged;
-            skillManager.OnSkillCooldownEnded -= OnSkillCooldownEnded;
+            playerUnit.OnSkillCooldownChanged -= OnSkillCooldownChanged;
+            playerUnit.OnSkillCooldownEnded -= OnSkillCooldownEnded;
         }
     }
 }

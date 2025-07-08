@@ -124,15 +124,7 @@ public class SelectionPanel : MonoBehaviour
 
     private void SelectSkill(SelectionData data)
     {
-        if (data.skillType == SkillType.Sub)
-        {
-            SubSkillData subSkillData = DataMgr.GetSubSkillData(data.skillKey);
-            playerUnit.LevelUpSkill(subSkillData.parentSkillKey, data.skillKey);
-        }
-
-        else
-            playerUnit.AddSkill(data.skillKey);
-
+        playerUnit.LearnSkill(data.skillKey);
         StartCoroutine(HideSelectionCoroutine());
     }
 

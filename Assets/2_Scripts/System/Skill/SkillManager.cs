@@ -5,14 +5,6 @@ using System.Collections;
 
 public class SkillManager : MonoBehaviour
 {
-    private Dictionary<SkillKey, List<SkillKey>> playerSkills = new();
-
-    // 쿨타임 관리
-    private List<SkillKey> activeCooldownSkills = new();
-    private Dictionary<SkillKey, float> previousCooldowns = new();
-    private Dictionary<SkillKey, float> currentCooldowns = new();
-    private Dictionary<SkillKey, float> skillCooldownTimes = new();
-
     // 스킬 인디케이터
     [SerializeField] private SkillIndicator indicatorPrefab;
     [SerializeField] private Material indicatorMaterial;
@@ -23,11 +15,6 @@ public class SkillManager : MonoBehaviour
 
     // 메시 풀 관리
     private Dictionary<SkillIndicatorType, Stack<Mesh>> meshPools = new();
-
-    // 이벤트
-    public event Action<SkillKey, float> OnSkillCooldownChanged;
-    public event Action<Dictionary<SkillKey, List<SkillKey>>> OnSkillListChanged;
-    public event Action<SkillKey> OnSkillCooldownEnded;
 
     // 스킬 인스턴스 관리
     [Header("스킬 런처 프리팹")]
@@ -46,105 +33,38 @@ public class SkillManager : MonoBehaviour
 
     private void Update()
     {
-        UpdateCooldowns();
         UpdateIndicator();
         UpdateSkillLauncher();
     }
 
-    private void UpdateCooldowns()
-    {
-        for (int i = activeCooldownSkills.Count - 1; i >= 0; i--)
-        {
-            SkillKey skillKey = activeCooldownSkills[i];
-            float newCooldown = GetCurrentCooldown(skillKey);
-
-            if (Mathf.Abs(previousCooldowns[skillKey] - newCooldown) > 0.01f)
-            {
-                previousCooldowns[skillKey] = newCooldown;
-                OnSkillCooldownChanged?.Invoke(skillKey, newCooldown);
-            }
-
-            if (newCooldown <= 0f)
-            {
-                activeCooldownSkills.RemoveAt(i);
-                OnSkillCooldownEnded?.Invoke(skillKey);
-            }
-        }
-    }
-
     public void Init(Unit unit)
     {
-        InitializeSkills(unit.Skills);
-        unit.OnSkillChanged += InitializeSkills;
         playerController = unit.GetComponentInChildren<PlayerController>();
-    }
-
-    public void InitializeSkills(Dictionary<SkillKey, List<SkillKey>> newSkillKeys)
-    {
-        playerSkills.Clear();
-        activeCooldownSkills.Clear();
-        currentCooldowns.Clear();
-        previousCooldowns.Clear();
-        skillCooldownTimes.Clear();
-
-        foreach (var skill in newSkillKeys)
-        {
-            skillCooldownTimes[skill.Key] = GetSkillCooldown(skill.Key);
-            currentCooldowns[skill.Key] = 0f;
-            previousCooldowns[skill.Key] = 0f;
-            playerSkills[skill.Key] = skill.Value;
-        }
-
-        OnSkillListChanged?.Invoke(playerSkills);
-    }
-
-    public float GetCooldown(SkillKey skillKey)
-    {
-        if (!currentCooldowns.ContainsKey(skillKey) || !skillCooldownTimes.ContainsKey(skillKey))
-            return 1f;
-
-        return currentCooldowns[skillKey];
-    }
-
-    private float GetSkillCooldown(SkillKey skillKey) => DataMgr.GetSkillData(skillKey).cooldown;
-    private float GetCurrentCooldown(SkillKey skillKey)
-    {
-        if (!currentCooldowns.ContainsKey(skillKey))
-            return 0f;
-
-        if (currentCooldowns[skillKey] > 0f)
-        {
-            currentCooldowns[skillKey] -= Time.deltaTime;
-            if (currentCooldowns[skillKey] < 0f)
-                currentCooldowns[skillKey] = 0f;
-        }
-
-        return currentCooldowns[skillKey];
     }
 
     /// <summary>
     /// 스킬 버튼 클릭으로 인디케이터 소환
     /// </summary>
-    public void UseSkill(SkillKey skillKey)
+    public void UseSkill(SkillKey skillKey, Unit caster)
     {
-        if (currentCooldowns.ContainsKey(skillKey) && currentCooldowns[skillKey] <= 0f)
+        if (caster.CanUseSkill(skillKey))
         {
             RemoveIndicatorsByskillKey(skillKey);
-            ShowIndicator(skillKey, playerController.transform.position, true);
+            ShowIndicator(skillKey, caster.transform.position, true);
         }
     }
 
     /// <summary>
     /// 인디케이터 이후 클릭으로 스킬 시전
     /// </summary>
-    public void ActivateSkill()
+    public void ActivateSkill(Unit caster)
     {
         if (activeIndicators.Count == 0)
             return;
 
         SkillKey skillKey = SkillKey.None;
 
-        Vector3 startPosition = playerController.transform.position;
+        Vector3 startPosition = caster.transform.position;
         startPosition.y = 0f;
         Vector3 targetPosition = Vector3.zero;
 
@@ -159,12 +79,9 @@ public class SkillManager : MonoBehaviour
         }
 
         // 쿨다운 설정
-        currentCooldowns[skillKey] = skillCooldownTimes[skillKey];
-        if (!activeCooldownSkills.Contains(skillKey))
-            activeCooldownSkills.Add(skillKey);
+        caster.StartCooldown(skillKey);
 
         SkillData skillData = DataMgr.GetSkillData(skillKey);
-        Unit caster = playerController.GetComponent<Unit>();
         CreateSkillLauncher(skillData, startPosition, targetPosition, caster);
         RemoveIndicatorsByskillKey(skillKey);
     }

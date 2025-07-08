@@ -1,17 +1,20 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using UnityEngine.Experimental.AI;
 
 public class Unit : MonoBehaviour
 {
     [Header("Components")]
     [SerializeField] private Animator animator;
     [SerializeField] private HealthBarBase healthBar;
+    [SerializeField] private PlayerController playerController;
 
     // 모듈
     private StatModule statModule;
     private BehaviourModule behaviourModule;
     private CombatModule combatModule;
+    private SkillModule skillModule;
 
     // 기본 정보
     private PlayerSaveData playerSaveData = new();
@@ -42,6 +45,7 @@ public class Unit : MonoBehaviour
         InitModule();
         InitHealthBar();
         playerSaveData.Init(this);
+        playerController?.Init(this);
         transform.position = position;
         mainCam = Camera.main;
         gameObject.SetActive(true);
@@ -57,10 +61,13 @@ public class Unit : MonoBehaviour
             combatModule = new CombatModule();
         if (playerSaveData == null)
             playerSaveData = new PlayerSaveData();
+        if (skillModule == null)
+            skillModule = new SkillModule();
 
         statModule.Init(DataMgr.GetUnitData(unitID));
         combatModule.Init(this);
         behaviourModule.Init(this);
+        skillModule.Init(this);
     }
 
     private void InitHealthBar()
@@ -75,6 +82,7 @@ public class Unit : MonoBehaviour
     private void Update()
     {
         behaviourModule?.Update();
+        skillModule.UpdateCooldowns();
     }
 
     private void LateUpdate()
@@ -88,8 +96,10 @@ public class Unit : MonoBehaviour
     public void SetTrigger(string name) => animator.SetTrigger(name);
 
     // StatModule
-    public float MaxHp => statModule.MaxHp;
-    public float MoveSpd => statModule.MoveSpd;
+    public float MaxHp => statModule.GetFinalStat(StatType.Health);
+    public float MoveSpeed => statModule.GetFinalStat(StatType.MoveSpeed);
+    public void AddBaseStatValue(StatType statType, float value) => statModule.AddBaseStatValue(statType, value);
+    public void AddStatModifier(StatType statType, float value) => statModule.AddStatModifier(statType, value); 
 
     // BehaviourModule
     public void OnAttackAnimationEnd() => behaviourModule.OnAttackAnimationEnd();
@@ -113,15 +123,7 @@ public class Unit : MonoBehaviour
     public float CurExp => playerSaveData.exp;
     public float MaxExp => playerSaveData.GetRequiredExp(playerSaveData.level);
     public int Gold => playerSaveData.gold;
-    public Dictionary<SkillKey, List<SkillKey>> Skills => playerSaveData.Skills;
-    public bool HasSkill(SkillKey skillKey) => playerSaveData.HasSkill(skillKey);
-
-    public event Action<Dictionary<SkillKey, List<SkillKey>>> OnSkillChanged
-    {
-        add => playerSaveData.OnSkillChanged += value;
-        remove => playerSaveData.OnSkillChanged -= value;
-    }
-
+    
     public event Action<int> OnLevelChanged
     {
         add => playerSaveData.OnLevelChanged += value;
@@ -140,9 +142,43 @@ public class Unit : MonoBehaviour
         remove => playerSaveData.OnGoldChanged -= value;
     }
 
-    public void AddSkill(SkillKey skillKey) => playerSaveData.AddSkill(skillKey);
-    public void RemoveSkill(SkillKey skillKey) => playerSaveData.RemoveSkill(skillKey);
-    public void LevelUpSkill(SkillKey parentKey, SkillKey skillKey) => playerSaveData.LevelUpSkill(parentKey, skillKey);
     public void AddGold(int amount) => playerSaveData.AddGold(amount);
     public int AddExp(float amount) => playerSaveData.AddExp(amount);
+
+    // SkillModule
+    public void LearnSkill(SkillKey skillKey) => skillModule.LearnSkill(skillKey);
+    public bool CanUseSkill(SkillKey skillKey) => skillModule.CanUseSkill(skillKey);
+    public void StartCooldown(SkillKey skillKey) => skillModule.StartCooldown(skillKey);
+    public int GetSkillLevel(SkillKey skillKey) => skillModule.GetSkillLevel(skillKey);
+    public bool HasSkill(SkillKey skillKey) => skillModule.HasSkill(skillKey);
+
+    public event Action<SkillKey, float> OnSkillCooldownChanged
+    {
+        add => skillModule.OnSkillCooldownChanged += value;
+        remove => skillModule.OnSkillCooldownChanged -= value;
+    }
+
+    public event Action<SkillKey> OnSkillCooldownEnded
+    {
+        add => skillModule.OnSkillCooldownEnded += value;
+        remove => skillModule.OnSkillCooldownEnded -= value;
+    }
+
+    public event Action<SkillKey> OnSkillAdded
+    {
+        add => skillModule.OnSkillAdded += value;
+        remove => skillModule.OnSkillAdded -= value;
+    }
+
+    public event Action<SkillKey> OnSkillRemoved
+    {
+        add => skillModule.OnSkillRemoved += value;
+        remove => skillModule.OnSkillRemoved -= value;
+    }
+
+    public event Action<SkillKey, int> OnSkillLevelChanged
+    {
+        add => skillModule.OnSkillLevelChanged += value;
+        remove => skillModule.OnSkillLevelChanged -= value;
+    }
 }

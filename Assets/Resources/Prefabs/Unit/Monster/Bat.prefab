@@ -246,7 +246,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9044eb9597e70a47ba698d18aa6fa98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 0}
+  animator: {fileID: 95811217926661648}
+  healthBar: {fileID: 0}
+  playerController: {fileID: 0}
 --- !u!95 &95811217926661648
 Animator:
   serializedVersion: 7

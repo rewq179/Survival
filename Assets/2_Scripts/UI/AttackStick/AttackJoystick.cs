@@ -16,7 +16,7 @@ public class AttackJoystick : MonoBehaviour
 
     [SerializeField] private GameObject panel;
     [SerializeField] private BaseAttackButton[] attackButtons;
-    private Unit unit;
+    private Unit playerUnit;
     private SkillManager skillManager;
 
     public void Init(Unit unit)
@@ -26,7 +26,7 @@ public class AttackJoystick : MonoBehaviour
             button.Reset();
         }
 
-        this.unit = unit;
+        playerUnit = unit;
         skillManager = GameManager.Instance.skillManager;
 
         UnsubscribeFromEvents();
@@ -37,32 +37,23 @@ public class AttackJoystick : MonoBehaviour
 
     private void UnsubscribeFromEvents()
     {
-        if (skillManager != null)
-        {
-            skillManager.OnSkillListChanged -= RefreshSkill;
-        }
+        playerUnit.OnSkillAdded -= RefreshSkill;
     }
 
     private void SubscribeToEvents()
     {
-        if (skillManager != null)
-        {
-            skillManager.OnSkillListChanged += RefreshSkill;
-        }
+        playerUnit.OnSkillAdded += RefreshSkill;
     }
 
-    private void RefreshSkill(Dictionary<SkillKey, List<SkillKey>> skillKeys)
+    private void RefreshSkill(SkillKey skillKey)
     {
-        int start = (int)SkillButtonType.Attack;
-
-        int index = 0;
-        foreach (var skill in skillKeys)
+        foreach (BaseAttackButton button in attackButtons)
         {
-            if (!DataMgr.IsActiveSkill(skill.Key))
-                continue;
-                
-            attackButtons[start + index].Init(skill.Key);
-            index++;
+            if (!button.gameObject.activeSelf)
+            {
+                button.Init(playerUnit, skillKey);
+                break;
+            }
         }
     }
 }

@@ -10,9 +10,12 @@ public class BaseAttackButton : MonoBehaviour
         Cool,
     }
 
+    [Header("UI Components")]
     [SerializeField] private Image skillIcon;
     [SerializeField] private ButtonType buttonType;
     [SerializeField] protected Button attackButton;
+
+    protected Unit playerUnit;
     protected SkillData skillData;
 
     public virtual void Reset()
@@ -20,11 +23,13 @@ public class BaseAttackButton : MonoBehaviour
         gameObject.SetActive(false);
         skillIcon.sprite = null;
         attackButton.interactable = true;
+        playerUnit = null;
         skillData = null;
     }
 
-    public virtual void Init(SkillKey skillKey)
+    public virtual void Init(Unit unit, SkillKey skillKey)
     {
+        playerUnit = unit;
         skillData = DataMgr.GetSkillData(skillKey);
         skillIcon.sprite = GameManager.Instance.resourceMgr.GetSkillIcon(skillKey);
         gameObject.SetActive(true);

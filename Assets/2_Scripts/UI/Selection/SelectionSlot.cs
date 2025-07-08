@@ -12,13 +12,14 @@ public class SelectionSlot : MonoBehaviour
 {
     [Header("UI Components")]
     [SerializeField] private RectTransform rect;
-    [SerializeField] private Image iconImage;
     [SerializeField] private TextMeshProUGUI titleText;
-    [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private TextMeshProUGUI nameText;
     [SerializeField] private TextMeshProUGUI descText;
-    [SerializeField] private DetailInfo detailInfo;
     [SerializeField] private Button clickButton;
+
+    [Header("Utility Components")]
+    [SerializeField] private IconSlot iconSlot;
+    [SerializeField] private DetailInfo detailInfo;
 
     // 데이터
     private SelectionData data;
@@ -32,6 +33,7 @@ public class SelectionSlot : MonoBehaviour
         data = null;
         onSlotClicked = null;
         detailInfo.Reset();
+        iconSlot.Reset();
         clickButton.onClick.RemoveAllListeners();
     }
 
@@ -58,7 +60,7 @@ public class SelectionSlot : MonoBehaviour
             _ => "아이템"
         };
 
-        iconImage.sprite = data.icon;
+        iconSlot.Init(data.icon, string.Empty);
         nameText.text = data.name;
 
         float value = 0;

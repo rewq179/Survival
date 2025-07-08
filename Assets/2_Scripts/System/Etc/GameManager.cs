@@ -49,8 +49,7 @@ public class GameManager : MonoBehaviour
         rewardMgr.Init(playerUnit);
         UIMgr.Instance.Init(playerUnit);
 
-        playerUnit.AddSkill(SkillKey.Arrow);
-
+        playerUnit.LearnSkill(SkillKey.Arrow);
         spawnManager.Init(currentWave);
         InputManager.Instance.EnablePlayerInput();
     }
@@ -81,8 +80,6 @@ public class GameManager : MonoBehaviour
 
     public void Test()
     {
-        // rewardMgr.CreateCollectibleItem(CollectibleType.Magnet, playerUnit.transform.position, 0.6f);
-
-        UIMgr.Instance.selectionPanel.ShowSkillSelection();
+        playerUnit.AddExp(250);
     }
 }

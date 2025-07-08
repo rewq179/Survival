@@ -19,70 +19,56 @@ MonoBehaviour:
   - id: 100
     name: "\uD50C\uB808\uC774\uC5B4"
     hp: 300
-    attack: 3
-    moveSpd: 7
-    cooldown: 0
-    critChance: 0
-    critMulti: 1
+    moveSpeed: 7
+    critcalChance: 0
+    criticalDamage: 1
     exp: 0
     gold: 0
   - id: 1001
     name: "\uBC8C"
     hp: 5
-    attack: 1
-    moveSpd: 5.5
-    cooldown: 0
-    critChance: 0
-    critMulti: 1
+    moveSpeed: 5.5
+    critcalChance: 0
+    criticalDamage: 1
     exp: 10
     gold: 5
   - id: 1002
     name: "\uBC15\uC950"
     hp: 8
-    attack: 2
-    moveSpd: 6
-    cooldown: 0
-    critChance: 0
-    critMulti: 1
+    moveSpeed: 6
+    critcalChance: 0
+    criticalDamage: 1
     exp: 15
     gold: 8
   - id: 1003
     name: "\uB291\uB300"
     hp: 10
-    attack: 3
-    moveSpd: 7
-    cooldown: 0
-    critChance: 0
-    critMulti: 1
+    moveSpeed: 7
+    critcalChance: 0
+    criticalDamage: 1
     exp: 20
     gold: 12
   - id: 1004
     name: "\uB098\uBB34 \uC815\uB839"
     hp: 17
-    attack: 4
-    moveSpd: 4.5
-    cooldown: 0
-    critChance: 0
-    critMulti: 1
+    moveSpeed: 4.5
+    critcalChance: 0
+    criticalDamage: 1
     exp: 35
     gold: 20
   - id: 1005
     name: "\uACE8\uB818"
     hp: 22
-    attack: 5
-    moveSpd: 3.8
-    cooldown: 0
-    critChance: 0.05
-    critMulti: 1
+    moveSpeed: 3.8
+    critcalChance: 0.05
+    criticalDamage: 1
     exp: 50
     gold: 30
   - id: 1006
     name: "\uC6A9"
     hp: 150
-    attack: 15
-    moveSpd: 3.5
-    cooldown: 0
-    critChance: 0.1
-    critMulti: 1
+    moveSpeed: 3.5
+    critcalChance: 0.1
+    criticalDamage: 1
     exp: 200
     gold: 150

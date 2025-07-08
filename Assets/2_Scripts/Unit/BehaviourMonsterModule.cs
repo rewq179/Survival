@@ -35,7 +35,7 @@ public class BehaviourMonsterModule : BehaviourModule
     {
         owner = unit;
         playerTransform = GameManager.Instance.PlayerUnit.transform;
-        moveSpeed = unit.MoveSpd;
+        moveSpeed = unit.MoveSpeed;
     }
 
     public override void Update()

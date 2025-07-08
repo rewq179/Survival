@@ -15,25 +15,20 @@ public class UnitData
     public int id;
     public string name;
     public float hp;
-    public float attack;
-    public float moveSpd;
-    public float cooldown;
-    public float critChance;
-    public float critMulti;
+    public float moveSpeed;
+    public float critcalChance;
+    public float criticalDamage;
     public float exp;
     public int gold;
 
-    public UnitData(int id, string name, float hp, float attack, float moveSpd, float cooldown, 
-        float critChance, float critMulti, float exp, int gold)
+    public UnitData(int id, string name, float hp, float moveSpeed, float critcalChance, float criticalDamage, float exp, int gold)
     {
         this.id = id;
         this.name = name;
         this.hp = hp;
-        this.attack = attack;
-        this.moveSpd = moveSpd;
-        this.cooldown = cooldown;
-        this.critChance = critChance;
-        this.critMulti = critMulti;
+        this.moveSpeed = moveSpeed;
+        this.critcalChance = critcalChance;
+        this.criticalDamage = criticalDamage;
         this.exp = exp;
         this.gold = gold;
     }
@@ -51,12 +46,10 @@ public class UnitDataReader : BaseReader
     {
         int id = 0;
         string name = string.Empty;
-        float hp = 0;
-        float attack = 0;
-        float moveSpd = 0;
-        float cooldown = 0;
-        float critChance = 0;
-        float critMulti = 0;
+        float health = 0;
+        float moveSpeed = 0;
+        float criticalChance = 0;
+        float criticalDamage = 0;
         float exp = 0;
         int gold = 0;
 
@@ -81,56 +74,38 @@ public class UnitDataReader : BaseReader
                         break;
                     }
 
-                case "hp":
+                case "health":
                     {
                         if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedHp))
                         {
-                            hp = parsedHp;
+                            health = parsedHp;
                         }
                         break;
                     }
 
-                case "attack":
+                case "movespeed":
                     {
-                        if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedAttack))
+                        if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedMoveSpeed))
                         {
-                            attack = parsedAttack;
+                            moveSpeed = parsedMoveSpeed;
                         }
                         break;
                     }
 
-                case "movespd":
+                case "criticalchance":
                     {
-                        if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedMoveSpd))
+                        if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedCriticalChance))
                         {
-                            moveSpd = parsedMoveSpd;
+                            criticalChance = parsedCriticalChance;
                         }
                         break;
                     }
 
-                case "cooldown":
+                case "criticaldamage":
                     {
-                        if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedCooldown))
+                        if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedCriticalDamage))
                         {
-                            cooldown = parsedCooldown;
-                        }
-                        break;
-                    }
-
-                case "critchance":
-                    {
-                        if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedCritChance))
-                        {
-                            critChance = parsedCritChance;
-                        }
-                        break;
-                    }
-
-                case "critmulti":
-                    {
-                        if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedCritMulti))
-                        {
-                            critMulti = parsedCritMulti;
+                            criticalDamage = parsedCriticalDamage;
                         }
                         break;
                     }
@@ -155,7 +130,7 @@ public class UnitDataReader : BaseReader
             }
         }
 
-        unitDatas.Add(new UnitData(id, name, hp, attack, moveSpd, cooldown, critChance, critMulti, exp, gold));
+        unitDatas.Add(new UnitData(id, name, health, moveSpeed, criticalChance, criticalDamage, exp, gold));
     }
 }
 

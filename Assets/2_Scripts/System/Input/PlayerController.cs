@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     private float rotationSpeed = 10f;
 
     // 스킬 관련
+    private Unit owner;
     private SkillManager skillManager;
     private Camera mainCamera;
 
@@ -21,6 +22,12 @@ public class PlayerController : MonoBehaviour
         PlayerInputAction = new PlayerInputAction();
         rigidBody = GetComponent<Rigidbody>();
         mainCamera = Camera.main;
+    }
+
+    public void Init(Unit owner)
+    {
+        this.owner = owner;
+        skillManager = GameManager.Instance.skillManager;
     }
 
     private void OnEnable()
@@ -62,7 +69,7 @@ public class PlayerController : MonoBehaviour
         if (skillManager == null)
             skillManager = GameManager.Instance.skillManager;
 
-        skillManager.ActivateSkill();
+        skillManager.ActivateSkill(owner);
     }
 
     private void FixedUpdate()

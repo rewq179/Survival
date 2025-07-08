@@ -10,7 +10,8 @@ using UnityEditor;
 #endif
 
 public enum SubSkillType
-{Cooldown,               // 쿨다운 감소
+{
+    Cooldown,               // 쿨다운 감소
     ProjectileCount,        // 투사체 개수 증가
     Piercing,               // 관통
     Ricochet,               // 도탄
@@ -18,7 +19,7 @@ public enum SubSkillType
     Duration,               // 지속 시간 증가
     Radius,                 // 범위 증가
     DamageTick,             // 데미지 틱 증가
-    
+
     // 패시브 스킬 타입들
     HealthInc,              // 체력 증가
     MoveSpeedInc,           // 이동 속도 증가
@@ -46,16 +47,20 @@ public class SubSkillData
     public int maxLevel;
     public SubSkillType type;
 
-    public void Init(SkillKey skillKey, SkillKey parentSkillKey, string name, string description, float baseValue, float perLevelValue, int maxLevel, SubSkillType type)
+    public void Init(SkillKey skillKey, SkillKey parentSkillKey, string description, float baseValue, float perLevelValue, int maxLevel, SubSkillType type)
     {
         this.skillKey = skillKey;
         this.parentSkillKey = parentSkillKey;
-        this.name = name;
         this.description = description;
         this.baseValue = baseValue;
         this.perLevelValue = perLevelValue;
         this.maxLevel = maxLevel;
         this.type = type;
+    }
+
+    public void SetName(string name)
+    {
+        this.name = name;
     }
 }
 
@@ -72,7 +77,6 @@ public class SubSkillDataReader : BaseReader
     {
         SkillKey skillKey = SkillKey.Max;
         SkillKey parentSkillKey = SkillKey.Max;
-        string name = string.Empty;
         string description = string.Empty;
         float baseValue = 0f;
         float perLevelValue = 0f;
@@ -93,10 +97,6 @@ public class SubSkillDataReader : BaseReader
                 case "parentskillkey":
                     if (Enum.TryParse(cells[i].value, true, out SkillKey parsedParentSkillKey))
                         parentSkillKey = parsedParentSkillKey;
-                    break;
-
-                case "name":
-                    name = cells[i].value;
                     break;
 
                 case "description":
@@ -126,7 +126,7 @@ public class SubSkillDataReader : BaseReader
         }
 
         SubSkillData data = new SubSkillData();
-        data.Init(skillKey, parentSkillKey, name, description, baseValue, perLevelValue, maxLevel, type);
+        data.Init(skillKey, parentSkillKey, description, baseValue, perLevelValue, maxLevel, type);
         subSkillDatas.Add(data);
     }
 }
@@ -170,4 +170,4 @@ public class SubSkillDataReaderEditor : Editor
         EditorUtility.SetDirty(target);
     }
 }
-#endif 
+#endif

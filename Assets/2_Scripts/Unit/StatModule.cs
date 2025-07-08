@@ -1,28 +1,55 @@
 using UnityEngine;
+using System.Collections.Generic;
+using UnityEngine.Rendering;
+
+public enum StatType
+{
+    Health,
+    MoveSpeed,
+    Defense,
+    MagnetRange,
+    ExpGain,
+    GoldGain,
+    CriticalChance,
+    CriticalDamage,
+    AllSkillRange,
+    AllSkillCooldown,
+    AllSkillDamage,
+    AllSkillDuration,
+    Max,
+}
 
 public class StatModule
 {
-    private float maxHp;
-    private float attack;
-    private float moveSpd;
-    private float cooldown;
-    private float critChance;
-    private float critMulti;
-
-    public float MaxHp => maxHp;
-    public float Attack => attack;
-    public float MoveSpd => moveSpd;
-    public float Cooldown => cooldown;
-    public float CritChance => critChance;
-    public float CritMulti => critMulti;
+    private Dictionary<StatType, float> baseStats = new();
+    private Dictionary<StatType, float> statModifiers = new();
 
     public void Init(UnitData unitData)
     {
-        maxHp = unitData.hp;
-        attack = unitData.attack;
-        moveSpd = unitData.moveSpd;
-        cooldown = unitData.cooldown;
-        critChance = unitData.critChance;
-        critMulti = unitData.critMulti;
+        for (StatType type = 0; type < StatType.Max; type++)
+        {
+            baseStats[type] = 0f;
+            statModifiers[type] = 0f;
+        }
+
+        baseStats[StatType.Health] = unitData.hp;
+        baseStats[StatType.MoveSpeed] = unitData.moveSpeed;
+        baseStats[StatType.CriticalChance] = unitData.critcalChance;
+        baseStats[StatType.CriticalDamage] = unitData.criticalDamage;
+    }
+
+    public float GetFinalStat(StatType statType)
+    {
+        return baseStats[statType] * (1 + statModifiers[statType]);
+    }
+
+    public void AddBaseStatValue(StatType statType, float value)
+    {
+        baseStats[statType] += value;
+    }
+
+    public void AddStatModifier(StatType statType, float value)
+    {
+        statModifiers[statType] += value;
     }
 }

@@ -46,6 +46,7 @@ public class DataMgr : MonoBehaviour
         for (int i = 0; i < subSkillDataReader.subSkillDatas.Count; i++)
         {
             SubSkillData data = subSkillDataReader.subSkillDatas[i];
+            data.SetName(GetSkillData(data.parentSkillKey).name);
             subSkillDatas.Add(data.skillKey, data);
 
             if (subSkillDatasByMain.TryGetValue(data.parentSkillKey, out List<SkillKey> keys))
@@ -75,6 +76,14 @@ public class DataMgr : MonoBehaviour
             return unitData;
 
         return null;
+    }
+
+    public static SkillType GetSkillType(SkillKey skillKey)
+    {
+        if (IsActiveSkill(skillKey))
+            return SkillType.Active;
+
+        return IsPassiveSkill(skillKey) ? SkillType.Passive : SkillType.Sub;
     }
 
     public static bool IsActiveSkill(SkillKey skillKey)
