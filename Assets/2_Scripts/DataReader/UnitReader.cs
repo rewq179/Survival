@@ -16,19 +16,15 @@ public class UnitData
     public string name;
     public float hp;
     public float moveSpeed;
-    public float critcalChance;
-    public float criticalDamage;
     public float exp;
     public int gold;
 
-    public UnitData(int id, string name, float hp, float moveSpeed, float critcalChance, float criticalDamage, float exp, int gold)
+    public UnitData(int id, string name, float hp, float moveSpeed, float exp, int gold)
     {
         this.id = id;
         this.name = name;
         this.hp = hp;
         this.moveSpeed = moveSpeed;
-        this.critcalChance = critcalChance;
-        this.criticalDamage = criticalDamage;
         this.exp = exp;
         this.gold = gold;
     }
@@ -48,8 +44,6 @@ public class UnitDataReader : BaseReader
         string name = string.Empty;
         float health = 0;
         float moveSpeed = 0;
-        float criticalChance = 0;
-        float criticalDamage = 0;
         float exp = 0;
         int gold = 0;
 
@@ -92,24 +86,6 @@ public class UnitDataReader : BaseReader
                         break;
                     }
 
-                case "criticalchance":
-                    {
-                        if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedCriticalChance))
-                        {
-                            criticalChance = parsedCriticalChance;
-                        }
-                        break;
-                    }
-
-                case "criticaldamage":
-                    {
-                        if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedCriticalDamage))
-                        {
-                            criticalDamage = parsedCriticalDamage;
-                        }
-                        break;
-                    }
-
                 case "exp":
                     {
                         if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedExpReward))
@@ -130,7 +106,7 @@ public class UnitDataReader : BaseReader
             }
         }
 
-        unitDatas.Add(new UnitData(id, name, health, moveSpeed, criticalChance, criticalDamage, exp, gold));
+        unitDatas.Add(new UnitData(id, name, health, moveSpeed, exp, gold));
     }
 }
 

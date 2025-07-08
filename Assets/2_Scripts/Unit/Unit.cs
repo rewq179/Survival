@@ -98,7 +98,7 @@ public class Unit : MonoBehaviour
     // StatModule
     public float MaxHp => statModule.GetFinalStat(StatType.Health);
     public float MoveSpeed => statModule.GetFinalStat(StatType.MoveSpeed);
-    public void AddBaseStatValue(StatType statType, float value) => statModule.AddBaseStatValue(statType, value);
+    public float GetFinalStat(StatType statType) => statModule.GetFinalStat(statType);
     public void AddStatModifier(StatType statType, float value) => statModule.AddStatModifier(statType, value); 
 
     // BehaviourModule

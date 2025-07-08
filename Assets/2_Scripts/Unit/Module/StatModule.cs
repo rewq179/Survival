@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.Rendering;
 
 public enum StatType
 {
@@ -21,35 +20,35 @@ public enum StatType
 
 public class StatModule
 {
-    private Dictionary<StatType, float> baseStats = new();
+    private float health;
+    private float moveSpeed;
     private Dictionary<StatType, float> statModifiers = new();
 
     public void Init(UnitData unitData)
     {
         for (StatType type = 0; type < StatType.Max; type++)
         {
-            baseStats[type] = 0f;
             statModifiers[type] = 0f;
         }
 
-        baseStats[StatType.Health] = unitData.hp;
-        baseStats[StatType.MoveSpeed] = unitData.moveSpeed;
-        baseStats[StatType.CriticalChance] = unitData.critcalChance;
-        baseStats[StatType.CriticalDamage] = unitData.criticalDamage;
+        health = unitData.hp;
+        moveSpeed = unitData.moveSpeed;
     }
 
-    public float GetFinalStat(StatType statType)
+    public float GetFinalStat(StatType type)
     {
-        return baseStats[statType] * (1 + statModifiers[statType]);
+        float baseStat = type switch
+        {
+            StatType.Health => health,
+            StatType.MoveSpeed => moveSpeed,
+            _ => 0f,
+        };
+
+        return baseStat * (1 + statModifiers[type]);
     }
 
-    public void AddBaseStatValue(StatType statType, float value)
+    public void AddStatModifier(StatType type, float value)
     {
-        baseStats[statType] += value;
-    }
-
-    public void AddStatModifier(StatType statType, float value)
-    {
-        statModifiers[statType] += value;
+        statModifiers[type] += value;
     }
 }

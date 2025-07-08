@@ -174,6 +174,7 @@ public class SkillModule : MonoBehaviour
                 owner.AddStatModifier(StatType.Health, value);
                 break;
 
+
             case SkillKey.MoveSpeed:
                 owner.AddStatModifier(StatType.MoveSpeed, value);
                 break;
@@ -195,7 +196,7 @@ public class SkillModule : MonoBehaviour
                 break;
 
             case SkillKey.CriticalChance:
-                owner.AddBaseStatValue(StatType.CriticalChance, value);
+                owner.AddStatModifier(StatType.CriticalChance, value);
                 break;
 
             case SkillKey.CriticalDamage:
