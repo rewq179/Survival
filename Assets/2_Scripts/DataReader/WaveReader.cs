@@ -13,7 +13,6 @@ using UnityEditor;
 public class WaveData
 {
     public int waveID;
-    public float duration;
     public float difficulty;
     public List<int> spawnGroupIDs;
 
@@ -22,11 +21,6 @@ public class WaveData
         this.waveID = waveID;
         this.difficulty = difficulty;
         this.spawnGroupIDs = spawnGroups;
-    }
-
-    public void SetDuration(float duration)
-    {
-        this.duration = duration;
     }
 }
 
@@ -131,4 +125,5 @@ public class WaveDataReaderEditor : Editor
         EditorUtility.SetDirty(target);
     }
 }
+
 #endif

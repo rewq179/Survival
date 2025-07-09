@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections;
 
-public class SpawnManager : MonoBehaviour
+public class SpawnMgr : MonoBehaviour
 {
     public enum SpawnPattern
     {
@@ -15,52 +15,48 @@ public class SpawnManager : MonoBehaviour
     private float SPAWN_RADIUS = 6f;
 
     // 웨이브 관리
+    private int nextWaveIndex;
     private List<WaveData> waveDatas = new();
-    private List<SpawnGroupData> spawnGroupDatas = new();
     private List<ActiveWave> activeWaves = new();
-    private int nextWaveIndex = 0;
-    public const float WAVE_TIME_EXCEEDED_TIME = 15f; // 웨이브 추가 시간
+    public const float WAVE_ADDITIVE_TIME = 5f; // 웨이브 추가 시간
 
     // 스폰 관리
-    private List<Unit> activeEnemies = new();
-    private Dictionary<int, Stack<Unit>> enemyPools = new();
-
-    // 스폰 위치 계산
     private Transform playerTransform;
-
-    // 이벤트
-    public event Action<int> OnWaveStarted;
-    public event Action<int> OnWaveCompleted;
-    public event Action<int> OnWaveTimeExceeded; // 시간 초과 이벤트
-    public event Action<Unit> OnEnemySpawned;
-    public event Action<Unit> OnEnemyDied;
-
-    // 코루틴 관리
-    private Dictionary<int, Coroutine> waveCoroutines = new Dictionary<int, Coroutine>();
-    private Dictionary<int, Coroutine> waveTimerCoroutines = new Dictionary<int, Coroutine>();
+    private List<Unit> aliveEnemies = new();
+    private Dictionary<int, Stack<Unit>> enemyPools = new();
 
     [Serializable]
     public class ActiveWave
     {
         public int waveID;
-        public WaveData waveData;
-        public List<Unit> waveEnemies = new List<Unit>();
-        public float elapsedTime;
+        private float waveTime;
+        public float waveDuration;
         public bool isTimeExceeded;
+        public bool isCompleted;
+        public List<Unit> waveEnemies = new();
 
-        public ActiveWave(int waveID, WaveData waveData)
+        public ActiveWave(int waveID, float waveDuration)
         {
             this.waveID = waveID;
-            this.waveData = waveData;
-            this.elapsedTime = 0f;
+            this.waveTime = 0f;
+            this.waveDuration = waveDuration;
             this.isTimeExceeded = false;
+            this.isCompleted = false;
+        }
+
+        public void Update(float time)
+        {
+            if (isCompleted)
+                return;
+
+            waveTime += time;
+            if (waveTime >= waveDuration)
+                isTimeExceeded = true;
         }
     }
 
     private void Update()
     {
-        // 활성 적들 정리 및 웨이브 상태 체크
-        CleanupDeadEnemies();
         CheckWaveCompletion();
     }
 
@@ -71,21 +67,13 @@ public class SpawnManager : MonoBehaviour
         this.playerTransform = playerTransform;
     }
 
-    public void Init(int wave)
+    public void Init()
     {
         nextWaveIndex = 0;
         waveDatas.Clear();
         activeWaves.Clear();
-
-        WaveData waveData = DataMgr.GetWaveData(wave);
-        waveDatas.Add(waveData);
-
-        List<int> spawnGroupIDs = waveData.spawnGroupIDs;
-        foreach (int groupID in spawnGroupIDs)
-        {
-            spawnGroupDatas.Add(DataMgr.GetSpawnGroupData(groupID));
-        }
-
+        
+        waveDatas = DataMgr.GetWaveDatas();
         StartNextWave();
     }
 
@@ -95,143 +83,49 @@ public class SpawnManager : MonoBehaviour
 
     public void StartNextWave()
     {
-        WaveData waveData = waveDatas[nextWaveIndex];
-        ActiveWave activeWave = new ActiveWave(waveData.waveID, waveData);
+        WaveData waveData = waveDatas[nextWaveIndex++];
+        ActiveWave activeWave = new ActiveWave(waveData.waveID, GetWaveDuration(waveData));
         activeWaves.Add(activeWave);
-
-        OnWaveStarted?.Invoke(waveData.waveID);
-
-        // 웨이브 코루틴 시작
-        Coroutine waveCoroutine = StartCoroutine(WaveCoroutine(activeWave));
-        waveCoroutines[waveData.waveID] = waveCoroutine;
-
-        // 웨이브 타이머 코루틴 시작
-        Coroutine timerCoroutine = StartCoroutine(WaveTimerCoroutine(activeWave));
-        waveTimerCoroutines[waveData.waveID] = timerCoroutine;
-
-        nextWaveIndex++;
+        StartCoroutine(WaveCoroutine(activeWave, waveData.spawnGroupIDs));
     }
 
-    private IEnumerator WaveCoroutine(ActiveWave activeWave)
+    private IEnumerator WaveCoroutine(ActiveWave activeWave, List<int> spawnGroupIDs)
     {
         // 웨이브 내 스폰 그룹들을 순차적으로 실행
-        foreach (int groupID in activeWave.waveData.spawnGroupIDs)
+        foreach (int groupID in spawnGroupIDs)
         {
-            SpawnGroupData spawnGroup = GetSpawnGroupData(groupID);
+            SpawnGroupData spawnGroup = DataMgr.GetSpawnGroupData(groupID);
             yield return StartCoroutine(SpawnGroupCoroutine(spawnGroup, activeWave));
         }
 
-        // 스폰 그룹이 모두 완료되면 웨이브가 끝날 때까지 대기
-        while (activeWave.waveEnemies.Count > 0)
-        {
-            yield return null;
-        }
-
-        CompleteWave(activeWave);
-    }
-
-    private IEnumerator WaveTimerCoroutine(ActiveWave activeWave)
-    {
-        while (activeWave.elapsedTime < activeWave.waveData.duration)
-        {
-            activeWave.elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-
-        // 시간 초과
-        activeWave.isTimeExceeded = true;
-        OnWaveTimeExceeded?.Invoke(activeWave.waveID);
-    }
-
-    private void CompleteWave(ActiveWave activeWave)
-    {
-        OnWaveCompleted?.Invoke(activeWave.waveID);
-
-        // 코루틴 정리
-        if (waveCoroutines.TryGetValue(activeWave.waveID, out Coroutine waveCoroutine))
-        {
-            StopCoroutine(waveCoroutine);
-            waveCoroutines.Remove(activeWave.waveID);
-        }
-
-        if (waveTimerCoroutines.TryGetValue(activeWave.waveID, out Coroutine timerCoroutine))
-        {
-            StopCoroutine(timerCoroutine);
-            waveTimerCoroutines.Remove(activeWave.waveID);
-        }
-
-        activeWaves.Remove(activeWave);
+        yield return null;
     }
 
     private void CheckWaveCompletion()
     {
-        // 각 활성 웨이브의 적들이 모두 죽었는지 확인
-        for (int i = activeWaves.Count - 1; i >= 0; i--)
+        float time = Time.deltaTime;
+        
+        bool canNextWave = false;
+        List<ActiveWave> completedWaves = new();
+        foreach (ActiveWave wave in activeWaves)
         {
-            ActiveWave activeWave = activeWaves[i];
-
-            // 해당 웨이브의 적들을 정리
-            for (int j = activeWave.waveEnemies.Count - 1; j >= 0; j--)
-            {
-                Unit enemy = activeWave.waveEnemies[j];
-                if (enemy == null || enemy.IsDead)
-                {
-                    RemoveEnemy(enemy);
-                    activeWave.waveEnemies.RemoveAt(j);
-                }
-            }
+            wave.Update(time);
+            
+            if (wave.isCompleted)
+                completedWaves.Add(wave);
+            else if(wave.isTimeExceeded)
+                canNextWave = true;
         }
-    }
-
-    public void StopWave(int waveID)
-    {
-        ActiveWave activeWave = GetActiveWave(waveID);
-        if (activeWave == null)
-            return;
-
-        if (waveCoroutines.TryGetValue(waveID, out Coroutine waveCoroutine))
+        
+        foreach (ActiveWave wave in completedWaves)
         {
-            StopCoroutine(waveCoroutine);
-            waveCoroutines.Remove(waveID);
+            activeWaves.Remove(wave);
         }
-
-        if (waveTimerCoroutines.TryGetValue(waveID, out Coroutine timerCoroutine))
+        
+        if (canNextWave)
         {
-            StopCoroutine(timerCoroutine);
-            waveTimerCoroutines.Remove(waveID);
+            StartNextWave();
         }
-
-        foreach (Unit enemy in activeWave.waveEnemies)
-        {
-            PushEnemy(enemy);
-        }
-
-        activeWaves.Remove(activeWave);
-    }
-
-    public void StopAllWaves()
-    {
-        foreach (var coroutine in waveCoroutines.Values)
-        {
-            StopCoroutine(coroutine);
-        }
-        waveCoroutines.Clear();
-
-        foreach (var coroutine in waveTimerCoroutines.Values)
-        {
-            StopCoroutine(coroutine);
-        }
-        waveTimerCoroutines.Clear();
-
-        foreach (ActiveWave activeWave in activeWaves)
-        {
-            foreach (Unit enemy in activeWave.waveEnemies)
-            {
-                RemoveEnemy(enemy);
-            }
-        }
-
-        activeWaves.Clear();
     }
 
     #endregion
@@ -263,15 +157,28 @@ public class SpawnManager : MonoBehaviour
         Unit enemy = PopEnemy(unitID);
         enemy.Init(unitID, spawnPosition);
 
-        activeEnemies.Add(enemy);
-        OnEnemySpawned?.Invoke(enemy);
+        aliveEnemies.Add(enemy);
         return enemy;
     }
 
     public void RemoveEnemy(Unit enemy)
     {
-        activeEnemies.Remove(enemy);
-        OnEnemyDied?.Invoke(enemy);
+        foreach (ActiveWave wave in activeWaves)
+        {
+            if (wave.waveEnemies.Remove(enemy))
+            {
+                if (wave.waveEnemies.Count == 0)
+                {
+                    wave.isCompleted = true;
+                    StartNextWave();
+                }
+
+                break;
+            }
+        }
+
+        aliveEnemies.Remove(enemy);
+        enemy.Reset();
         PushEnemy(enemy);
     }
 
@@ -348,6 +255,35 @@ public class SpawnManager : MonoBehaviour
 
     #endregion
 
+    #region 유틸
+
+    private ActiveWave GetActiveWaveData(int waveID)
+    {
+        foreach (ActiveWave activeWave in activeWaves)
+        {
+            if (activeWave.waveID == waveID)
+                return activeWave;
+        }
+
+        return null;
+    }
+
+    public float GetWaveDuration(WaveData waveData)
+    {
+        float time = 0f;
+
+        List<int> spawnGroupIDs = waveData.spawnGroupIDs;
+        foreach (int groupID in spawnGroupIDs)
+        {
+            SpawnGroupData data = DataMgr.GetSpawnGroupData(groupID);
+            time += data.startDelay + data.repeatInterval * (data.repeat - 1);
+        }
+
+        return time + WAVE_ADDITIVE_TIME;
+    }
+
+    #endregion
+
     #region 오브젝트 풀링
 
     private Unit PopEnemy(int unitID)
@@ -361,8 +297,6 @@ public class SpawnManager : MonoBehaviour
 
     private void PushEnemy(Unit enemy)
     {
-        enemy.Reset();
-
         if (enemyPools.TryGetValue(enemy.UnitID, out Stack<Unit> pool))
             pool.Push(enemy);
 
@@ -371,83 +305,6 @@ public class SpawnManager : MonoBehaviour
             enemyPools[enemy.UnitID] = new Stack<Unit>();
             enemyPools[enemy.UnitID].Push(enemy);
         }
-    }
-
-    #endregion
-
-    #region 유틸
-
-    private WaveData GetWaveData(int waveID)
-    {
-        if (waveDatas == null)
-            return null;
-
-        foreach (WaveData wave in waveDatas)
-        {
-            if (wave.waveID == waveID)
-                return wave;
-        }
-
-        return null;
-    }
-
-    private SpawnGroupData GetSpawnGroupData(int groupID)
-    {
-        if (spawnGroupDatas == null)
-            return null;
-
-        foreach (SpawnGroupData group in spawnGroupDatas)
-        {
-            if (group.groupID == groupID)
-                return group;
-        }
-
-        return null;
-    }
-
-    private ActiveWave GetActiveWave(int waveID)
-    {
-        foreach (ActiveWave activeWave in activeWaves)
-        {
-            if (activeWave.waveID == waveID)
-                return activeWave;
-        }
-
-        return null;
-    }
-
-    private void CleanupDeadEnemies()
-    {
-        for (int i = activeEnemies.Count - 1; i >= 0; i--)
-        {
-            Unit enemy = activeEnemies[i];
-            if (enemy == null || enemy.IsDead)
-            {
-                activeEnemies.RemoveAt(i);
-            }
-        }
-    }
-
-    #endregion
-
-    #region 웨이브 시간 계산
-
-    public float GetWaveDuration(WaveData waveData)
-    {
-        float time = 0f;
-
-        foreach (int groupID in waveData.spawnGroupIDs)
-        {
-            SpawnGroupData data = GetSpawnGroupData(groupID);
-            time += GetSpawnGroupDuration(data);
-        }
-
-        return time + WAVE_TIME_EXCEEDED_TIME;
-    }
-
-    private float GetSpawnGroupDuration(SpawnGroupData spawnGroup)
-    {
-        return spawnGroup.startDelay + spawnGroup.repeatInterval * (spawnGroup.repeat - 1);
     }
 
     #endregion

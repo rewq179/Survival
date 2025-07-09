@@ -16,7 +16,7 @@ public class DataMgr : MonoBehaviour
     private static Dictionary<SkillKey, SubSkillData> subSkillDatas = new();
     private static Dictionary<SkillKey, List<SkillKey>> subSkillDatasByMain = new();
     private static Dictionary<int, SpawnGroupData> spawnGroupDatas = new();
-    private static Dictionary<int, WaveData> waveDatas = new();
+    private static List<WaveData> waveDatas = new();
 
     public void Init()
     {
@@ -66,7 +66,7 @@ public class DataMgr : MonoBehaviour
         for (int i = 0; i < waveDataReader.waveDatas.Count; i++)
         {
             WaveData waveData = waveDataReader.waveDatas[i];
-            waveDatas.Add(waveData.waveID, waveData);
+            waveDatas.Add(waveData);
         }
     }
 
@@ -133,10 +133,14 @@ public class DataMgr : MonoBehaviour
         return null;
     }
 
+    public static List<WaveData> GetWaveDatas() => waveDatas;
     public static WaveData GetWaveData(int waveID)
     {
-        if (waveDatas.TryGetValue(waveID, out WaveData waveData))
-            return waveData;
+        for (int i = 0; i < waveDatas.Count; i++)
+        {
+            if (waveDatas[i].waveID == waveID)
+                return waveDatas[i];
+        }
 
         return null;
     }

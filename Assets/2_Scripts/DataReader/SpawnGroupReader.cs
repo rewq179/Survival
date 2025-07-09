@@ -17,10 +17,10 @@ public class SpawnGroupData
     public int count;
     public int repeat;
     public float repeatInterval;
-    public SpawnManager.SpawnPattern pattern;
+    public SpawnMgr.SpawnPattern pattern;
     public float startDelay;
 
-    public SpawnGroupData(int groupID, int unitID, int count, int repeat, float repeatInterval, SpawnManager.SpawnPattern pattern, float startDelay)
+    public SpawnGroupData(int groupID, int unitID, int count, int repeat, float repeatInterval, SpawnMgr.SpawnPattern pattern, float startDelay)
     {
         this.groupID = groupID;
         this.unitID = unitID;
@@ -47,7 +47,7 @@ public class SpawnGroupDataReader : BaseReader
         int count = 0;
         int repeat = 0;
         float repeatInterval = 0;
-        SpawnManager.SpawnPattern pattern = SpawnManager.SpawnPattern.Circle;
+        SpawnMgr.SpawnPattern pattern = SpawnMgr.SpawnPattern.Circle;
         float startDelay = 0;
 
         for (int i = 0; i < cells.Count; i++)
@@ -105,7 +105,7 @@ public class SpawnGroupDataReader : BaseReader
                     {
                         if (int.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out int parsedPattern))
                         {
-                            pattern = (SpawnManager.SpawnPattern)parsedPattern;
+                            pattern = (SpawnMgr.SpawnPattern)parsedPattern;
                         }
                         break;
                     }

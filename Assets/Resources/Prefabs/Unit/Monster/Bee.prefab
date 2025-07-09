@@ -2572,6 +2572,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 95212052626076970}
   healthBar: {fileID: 4871846639675131606}
+  playerController: {fileID: 0}
 --- !u!95 &95212052626076970
 Animator:
   serializedVersion: 7
@@ -3644,7 +3645,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7707971084563570402, guid: a2d774c1986fbb246878a1161644b567, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7707971084563570402, guid: a2d774c1986fbb246878a1161644b567, type: 3}
       propertyPath: m_LocalPosition.z

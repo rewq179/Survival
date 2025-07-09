@@ -10,13 +10,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] private DataMgr dataManager;
     public ResourceMgr resourceMgr;
     public SkillManager skillManager;
-    public SpawnManager spawnManager;
+    public SpawnMgr spawnMgr;
     public CameraManager cameraManager;
     public DamageTextMgr damageTextMgr;
     public RewardMgr rewardMgr;
 
     private Unit playerUnit;
-    private int currentWave;
 
     public Unit PlayerUnit => playerUnit;
 
@@ -46,7 +45,7 @@ public class GameManager : MonoBehaviour
 
         CreatePlayerUnit();
 
-        spawnManager.Init(currentWave);
+        spawnMgr.Init();
         InputManager.Instance.EnablePlayerInput();
     }
 
@@ -55,7 +54,7 @@ public class GameManager : MonoBehaviour
         if (playerUnit == null)
         {
             playerUnit = Instantiate(playerUnitPrefab, Vector3.zero, Quaternion.identity).GetComponent<Unit>();
-            spawnManager.SetPlayerTransform(playerUnit.transform);
+            spawnMgr.SetPlayerTransform(playerUnit.transform);
             cameraManager.SetTarget(playerUnit.transform);
 
         }

@@ -77,6 +77,9 @@ public class SkillModule : MonoBehaviour
 
     public void LearnSkill(SkillKey skillKey)
     {
+        if (skillKey == SkillKey.None)
+            return;
+
         if (skillLevels.ContainsKey(skillKey))
             LevelUpSkill(skillKey);
         else

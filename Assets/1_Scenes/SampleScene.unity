@@ -719,7 +719,7 @@ MonoBehaviour:
   dataManager: {fileID: 267096342}
   resourceMgr: {fileID: 170821100}
   skillManager: {fileID: 880473370}
-  spawnManager: {fileID: 2143306119}
+  spawnMgr: {fileID: 2143306119}
   cameraManager: {fileID: 330585548}
   damageTextMgr: {fileID: 948412577}
   rewardMgr: {fileID: 1668415284}

@@ -4,8 +4,8 @@ using System;
 public class CombatModule
 {
     private DamageTextMgr damageTextMgr;
-    private RewardMgr rewardManager;
-    private SpawnManager spawnManager;
+    private RewardMgr rewardMgr;
+    private SpawnMgr spawnMgr;
 
     private Unit owner;
     private float maxHp;
@@ -27,8 +27,8 @@ public class CombatModule
     {
         this.owner = owner;
         damageTextMgr = GameManager.Instance.damageTextMgr;
-        rewardManager = GameManager.Instance.rewardMgr;
-        spawnManager = GameManager.Instance.spawnManager;
+        rewardMgr = GameManager.Instance.rewardMgr;
+        spawnMgr = GameManager.Instance.spawnMgr;
         UpdateHp();
     }
 
@@ -72,8 +72,8 @@ public class CombatModule
         isDead = true;
 
         if (!owner.IsPlayer)
-            rewardManager.CreateItem(owner);
+            rewardMgr.CreateItem(owner);
 
-        spawnManager.RemoveEnemy(owner);
+        spawnMgr.RemoveEnemy(owner);
     }
 }
