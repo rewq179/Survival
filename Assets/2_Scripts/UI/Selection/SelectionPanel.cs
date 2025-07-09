@@ -11,7 +11,6 @@ public class SelectionPanel : MonoBehaviour
     [SerializeField] private GameObject panel;
     [SerializeField] private CanvasGroup canvasGroup;
 
-
     // 데이터
     private Unit playerUnit;
     private List<SelectionData> skills = new();
@@ -21,12 +20,15 @@ public class SelectionPanel : MonoBehaviour
     private Vector2[] startPos = new Vector2[SELECTION_COUNT];
     private Vector2[] targetPos = new Vector2[SELECTION_COUNT];
 
+    // 레벨업
+    private int levelUpCount;
+    private bool isAnimationing;
+
     // 상수
     private const int SELECTION_COUNT = 3;
     private const float ACTIVE_WEIGHT = 1.2f;
     private const float PASSIVE_WEIGHT = 0.7f;
     private const float SUB_WEIGHT = 1.5f;
-
     private const float FADE_IN_DURATION = 0.3f;
     private const float FADE_IN_INV_DURATION = 1 / FADE_IN_DURATION;
     private const float FADE_OUT_DURATION = 0.2f;
@@ -47,11 +49,12 @@ public class SelectionPanel : MonoBehaviour
         panel.SetActive(isActive);
     }
 
-    public void ShowSkillSelection()
+    public void AddLevelUpCount(int levelUpCount)
     {
-        UpdateSkillPool();
-        GetRandomSkills(SELECTION_COUNT);
-        StartCoroutine(ShowSelectionCoroutine());
+        this.levelUpCount += levelUpCount;
+        
+        if (!isAnimationing)
+            ProcessShowSelection();
     }
 
     private void UpdateSkillPool()
@@ -124,6 +127,22 @@ public class SelectionPanel : MonoBehaviour
     }
 
     #region Animation
+
+    private void ProcessShowSelection()
+    {
+        if (levelUpCount == 0)
+        {
+            isAnimationing = false;
+            return;
+        }
+
+        isAnimationing = true;
+        levelUpCount--;
+        
+        UpdateSkillPool();
+        GetRandomSkills(SELECTION_COUNT);
+        StartCoroutine(ShowSelectionCoroutine());
+    }
 
     private IEnumerator ShowSelectionCoroutine()
     {
@@ -242,7 +261,10 @@ public class SelectionPanel : MonoBehaviour
         }
 
         SetActive(false);
-        GameManager.Instance.OnGameResume();
+
+        ProcessShowSelection();
+        if (!isAnimationing)
+            GameManager.Instance.OnGameResume();
     }
 
     #endregion

@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c84b370c07161d418509239739a9524, type: 3}
   m_Name: GSTU_Config
   m_EditorClassIdentifier: Assembly-CSharp:GoogleSheetsToUnity:GoogleSheetsToUnityConfig
-  CLIENT_ID: 
-  CLIENT_SECRET: 
+  CLIENT_ID: 1065561785709-vm159069fss6f98mub800agvt65fottv.apps.googleusercontent.com
+  CLIENT_SECRET: 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
   ACCESS_TOKEN: 
   REFRESH_TOKEN: 1/kqepo9i9qIVDShLRC2c0kJgb-3DYKJevwVTF6LAfGGM
   API_Key: 
   PORT: 8080
   gdr:
-    access_token: ya29.a0AS3H6Nw5ws8hORUL2VObcN2p9P8jB87X1oSesl4V3tjeUwiGS4ifgmqwRViL3TKrKEsJWgloLa7WCZV8d6EzP-7d6X2dBNWT3YCak_68Hq3pzfAul5SALzSsYHTHi9qwXoBy3NvIF1XhKKZzqnDpo4rq25EwDyVGA3FN2L9OaCgYKAXgSARESFQHGX2MiNRICwBPPEtXEYhTha_PE2A0175
-    refresh_token: 1//0efIVHr_WGdW_CgYIARAAGA4SNwF-L9IrUyrXow7Vys4Np0UCN6EngZvmu_3bp2_wGorAr7FpphZvA3DjxWxPudSBaE-uNNiHAys
+    access_token: ya29.a0AS3H6NxnoYIenEt4WVd_LymUnD4a5vsa1RRydStUrIRlJSbegFTgeh6L2bsSWLhOAHoP8hghfoYzN0LagJky37iVPmoLWEmHtftRSR_K9EAZ7vdqfursVRJ1nIXdEk-LFqoB2lhKrQrGLBh6XNM5iH1b4a8wMeVJJv3NJwXiaCgYKAYESARESFQHGX2MiWoIpq5RsRuqPixcj6co-aw0175
+    refresh_token: 1//0e-poa1Xo4AapCgYIARAAGA4SNwF-L9IrYppJvSJ-EqwEsDGOGkmwEI55dQ8cpnQqfLTrbmomcDe7dvig3HxeOMfO11CLbdIQ8rI
     token_type: Bearer
     expires_in: 3599

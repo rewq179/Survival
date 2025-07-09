@@ -45,7 +45,7 @@ public class PlayerSaveData
         
         if (levelUpCount > 0)
         {
-            UIMgr.Instance.selectionPanel.ShowSkillSelection();
+            UIMgr.Instance.selectionPanel.AddLevelUpCount(levelUpCount);
             unit.UpdateHp();
             OnLevelChanged?.Invoke(level);
         }
