@@ -6,7 +6,7 @@ public class SkillCoolButton : BaseAttackButton
 {
     [SerializeField] private Slider cooldownSlider;
     [SerializeField] private TextMeshProUGUI cooldownText;
-    private SkillManager skillManager;
+    private SkillMgr skillManager;
     private float maxCooldown;
 
     public override void Reset()
@@ -29,7 +29,7 @@ public class SkillCoolButton : BaseAttackButton
     private void SubscribeToSkillManager()
     {
         if (skillManager == null)
-            skillManager = GameManager.Instance.skillManager;
+            skillManager = GameMgr.Instance.skillMgr;
 
         playerUnit.OnSkillCooldownChanged += OnSkillCooldownChanged;
         playerUnit.OnSkillCooldownEnded += OnSkillCooldownEnded;

@@ -32,7 +32,7 @@ public class RewardMgr : MonoBehaviour
     {
         ResetBonuses();
         this.playerUnit = playerUnit;
-        resourceMgr = GameManager.Instance.resourceMgr;
+        resourceMgr = GameMgr.Instance.resourceMgr;
         InitializeItemPools();
     }
 

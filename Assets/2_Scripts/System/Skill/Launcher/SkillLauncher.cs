@@ -140,8 +140,8 @@ public class SkillLauncher : MonoBehaviour
             particleController.Stop();
         }
 
-        GameManager.Instance.skillManager.PushParticle(skillKey, particleController);
-        GameManager.Instance.skillManager.RemoveLauncher(this);
+        GameMgr.Instance.skillMgr.PushParticle(skillKey, particleController);
+        GameMgr.Instance.skillMgr.RemoveLauncher(this);
     }
 
     private void OnParticleFinished()

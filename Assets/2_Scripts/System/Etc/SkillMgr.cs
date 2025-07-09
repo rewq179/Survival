@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections;
 
-public class SkillManager : MonoBehaviour
+public class SkillMgr : MonoBehaviour
 {
     // 스킬 인디케이터
     [SerializeField] private SkillIndicator indicatorPrefab;
@@ -328,7 +328,7 @@ public class SkillManager : MonoBehaviour
             return particle;
         }
 
-        return GameManager.Instance.resourceMgr.GetSkillEffect(parent, skillKey);
+        return GameMgr.Instance.resourceMgr.GetSkillEffect(parent, skillKey);
     }
 
     public void PushParticle(SkillKey skillKey, SkillParticleController particle)

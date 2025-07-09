@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class InputManager : MonoBehaviour
+public class InputMgr : MonoBehaviour
 {
-    public static InputManager Instance { get; private set; }
+    public static InputMgr Instance { get; private set; }
     private PlayerInputAction PlayerInputAction;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -11,7 +11,7 @@ public class InputManager : MonoBehaviour
     {
         // 씬이 로드되기 전에 InputManager 생성
         GameObject inputManagerObj = new GameObject("InputManager");
-        Instance = inputManagerObj.AddComponent<InputManager>();
+        Instance = inputManagerObj.AddComponent<InputMgr>();
         DontDestroyOnLoad(inputManagerObj);
     }
 

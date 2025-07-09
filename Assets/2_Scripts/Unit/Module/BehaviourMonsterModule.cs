@@ -34,7 +34,7 @@ public class BehaviourMonsterModule : BehaviourModule
     public override void Init(Unit unit)
     {
         owner = unit;
-        playerTransform = GameManager.Instance.PlayerUnit.transform;
+        playerTransform = GameMgr.Instance.PlayerUnit.transform;
         moveSpeed = unit.MoveSpeed;
     }
 
@@ -109,7 +109,7 @@ public class BehaviourMonsterModule : BehaviourModule
             transform.rotation = GetRotation(transform.rotation, direction, 2f);
         }
 
-        AttackTarget(GameManager.Instance.PlayerUnit, SkillKey.StingAttack);
+        AttackTarget(GameMgr.Instance.PlayerUnit, SkillKey.StingAttack);
     }
 
     public override void OnAttackAnimationEnd()

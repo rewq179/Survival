@@ -291,7 +291,7 @@ public class SpawnMgr : MonoBehaviour
         if (enemyPools.TryGetValue(unitID, out Stack<Unit> pool) && pool.Count > 0)
             return pool.Pop();
 
-        Unit unit = GameManager.Instance.resourceMgr.GetUnitPrefab(unitID);
+        Unit unit = GameMgr.Instance.resourceMgr.GetUnitPrefab(unitID);
         return Instantiate(unit, Vector3.zero, Quaternion.identity);
     }
 

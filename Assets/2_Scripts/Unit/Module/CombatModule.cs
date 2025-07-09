@@ -26,9 +26,9 @@ public class CombatModule
     public void Init(Unit owner)
     {
         this.owner = owner;
-        damageTextMgr = GameManager.Instance.damageTextMgr;
-        rewardMgr = GameManager.Instance.rewardMgr;
-        spawnMgr = GameManager.Instance.spawnMgr;
+        damageTextMgr = GameMgr.Instance.damageTextMgr;
+        rewardMgr = GameMgr.Instance.rewardMgr;
+        spawnMgr = GameMgr.Instance.spawnMgr;
         UpdateHp();
     }
 

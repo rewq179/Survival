@@ -78,14 +78,14 @@ public class CollectibleItem : MonoBehaviour
 
     private void UpdateMagnetEffect()
     {
-        Unit playerUnit = GameManager.Instance.PlayerUnit;
+        Unit playerUnit = GameMgr.Instance.PlayerUnit;
         if (playerUnit == null)
             return;
 
         Vector3 direction = playerUnit.transform.position - transform.position;
         float dist = direction.sqrMagnitude;
-        float currMagnetSpeed = GameManager.Instance.rewardMgr.GetMagnetSpeed();
-        float curMagnetRange = GameManager.Instance.rewardMgr.GetMagnetRange();
+        float currMagnetSpeed = GameMgr.Instance.rewardMgr.GetMagnetSpeed();
+        float curMagnetRange = GameMgr.Instance.rewardMgr.GetMagnetRange();
 
         if (isGolbalMagentEffect)
             currMagnetSpeed *= MAGNET_EFFECT_SPEED_MULTIPLIER;
@@ -113,7 +113,7 @@ public class CollectibleItem : MonoBehaviour
     public void Collect()
     {
         isCollected = true;
-        GameManager.Instance.rewardMgr.OnItemCollected(this);
+        GameMgr.Instance.rewardMgr.OnItemCollected(this);
     }
 }
 

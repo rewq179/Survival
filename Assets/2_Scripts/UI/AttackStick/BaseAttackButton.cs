@@ -31,7 +31,7 @@ public class BaseAttackButton : MonoBehaviour
     {
         playerUnit = unit;
         skillData = DataMgr.GetSkillData(skillKey);
-        skillIcon.sprite = GameManager.Instance.resourceMgr.GetSkillIcon(skillKey);
+        skillIcon.sprite = GameMgr.Instance.resourceMgr.GetSkillIcon(skillKey);
         gameObject.SetActive(true);
     }
 

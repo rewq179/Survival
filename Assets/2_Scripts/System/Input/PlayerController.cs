@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
 
     // 스킬 관련
     private Unit owner;
-    private SkillManager skillManager;
+    private SkillMgr skillManager;
     private Camera mainCamera;
 
     private void Awake()
@@ -27,7 +27,7 @@ public class PlayerController : MonoBehaviour
     public void Init(Unit owner)
     {
         this.owner = owner;
-        skillManager = GameManager.Instance.skillManager;
+        skillManager = GameMgr.Instance.skillMgr;
     }
 
     private void OnEnable()
@@ -67,7 +67,7 @@ public class PlayerController : MonoBehaviour
     private void OnSkillActivate(InputAction.CallbackContext context)
     {
         if (skillManager == null)
-            skillManager = GameManager.Instance.skillManager;
+            skillManager = GameMgr.Instance.skillMgr;
 
         skillManager.ActivateSkill(owner);
     }

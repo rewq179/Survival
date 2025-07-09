@@ -82,7 +82,7 @@ public class SelectionPanel : MonoBehaviour
     {
         SkillData skillData = DataMgr.GetSkillData(key);
         SelectionData data = PopSelectionData();
-        data.Init(key, skillData.skillType, skillData.name, skillData.description, GameManager.Instance.resourceMgr.GetSkillIcon(key));
+        data.Init(key, skillData.skillType, skillData.name, skillData.description, GameMgr.Instance.resourceMgr.GetSkillIcon(key));
         return data;
     }
 
@@ -90,7 +90,7 @@ public class SelectionPanel : MonoBehaviour
     {
         SubSkillData skillData = DataMgr.GetSubSkillData(key);
         SelectionData data = PopSelectionData();
-        data.Init(key, SkillType.Sub, skillData.name, skillData.description, GameManager.Instance.resourceMgr.GetSkillIcon(key));
+        data.Init(key, SkillType.Sub, skillData.name, skillData.description, GameMgr.Instance.resourceMgr.GetSkillIcon(key));
         return data;
     }
 
@@ -161,7 +161,7 @@ public class SelectionPanel : MonoBehaviour
 
     private IEnumerator InitSelection()
     {
-        GameManager.Instance.OnGamePause();
+        GameMgr.Instance.OnGamePause();
         SetActive(true);
         canvasGroup.alpha = 0f;
 
@@ -264,7 +264,7 @@ public class SelectionPanel : MonoBehaviour
 
         ProcessShowSelection();
         if (!isAnimationing)
-            GameManager.Instance.OnGameResume();
+            GameMgr.Instance.OnGameResume();
     }
 
     #endregion

@@ -17,7 +17,7 @@ public class AttackJoystick : MonoBehaviour
     [SerializeField] private GameObject panel;
     [SerializeField] private BaseAttackButton[] attackButtons;
     private Unit playerUnit;
-    private SkillManager skillManager;
+    private SkillMgr skillManager;
 
     public void Init(Unit unit)
     {
@@ -27,7 +27,7 @@ public class AttackJoystick : MonoBehaviour
         }
 
         playerUnit = unit;
-        skillManager = GameManager.Instance.skillManager;
+        skillManager = GameMgr.Instance.skillMgr;
 
         UnsubscribeFromEvents();
         SubscribeToEvents();

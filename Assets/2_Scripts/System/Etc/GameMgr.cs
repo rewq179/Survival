@@ -1,17 +1,16 @@
 using UnityEngine;
 using System;
-using UnityEngine.Video;
 
-public class GameManager : MonoBehaviour
+public class GameMgr : MonoBehaviour
 {
-    public static GameManager Instance { get; private set; }
+    public static GameMgr Instance { get; private set; }
 
     [SerializeField] private GameObject playerUnitPrefab;
     [SerializeField] private DataMgr dataManager;
     public ResourceMgr resourceMgr;
-    public SkillManager skillManager;
+    public SkillMgr skillMgr;
     public SpawnMgr spawnMgr;
-    public CameraManager cameraManager;
+    public CameraMgr cameraMgr;
     public DamageTextMgr damageTextMgr;
     public RewardMgr rewardMgr;
 
@@ -46,7 +45,7 @@ public class GameManager : MonoBehaviour
         CreatePlayerUnit();
 
         spawnMgr.Init();
-        InputManager.Instance.EnablePlayerInput();
+        InputMgr.Instance.EnablePlayerInput();
     }
 
     private void CreatePlayerUnit()
@@ -55,11 +54,11 @@ public class GameManager : MonoBehaviour
         {
             playerUnit = Instantiate(playerUnitPrefab, Vector3.zero, Quaternion.identity).GetComponent<Unit>();
             spawnMgr.SetPlayerTransform(playerUnit.transform);
-            cameraManager.SetTarget(playerUnit.transform);
+            cameraMgr.SetTarget(playerUnit.transform);
 
         }
         
-        skillManager.Init(playerUnit);
+        skillMgr.Init(playerUnit);
         rewardMgr.Init(playerUnit);
         UIMgr.Instance.Init(playerUnit);
         playerUnit.Init(100, Vector3.zero);
@@ -69,13 +68,13 @@ public class GameManager : MonoBehaviour
     public void OnGameResume()
     {
         Time.timeScale = 1f;
-        InputManager.Instance.EnablePlayerInput();
+        InputMgr.Instance.EnablePlayerInput();
     }
 
     public void OnGamePause()
     {
         Time.timeScale = 0f;
-        InputManager.Instance.DisablePlayerInput();
+        InputMgr.Instance.DisablePlayerInput();
     }
 
     public void Test()

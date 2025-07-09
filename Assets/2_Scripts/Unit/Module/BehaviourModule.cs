@@ -13,7 +13,7 @@ public abstract class BehaviourModule
         target.PlayAnimation("Take Damage");
         
         // 스킬 매니저를 통해 공격 실행
-        GameManager.Instance.skillManager.ExecuteMonsterAttack(skillKey, owner, target);
+        GameMgr.Instance.skillMgr.ExecuteMonsterAttack(skillKey, owner, target);
     }
 
     public virtual void OnAttackAnimationEnd()
