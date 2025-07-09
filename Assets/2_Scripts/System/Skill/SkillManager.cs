@@ -63,9 +63,7 @@ public class SkillManager : MonoBehaviour
             return;
 
         SkillKey skillKey = SkillKey.None;
-
         Vector3 startPosition = caster.transform.position;
-        startPosition.y = 0f;
         Vector3 targetPosition = Vector3.zero;
 
         foreach (SkillIndicator indicator in activeIndicators)
@@ -78,11 +76,12 @@ public class SkillManager : MonoBehaviour
             }
         }
 
-        // 쿨다운 설정
+        // 스킬 인스턴스 생성
+        SkillInstance inst = caster.GetSkillInstance(skillKey);
         caster.StartCooldown(skillKey);
 
-        SkillData skillData = DataMgr.GetSkillData(skillKey);
-        CreateSkillLauncher(skillData, startPosition, targetPosition, caster);
+        // 스킬 런처 생성
+        CreateSkillLauncher(inst, startPosition, targetPosition, caster);
         RemoveIndicatorsByskillKey(skillKey);
     }
 
@@ -221,27 +220,16 @@ public class SkillManager : MonoBehaviour
         }
     }
 
-    private SkillLauncher CreateSkillLauncher(SkillData skillData, Vector3 startPos, Vector3 targetPos, Unit caster, Unit target = null)
+    private SkillLauncher CreateSkillLauncher(SkillInstance skillInstance, Vector3 startPos, Vector3 targetPos, Unit caster, Unit target = null)
     {
-        SkillLauncherType type = skillData.launcherType;
         targetPos.y = 0f;
-
-        // 발사 위치 조정
-        startPos = type switch
-        {
-            SkillLauncherType.Projectile => startPos,
-            SkillLauncherType.InstantAOE => startPos,
-            SkillLauncherType.PersistentAOE => targetPos,
-            SkillLauncherType.InstantAttack => startPos,
-            _ => Vector3.zero,
-        };
-
-        // 런처 생성
         Vector3 direction = (targetPos - startPos).normalized;
         SkillLauncher launcher = PopSkillLauncher();
         activeLaunchers.Add(launcher);
-        SkillParticleController particle = PopParticle(skillData.skillKey, launcher.transform);
-        launcher.Initialize(skillData, startPos, direction, particle, caster, target);
+        SkillParticleController particle = PopParticle(skillInstance.skillKey, launcher.transform);
+        
+        // 스킬 인스턴스 데이터 전달
+        launcher.Initialize(skillInstance, startPos, direction, particle, caster, target);
         return launcher;
     }
 
@@ -256,12 +244,10 @@ public class SkillManager : MonoBehaviour
     /// </summary>
     public void ExecuteMonsterAttack(SkillKey skillKey, Unit caster, Unit target)
     {
-        SkillData skillData = DataMgr.GetSkillData(skillKey);
-
-        // 몬스터 위치에서 공격 실행
         Vector3 startPos = caster.transform.position;
         Vector3 targetPos = target.transform.position;
-        CreateSkillLauncher(skillData, startPos, targetPos, caster, target);
+        SkillInstance inst = caster.GetSkillInstance(skillKey);
+        CreateSkillLauncher(inst, startPos, targetPos, caster, target);
     }
 
     /// <summary>

@@ -5,6 +5,17 @@ using System.Linq;
 using Unity.Burst.Intrinsics;
 
 
+public static class UtilityFunc
+{
+    public static T Get<T>(this List<T> list, int index)
+    {
+        if (index < 0 || index >= list.Count)
+            return default;
+
+        return list[index];
+    }
+}
+
 public static class VectorExtension
 {
     public static Vector2 Bezier2D(Vector2 start, Vector2 end, float t)

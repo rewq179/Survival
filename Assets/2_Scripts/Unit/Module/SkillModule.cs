@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using Google.GData.Spreadsheets;
 
 /// <summary>
 /// 개별 스킬 관리 모듈
@@ -8,8 +9,7 @@ using System;
 public class SkillModule : MonoBehaviour
 {
     private Unit owner;
-
-    // 개별 유닛 스킬 관리
+    private Dictionary<SkillKey, SkillInstance> skillInstances = new();
     private Dictionary<SkillKey, int> skillLevels = new();
     private List<SkillKey> activeSkills = new();
     private List<SkillKey> passiveSkills = new();
@@ -28,14 +28,28 @@ public class SkillModule : MonoBehaviour
     public event Action<SkillKey> OnSkillRemoved;
     public event Action<SkillKey, int> OnSkillLevelChanged;
 
-    public void Init(Unit unit)
+    private static HashSet<SkillKey> applyAllSkill = new()
+    {
+        SkillKey.AllSkillRange,
+        SkillKey.AllSkillRange_Inc,
+        SkillKey.AllSkillCooldown,
+        SkillKey.AllSkillCooldown_Dec,
+        SkillKey.AllSkillDamage,
+        SkillKey.AllSkillDamage_Inc,
+        SkillKey.AllSkillDuration,
+        SkillKey.AllSkillDuration_Inc,
+    };
+
+    public void Init(Unit unit, UnitData data)
     {
         owner = unit;
 
-        RemoveAllSkillEffects();
         cooldowns.Clear();
         cooldownTimes.Clear();
         activatedSkills.Clear();
+        skillInstances.Clear();
+
+        LearnSkill(data.skillKey);
     }
 
     public void UpdateCooldowns()
@@ -80,8 +94,9 @@ public class SkillModule : MonoBehaviour
         switch (type)
         {
             case SkillType.Active:
+                CreateSkillInstance(skillKey);
                 activeSkills.Add(skillKey);
-                cooldownTimes[skillKey] = DataMgr.GetSkillData(skillKey).cooldown;
+                cooldownTimes[skillKey] = GetSkillInstance(skillKey).cooldownFinal;
                 cooldowns[skillKey] = 0f;
                 OnSkillAdded?.Invoke(skillKey);
                 break;
@@ -99,7 +114,8 @@ public class SkillModule : MonoBehaviour
                 else
                     subSkills[parentKey] = new List<SkillKey> { skillKey };
 
-                ApplySubSkillEffect(skillKey);
+                ApplySubSkillEffect(skillKey, false);
+                GetSkillInstance(parentKey)?.Refresh(owner);
                 break;
         }
     }
@@ -109,13 +125,28 @@ public class SkillModule : MonoBehaviour
         if (!skillLevels.ContainsKey(skillKey))
             return;
 
+        skillLevels[skillKey]++;
+        OnSkillLevelChanged?.Invoke(skillKey, skillLevels[skillKey]);
+
         if (DataMgr.IsSubSkill(skillKey))
         {
-            RemoveSubSkillEffect(skillKey);
-            skillLevels[skillKey]++;
-            ApplySubSkillEffect(skillKey);
-            OnSkillLevelChanged?.Invoke(skillKey, skillLevels[skillKey]);
+            ApplySubSkillEffect(skillKey, true);
         }
+
+        GetSkillInstance(skillKey)?.Refresh(owner);
+    }
+
+    private void CreateSkillInstance(SkillKey skillKey)
+    {
+        SkillInstance instance = new SkillInstance();
+        instance.Init(skillKey);
+        instance.Refresh(owner);
+        skillInstances[skillKey] = instance;
+    }
+
+    public SkillInstance GetSkillInstance(SkillKey skillKey)
+    {
+        return skillInstances.ContainsKey(skillKey) ? skillInstances[skillKey] : null;
     }
 
     public bool CanUseSkill(SkillKey skillKey)
@@ -138,28 +169,66 @@ public class SkillModule : MonoBehaviour
         return skillLevels.ContainsKey(skillKey) ? skillLevels[skillKey] : 0;
     }
 
+    public List<SkillKey> GetSubSkills(SkillKey parentSkillKey)
+    {
+        return subSkills.ContainsKey(parentSkillKey) ? subSkills[parentSkillKey] : null;
+    }
+
     public bool HasSkill(SkillKey skillKey)
     {
         return activeSkills.Contains(skillKey) || passiveSkills.Contains(skillKey) || subSkills.ContainsKey(skillKey);
     }
 
-    #region 스킬 효과 적용
-
-    private void RemoveAllSkillEffects()
+    public bool IsSkillLearnable(SkillKey key)
     {
-        foreach (SkillKey skill in passiveSkills)
+        SkillType type = DataMgr.GetSkillType(key);
+        switch (type)
         {
-            RemovePassiveSkillEffect(skill);
-        }
+            case SkillType.Active: // 액티브 : 보유하지 않았거나 액티브 계열이 N개 미만일 경우
+                if (HasSkill(key) || activeSkills.Count >= GameValue.MAX_ACTIVE_SKILL_LEVEL)
+                    return false;
+                return true;
 
-        foreach (var skill in subSkills)
-        {
-            foreach (SkillKey subSkill in skill.Value)
-            {
-                RemoveSubSkillEffect(subSkill);
-            }
+            case SkillType.Passive: // 패시브 : 보유하지 않았거나 패시브 계열이 N개 미만일 경우
+                if (HasSkill(key) || passiveSkills.Count >= GameValue.MAX_PASSIVE_SKILL_LEVEL)
+                    return false;
+                return true;
+
+            case SkillType.Sub: // 서브 : 부모 스킬을 보유하고 있고 서브 계열이 N개 미만일 경우
+                // 또한, 동일 계열의 서브는 최대 N개 가능
+                SubSkillData data = DataMgr.GetSubSkillData(key);
+                if (!HasSkill(data.parentSkillKey))
+                    return false;
+
+                int cnt = GetSubSkillTotalLevel(data.parentSkillKey);
+                if (cnt >= GameValue.MAX_SUB_SKILL_LEVEL)
+                    return false;
+
+                if (skillLevels.TryGetValue(key, out int level))
+                    return level < GameValue.MAX_SUB_SKILL_LEVEL && cnt < GameValue.MAX_SUB_SKILL_LEVEL;
+                return true;
+
+            default:
+                return false;
         }
     }
+
+    private int GetSubSkillTotalLevel(SkillKey parentKey)
+    {
+        int cnt = 0;
+        if (subSkills.TryGetValue(parentKey, out List<SkillKey> skills))
+        {
+            foreach (SkillKey key in skills)
+            {
+                if (skillLevels.ContainsKey(key))
+                    cnt += skillLevels[key];
+            }
+        }
+
+        return cnt;
+    }
+
+    #region 스킬 효과 적용
 
     private void ApplyPassiveSkillEffect(SkillKey skillKey)
     {
@@ -174,7 +243,6 @@ public class SkillModule : MonoBehaviour
                 owner.AddStatModifier(StatType.Health, value);
                 break;
 
-
             case SkillKey.MoveSpeed:
                 owner.AddStatModifier(StatType.MoveSpeed, value);
                 break;
@@ -219,65 +287,17 @@ public class SkillModule : MonoBehaviour
                 owner.AddStatModifier(StatType.AllSkillDuration, value);
                 break;
         }
+
+        CheckAllSkillEffect(skillKey);
     }
 
-    private void RemovePassiveSkillEffect(SkillKey skillKey)
-    {
-        SkillData data = DataMgr.GetSkillData(skillKey);
-        if (data == null)
-            return;
-
-        float value = data.baseValue;
-        switch (skillKey)
-        {
-            case SkillKey.Health:
-                owner.AddStatModifier(StatType.Health, -value);
-                break;
-            case SkillKey.MoveSpeed:
-                owner.AddStatModifier(StatType.MoveSpeed, -value);
-                break;
-            case SkillKey.Defense:
-                owner.AddStatModifier(StatType.Defense, -value);
-                break;
-            case SkillKey.MagnetRange:
-                owner.AddStatModifier(StatType.MagnetRange, -value);
-                break;
-            case SkillKey.ExpGain:
-                owner.AddStatModifier(StatType.ExpGain, -value);
-                break;
-            case SkillKey.GoldGain:
-                owner.AddStatModifier(StatType.GoldGain, -value);
-                break;
-            case SkillKey.CriticalChance:
-                owner.AddStatModifier(StatType.CriticalChance, -value);
-                break;
-            case SkillKey.CriticalDamage:
-                owner.AddStatModifier(StatType.CriticalDamage, -value);
-                break;
-            case SkillKey.AllSkillRange:
-                owner.AddStatModifier(StatType.AllSkillRange, -value);
-                break;
-            case SkillKey.AllSkillCooldown:
-                owner.AddStatModifier(StatType.AllSkillCooldown, -value);
-                break;
-            case SkillKey.AllSkillDamage:
-                owner.AddStatModifier(StatType.AllSkillDamage, -value);
-                break;
-            case SkillKey.AllSkillDuration:
-                owner.AddStatModifier(StatType.AllSkillDuration, -value);
-                break;
-        }
-    }
-
-    private void ApplySubSkillEffect(SkillKey skillKey)
+    private void ApplySubSkillEffect(SkillKey skillKey, bool isLevelUp)
     {
         SubSkillData data = DataMgr.GetSubSkillData(skillKey);
         if (data == null)
             return;
 
-        int level = GetSkillLevel(data.skillKey);
-        float value = data.baseValue + (data.perLevelValue * (level - 1));
-
+        float value = isLevelUp ? data.perLevelValue : data.baseValue;
         switch (skillKey)
         {
             case SkillKey.Health_Inc:
@@ -317,55 +337,21 @@ public class SkillModule : MonoBehaviour
                 owner.AddStatModifier(StatType.AllSkillDuration, value);
                 break;
         }
+
+        CheckAllSkillEffect(skillKey);
     }
 
-    private void RemoveSubSkillEffect(SkillKey skillKey)
+    /// <summary>
+    /// 모든 스킬 효과 적용
+    /// </summary>
+    private void CheckAllSkillEffect(SkillKey skillKey)
     {
-        SubSkillData data = DataMgr.GetSubSkillData(skillKey);
-        if (data == null)
+        if (!applyAllSkill.Contains(skillKey))
             return;
 
-        int level = GetSkillLevel(data.skillKey);
-        float value = data.baseValue + (data.perLevelValue * (level - 1));
-
-        switch (skillKey)
+        foreach (SkillKey key in activeSkills)
         {
-            case SkillKey.Health_Inc:
-                owner.AddStatModifier(StatType.Health, -value);
-                break;
-            case SkillKey.MoveSpeed_Inc:
-                owner.AddStatModifier(StatType.MoveSpeed, -value);
-                break;
-            case SkillKey.Defense_Inc:
-                owner.AddStatModifier(StatType.Defense, -value);
-                break;
-            case SkillKey.MagnetRange_Inc:
-                owner.AddStatModifier(StatType.MagnetRange, -value);
-                break;
-            case SkillKey.ExpGain_Inc:
-                owner.AddStatModifier(StatType.ExpGain, -value);
-                break;
-            case SkillKey.GoldGain_Inc:
-                owner.AddStatModifier(StatType.GoldGain, -value);
-                break;
-            case SkillKey.CriticalChance_Inc:
-                owner.AddStatModifier(StatType.CriticalChance, -value);
-                break;
-            case SkillKey.CriticalDamage_Inc:
-                owner.AddStatModifier(StatType.CriticalDamage, -value);
-                break;
-            case SkillKey.AllSkillRange_Inc:
-                owner.AddStatModifier(StatType.AllSkillRange, -value);
-                break;
-            case SkillKey.AllSkillCooldown_Dec:
-                owner.AddStatModifier(StatType.AllSkillCooldown, -value);
-                break;
-            case SkillKey.AllSkillDamage_Inc:
-                owner.AddStatModifier(StatType.AllSkillDamage, -value);
-                break;
-            case SkillKey.AllSkillDuration_Inc:
-                owner.AddStatModifier(StatType.AllSkillDuration, -value);
-                break;
+            GetSkillInstance(key).Refresh(owner);
         }
     }
 

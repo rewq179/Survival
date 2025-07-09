@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters;
 
 [System.Serializable]
-public struct IndicatorElement
+public class IndicatorElement
 {
     public SkillKey skillKey;
     public int index;

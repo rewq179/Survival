@@ -24,6 +24,9 @@ public class StatModule
     private float moveSpeed;
     private Dictionary<StatType, float> statModifiers = new();
 
+    public float MaxHP => health;
+    public float MoveSpeed => moveSpeed;
+
     public void Init(UnitData unitData)
     {
         for (StatType type = 0; type < StatType.Max; type++)
@@ -37,14 +40,12 @@ public class StatModule
 
     public float GetFinalStat(StatType type)
     {
-        float baseStat = type switch
+        return type switch
         {
             StatType.Health => health,
             StatType.MoveSpeed => moveSpeed,
-            _ => 0f,
+            _ => statModifiers[type],
         };
-
-        return baseStat * (1 + statModifiers[type]);
     }
 
     public void AddStatModifier(StatType type, float value)

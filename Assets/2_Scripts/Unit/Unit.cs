@@ -11,10 +11,10 @@ public class Unit : MonoBehaviour
     [SerializeField] private PlayerController playerController;
 
     // 모듈
-    private StatModule statModule;
+    private StatModule statModule = new();
     private BehaviourModule behaviourModule;
-    private CombatModule combatModule;
-    private SkillModule skillModule;
+    private CombatModule combatModule = new();
+    private SkillModule skillModule = new();
 
     // 기본 정보
     private PlayerSaveData playerSaveData = new();
@@ -53,21 +53,14 @@ public class Unit : MonoBehaviour
 
     private void InitModule()
     {
-        if (statModule == null)
-            statModule = new StatModule();
         if (behaviourModule == null)
             behaviourModule = isPlayer ? new BehaviourPlayerModule() : new BehaviourMonsterModule();
-        if (combatModule == null)
-            combatModule = new CombatModule();
-        if (playerSaveData == null)
-            playerSaveData = new PlayerSaveData();
-        if (skillModule == null)
-            skillModule = new SkillModule();
 
-        statModule.Init(DataMgr.GetUnitData(unitID));
+        UnitData data = DataMgr.GetUnitData(unitID);
+        statModule.Init(data);
         combatModule.Init(this);
         behaviourModule.Init(this);
-        skillModule.Init(this);
+        skillModule.Init(this, data);
     }
 
     private void InitHealthBar()
@@ -96,10 +89,10 @@ public class Unit : MonoBehaviour
     public void SetTrigger(string name) => animator.SetTrigger(name);
 
     // StatModule
-    public float MaxHp => statModule.GetFinalStat(StatType.Health);
-    public float MoveSpeed => statModule.GetFinalStat(StatType.MoveSpeed);
+    public float MaxHp => statModule.MaxHP;
+    public float MoveSpeed => statModule.MoveSpeed;
     public float GetFinalStat(StatType statType) => statModule.GetFinalStat(statType);
-    public void AddStatModifier(StatType statType, float value) => statModule.AddStatModifier(statType, value); 
+    public void AddStatModifier(StatType statType, float value) => statModule.AddStatModifier(statType, value);
 
     // BehaviourModule
     public void OnAttackAnimationEnd() => behaviourModule.OnAttackAnimationEnd();
@@ -123,7 +116,7 @@ public class Unit : MonoBehaviour
     public float CurExp => playerSaveData.exp;
     public float MaxExp => playerSaveData.GetRequiredExp(playerSaveData.level);
     public int Gold => playerSaveData.gold;
-    
+
     public event Action<int> OnLevelChanged
     {
         add => playerSaveData.OnLevelChanged += value;
@@ -150,7 +143,10 @@ public class Unit : MonoBehaviour
     public bool CanUseSkill(SkillKey skillKey) => skillModule.CanUseSkill(skillKey);
     public void StartCooldown(SkillKey skillKey) => skillModule.StartCooldown(skillKey);
     public int GetSkillLevel(SkillKey skillKey) => skillModule.GetSkillLevel(skillKey);
+    public List<SkillKey> GetSubSkills(SkillKey skillKey) => skillModule.GetSubSkills(skillKey);
     public bool HasSkill(SkillKey skillKey) => skillModule.HasSkill(skillKey);
+    public bool IsSkillLearnable(SkillKey skillKey) => skillModule.IsSkillLearnable(skillKey);
+    public SkillInstance GetSkillInstance(SkillKey skillKey) => skillModule.GetSkillInstance(skillKey);
 
     public event Action<SkillKey, float> OnSkillCooldownChanged
     {

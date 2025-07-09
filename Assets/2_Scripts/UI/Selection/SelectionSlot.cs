@@ -23,6 +23,7 @@ public class SelectionSlot : MonoBehaviour
 
     // 데이터
     private SelectionData data;
+    private bool isSelected;
     private System.Action<SelectionData> onSlotClicked;
 
     public RectTransform Rect => rect;
@@ -35,6 +36,7 @@ public class SelectionSlot : MonoBehaviour
         detailInfo.Reset();
         iconSlot.Reset();
         clickButton.onClick.RemoveAllListeners();
+        isSelected = false;
     }
 
     public void Init(SelectionData data, System.Action<SelectionData> onClickCallback)
@@ -81,6 +83,10 @@ public class SelectionSlot : MonoBehaviour
 
     public void OnClick()
     {
+        if (isSelected)
+            return;
+
+        isSelected = true;
         onSlotClicked(data);
     }
 }

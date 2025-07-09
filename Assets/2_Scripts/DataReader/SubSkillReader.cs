@@ -15,7 +15,7 @@ public enum SubSkillType
     ProjectileCount,        // 투사체 개수 증가
     Piercing,               // 관통
     Ricochet,               // 도탄
-    DamageInc,              // 데미지 증가
+    Damage,                 // 데미지 증가
     Duration,               // 지속 시간 증가
     Radius,                 // 범위 증가
     DamageTick,             // 데미지 틱 증가
@@ -33,6 +33,8 @@ public enum SubSkillType
     AllSkillCooldownDec,    // 모든 스킬 쿨다운 감소
     AllSkillDamageInc,      // 모든 스킬 데미지 증가
     AllSkillDurationInc,    // 모든 스킬 지속시간 증가
+
+    Max,
 }
 
 [Serializable]

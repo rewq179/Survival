@@ -19,7 +19,6 @@ public class CharacterInfo : MonoBehaviour
 
         UnsubscribeFromEvents();
         SubscribeToEvents();
-        UpdateAllUI();
     }
 
     private void SubscribeToEvents()
@@ -42,7 +41,7 @@ public class CharacterInfo : MonoBehaviour
         unit.OnLevelChanged -= UpdateLevelUI;
     }
 
-    private void UpdateAllUI()
+    public void UpdateAllUI()
     {
         healthBar.Init(unit.CurHp, unit.MaxHp);
         hpText.text = $"{unit.CurHp}/{unit.MaxHp}";

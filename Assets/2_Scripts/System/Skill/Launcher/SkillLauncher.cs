@@ -63,10 +63,10 @@ public class SkillLauncher : MonoBehaviour
         }
     }
 
-    public virtual void Initialize(SkillData skillData, Vector3 startPos, Vector3 dir, SkillParticleController particleController,
+    public virtual void Initialize(SkillInstance skillInstance, Vector3 startPos, Vector3 dir, SkillParticleController particleController,
         Unit caster, Unit fixedTarget = null)
     {
-        skillKey = skillData.skillKey;
+        skillKey = skillInstance.skillKey;
         startPosition = startPos;
         direction = dir.normalized;
         this.caster = caster;
@@ -79,6 +79,7 @@ public class SkillLauncher : MonoBehaviour
         gameObject.SetActive(true);
 
         // 스킬 데이터 기반으로 효과들 자동 추가
+        SkillData skillData = DataMgr.GetSkillData(skillInstance.skillKey);
         SetupSkillEffects(skillData, fixedTarget);
 
         if (particleController != null)

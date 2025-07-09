@@ -45,11 +45,7 @@ public class GameManager : MonoBehaviour
         dataManager.Init();
 
         CreatePlayerUnit();
-        skillManager.Init(playerUnit);
-        rewardMgr.Init(playerUnit);
-        UIMgr.Instance.Init(playerUnit);
 
-        playerUnit.LearnSkill(SkillKey.Arrow);
         spawnManager.Init(currentWave);
         InputManager.Instance.EnablePlayerInput();
     }
@@ -61,9 +57,14 @@ public class GameManager : MonoBehaviour
             playerUnit = Instantiate(playerUnitPrefab, Vector3.zero, Quaternion.identity).GetComponent<Unit>();
             spawnManager.SetPlayerTransform(playerUnit.transform);
             cameraManager.SetTarget(playerUnit.transform);
+
         }
         
+        skillManager.Init(playerUnit);
+        rewardMgr.Init(playerUnit);
+        UIMgr.Instance.Init(playerUnit);
         playerUnit.Init(100, Vector3.zero);
+        UIMgr.Instance.UpdateUI();
     }
 
     public void OnGameResume()

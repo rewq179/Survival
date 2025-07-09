@@ -32,4 +32,9 @@ public class UIMgr : MonoBehaviour
         topBar.Init(playerUnit);
         selectionPanel.Init(playerUnit);
     }
+
+    public void UpdateUI()
+    {
+        characterInfo.UpdateAllUI();
+    }
 }

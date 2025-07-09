@@ -83,14 +83,16 @@ public enum SkillType
 }
 
 [System.Serializable]
-public struct SkillElement
+public class SkillElement
 {
     public float damage;
+    public float duration;
     public float interval;
 
-    public SkillElement(float damage, float interval)
+    public SkillElement(float damage, float duration, float interval)
     {
         this.damage = damage;
+        this.duration = duration;
         this.interval = interval;
     }
 }
@@ -117,8 +119,8 @@ public class SkillData
         this.description = description;
         this.cooldown = cooldown;
         this.baseValue = baseValue;
-        this.indicatorElements = indicators;
-        this.skillElements = skills;
+        indicatorElements = indicators;
+        skillElements = skills;
         this.launcherType = launcherType;
     }
 }
@@ -139,8 +141,8 @@ public class SkillDataReader : BaseReader
         string description = string.Empty;
         float cooldown = 0;
         float baseValue = 0;
-        List<IndicatorElement> elements = new List<IndicatorElement>();
-        List<SkillElement> skills = new List<SkillElement>();
+        List<IndicatorElement> elements = new();
+        List<SkillElement> skills = new();
         SkillLauncherType launcherType = SkillLauncherType.Projectile;
 
         for (int i = 0; i < cells.Count; i++)
@@ -187,7 +189,7 @@ public class SkillDataReader : BaseReader
                 case "skill":
                     if (!string.IsNullOrEmpty(cells[i].value))
                     {
-                        skills = DecodeSkillElement(skillKey, cells[i].value);
+                        skills = DecodeSkillElement(cells[i].value);
                     }
                     break;
 
@@ -203,7 +205,7 @@ public class SkillDataReader : BaseReader
 
     private List<IndicatorElement> DecodeIndicatorElement(SkillKey skillKey, string indicatorString)
     {
-        List<IndicatorElement> elements = new List<IndicatorElement>();
+        List<IndicatorElement> elements = new();
 
         /// Line : 1.5 / 6, Circle : 2.5 / 360
         string[] splits = indicatorString.Split(',');
@@ -267,24 +269,25 @@ public class SkillDataReader : BaseReader
         return new IndicatorElement(skillKey, index, speed, length, width, angle, radius);
     }
 
-    private List<SkillElement> DecodeSkillElement(SkillKey skillKey, string skillString)
+    private List<SkillElement> DecodeSkillElement(string skillString)
     {
-        List<SkillElement> elements = new List<SkillElement>();
+        List<SkillElement> elements = new();
 
         // DMG : 12 / Int : 0.5
         string[] splits = skillString.Split(',');
         foreach (string str in splits)
         {
-            SkillElement element = DecodeSingleSkillElement(str.Trim(), skillKey, elements.Count);
+            SkillElement element = DecodeSingleSkillElement(str.Trim());
             elements.Add(element);
         }
 
         return elements;
     }
 
-    private SkillElement DecodeSingleSkillElement(string str, SkillKey skillKey, int index)
+    private SkillElement DecodeSingleSkillElement(string str)
     {
         float damage = 0f;
+        float duration = 0f;
         float interval = 0f;
 
         // Dmg : 12 / Int : 0.5
@@ -308,6 +311,10 @@ public class SkillDataReader : BaseReader
                         damage = parsedValue;
                         break;
 
+                    case "duration":
+                        duration = parsedValue;
+                        break;
+
                     case "interval":
                         interval = parsedValue;
                         break;
@@ -315,7 +322,7 @@ public class SkillDataReader : BaseReader
             }
         }
 
-        return new SkillElement(damage, interval);
+        return new SkillElement(damage, duration, interval);
     }
 }
 

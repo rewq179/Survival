@@ -47,6 +47,9 @@ public class AttackJoystick : MonoBehaviour
 
     private void RefreshSkill(SkillKey skillKey)
     {
+        if (DataMgr.IsPassiveSkill(skillKey))
+            return;
+
         foreach (BaseAttackButton button in attackButtons)
         {
             if (!button.gameObject.activeSelf)

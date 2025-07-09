@@ -25,7 +25,7 @@ public class SelectionPanel : MonoBehaviour
     private const int SELECTION_COUNT = 3;
     private const float ACTIVE_WEIGHT = 1.2f;
     private const float PASSIVE_WEIGHT = 0.7f;
-    private const float SUB_WEIGHT = 0.5f;
+    private const float SUB_WEIGHT = 1.5f;
 
     private const float FADE_IN_DURATION = 0.3f;
     private const float FADE_IN_INV_DURATION = 1 / FADE_IN_DURATION;
@@ -64,19 +64,14 @@ public class SelectionPanel : MonoBehaviour
 
         for (SkillKey skillKey = 0; skillKey < SkillKey.StingAttack; skillKey++)
         {
-            if (playerUnit.HasSkill(skillKey))
-            {
-                List<SkillKey> subSkills = DataMgr.GetSubSkillKeysByMain(skillKey);
-                foreach (SkillKey key in subSkills)
-                {
-                    skills.Add(CreateSelectionDataBySub(key));
-                }
-            }
+            if (!playerUnit.IsSkillLearnable(skillKey))
+                continue;
 
-            else if (!DataMgr.IsSubSkill(skillKey))
-            {
+            if (DataMgr.IsSubSkill(skillKey))
+                skills.Add(CreateSelectionDataBySub(skillKey));
+
+            else
                 skills.Add(CreateSelectionDataByMain(skillKey));
-            }
         }
     }
 
@@ -151,6 +146,11 @@ public class SelectionPanel : MonoBehaviour
         SetActive(true);
         canvasGroup.alpha = 0f;
 
+        for (int i = 0; i < selectionSlots.Count; i++)
+        {
+            selectionSlots[i].Reset();
+        }
+
         int count = selectedSkills.Count;
         for (int i = 0; i < count; i++)
         {
@@ -158,11 +158,6 @@ public class SelectionPanel : MonoBehaviour
             slot.Init(selectedSkills[i], SelectSkill);
             slot.UpdatePosition(slotStartPosition);
             startPos[i] = slot.Rect.anchoredPosition;
-        }
-
-        for (int i = count; i < selectionSlots.Count; i++)
-        {
-            selectionSlots[i].Reset();
         }
 
         yield return null;
