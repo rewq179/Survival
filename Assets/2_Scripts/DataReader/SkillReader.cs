@@ -70,6 +70,14 @@ public enum SkillKey
 
     // 몬스터
     StingAttack,
+    FireProjectile,
+    MeleeAttack,
+    BiteAttack,
+    SpitPoisonAttack,
+    PunchAttack,
+    HitGroundAttack,
+    DradonBiteAttack,
+    BreathAttack,
 
     Max,
 }
