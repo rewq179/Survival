@@ -42,18 +42,14 @@ public class InstanceValue
     private float piercingAdditive;
     public float piercingFinal;
 
-    public void SetFix(IndicatorElement indicatorElement, SkillElement skillElement)
+    public void SetFix(SkillElement skillElement)
     {
-        if (indicatorElement != null)
-        {
-            radiusFix = indicatorElement.radius;
-        }
-
         if (skillElement != null)
         {
             damageFix = skillElement.damage;
             durationFix = skillElement.duration;
             damageTickFix = skillElement.interval;
+            radiusFix = skillElement.radius;
         }
 
         projectileCountFix = 1;
@@ -167,10 +163,10 @@ public class SkillInstance
         SkillData baseData = DataMgr.GetSkillData(skillKey);
         cooldownFix = baseData.cooldown;
 
-        for (int i = 0; i < baseData.indicatorElements.Count; i++)
+        for (int i = 0; i < baseData.skillElements.Count; i++)
         {
             InstanceValue value = new InstanceValue();
-            value.SetFix(baseData.indicatorElements.Get(i), baseData.skillElements.Get(i));
+            value.SetFix(baseData.skillElements.Get(i));
             values.Add(value);
         }
     }

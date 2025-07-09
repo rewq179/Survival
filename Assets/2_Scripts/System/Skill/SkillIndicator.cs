@@ -1,12 +1,12 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Runtime.Serialization.Formatters;
 
 [System.Serializable]
-public class IndicatorElement
+public class SkillElement
 {
     public SkillKey skillKey;
     public int index;
+
     public SkillIndicatorType type;
     public float moveSpeed;
     public float length;
@@ -14,10 +14,14 @@ public class IndicatorElement
     public float angle;
     public float radius;
     public float maxDistance;
+    public float damage;
+    public float duration;
+    public float interval;
 
     public bool IsMainIndicator => index == 0;
 
-    public IndicatorElement(SkillKey skillKey, int index, float speed = 0, float length = 0, float width = 0, float angle = 0, float radius = 0)
+    public void Init(SkillKey skillKey, int index, float speed, float length, float width,
+        float angle, float radius, float damage, float duration, float interval)
     {
         this.skillKey = skillKey;
         this.index = index;
@@ -26,6 +30,9 @@ public class IndicatorElement
         this.width = width;
         this.angle = angle;
         this.radius = radius;
+        this.damage = damage;
+        this.duration = duration;
+        this.interval = interval;
 
         if (length > 0)
             type = SkillIndicatorType.Line;
@@ -56,21 +63,21 @@ public class SkillIndicator : MonoBehaviour
     [SerializeField] private MeshRenderer meshRenderer;
 
     private Mesh mesh;
-    private IndicatorElement indicatorElement;
+    private SkillElement skillElement;
     private bool isMainIndicator;
     public bool isPlayerIndicator;
 
     private const float SEGMENTS = 32;      // 원/부채꼴 세분화
     private const float INV_SEGMENTS = 1 / SEGMENTS;
 
-    public IndicatorElement Element => indicatorElement;
+    public SkillElement Element => skillElement;
     public Mesh Mesh => mesh;
 
-    public void Init(IndicatorElement element, Material indicatorMaterial, Mesh mesh, bool isPlayerIndicator)
+    public void Init(SkillElement element, Material indicatorMaterial, Mesh mesh, bool isPlayerIndicator)
     {
-        indicatorElement = element;
+        skillElement = element;
         this.mesh = mesh;
-        isMainIndicator = indicatorElement.IsMainIndicator;
+        isMainIndicator = skillElement.IsMainIndicator;
         this.isPlayerIndicator = isPlayerIndicator;
 
         meshRenderer.material = indicatorMaterial;
@@ -93,7 +100,7 @@ public class SkillIndicator : MonoBehaviour
     {
         if (isMainIndicator)
         {
-            switch (indicatorElement.type)
+            switch (skillElement.type)
             {
                 case SkillIndicatorType.Line:
                     transform.position = start;
@@ -108,7 +115,7 @@ public class SkillIndicator : MonoBehaviour
                     break;
 
                 case SkillIndicatorType.Circle:
-                    transform.position = GetElementEndPoint(start, mouse, indicatorElement);
+                    transform.position = GetElementEndPoint(start, mouse, skillElement);
                     transform.rotation = Quaternion.identity;
                     break;
             }
@@ -116,7 +123,7 @@ public class SkillIndicator : MonoBehaviour
 
         else
         {
-            switch (indicatorElement.type)
+            switch (skillElement.type)
             {
                 case SkillIndicatorType.Line:
                     transform.position = start;
@@ -209,7 +216,7 @@ public class SkillIndicator : MonoBehaviour
         return CreateSectorMesh(360f, radius);
     }
 
-    public static Vector3 GetElementEndPoint(Vector3 startPoint, Vector3 mouse, IndicatorElement element)
+    public static Vector3 GetElementEndPoint(Vector3 startPoint, Vector3 mouse, SkillElement element)
     {
         Vector3 direction = (mouse - startPoint).normalized;
         if (direction == Vector3.zero)

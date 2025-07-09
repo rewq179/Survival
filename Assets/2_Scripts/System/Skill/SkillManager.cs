@@ -126,7 +126,7 @@ public class SkillManager : MonoBehaviour
 
             else
             {
-                IndicatorElement previousElement = indicators[i - 1].Element;
+                SkillElement previousElement = indicators[i - 1].Element;
                 Vector3 previousEndPoint = SkillIndicator.GetElementEndPoint(player, mouse, previousElement);
                 indicator.DrawIndicator(previousEndPoint, mouse);
             }
@@ -148,23 +148,23 @@ public class SkillManager : MonoBehaviour
     {
         SkillData skillData = DataMgr.GetSkillData(skillKey);
 
-        if (skillData.indicatorElements.Count > 1) // 복합 인디케이터
+        if (skillData.skillElements.Count > 1) // 복합 인디케이터
         {
             ShowMultipleIndicators(skillData, start, isPlayerIndicator);
         }
 
         else // 단일 인디케이터
         {
-            SkillIndicator indicator = CreateIndicator(skillData.indicatorElements[0], isPlayerIndicator);
+            SkillIndicator indicator = CreateIndicator(skillData.skillElements[0], isPlayerIndicator);
             indicator.DrawIndicator(start, Vector3.zero);
         }
     }
 
     private void ShowMultipleIndicators(SkillData skillData, Vector3 start, bool isPlayerIndicator)
     {
-        for (int i = 0; i < skillData.indicatorElements.Count; i++)
+        for (int i = 0; i < skillData.skillElements.Count; i++)
         {
-            SkillIndicator indicator = CreateIndicator(skillData.indicatorElements[i], isPlayerIndicator);
+            SkillIndicator indicator = CreateIndicator(skillData.skillElements[i], isPlayerIndicator);
 
             if (i == 0)
             {
@@ -173,13 +173,13 @@ public class SkillManager : MonoBehaviour
 
             else
             {
-                Vector3 previousEndPoint = SkillIndicator.GetElementEndPoint(start, Vector3.zero, skillData.indicatorElements[i - 1]);
+                Vector3 previousEndPoint = SkillIndicator.GetElementEndPoint(start, Vector3.zero, skillData.skillElements[i - 1]);
                 indicator.DrawIndicator(previousEndPoint, Vector3.zero);
             }
         }
     }
 
-    private SkillIndicator CreateIndicator(IndicatorElement element, bool isPlayerIndicator)
+    private SkillIndicator CreateIndicator(SkillElement element, bool isPlayerIndicator)
     {
         SkillIndicator indicator = PopIndicator();
         indicator.Init(element, indicatorMaterial, PopMesh(element), isPlayerIndicator);
@@ -291,7 +291,7 @@ public class SkillManager : MonoBehaviour
         meshPools[type].Push(mesh);
     }
 
-    private Mesh PopMesh(IndicatorElement element)
+    private Mesh PopMesh(SkillElement element)
     {
         if (meshPools[element.type].TryPop(out Mesh mesh))
             return mesh;

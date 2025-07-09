@@ -29,7 +29,7 @@ public class ProjectileMovementEffect : ISkillEffect
     public ProjectileMovementEffect(SkillData skillData, int index)
     {
         damage = skillData.skillElements[index].damage;
-        IndicatorElement element = skillData.indicatorElements[index];
+        SkillElement element = skillData.skillElements[index];
         moveSpeed = element.moveSpeed;
         maxRange = element.length;
     }
@@ -96,7 +96,7 @@ public class AOEDamageEffect : ISkillEffect
     {
         damage = skillData.skillElements[index].damage;
 
-        IndicatorElement element = skillData.indicatorElements[index];
+        SkillElement element = skillData.skillElements[index];
         type = element.type;
         radius = element.radius;
         length = element.length;
