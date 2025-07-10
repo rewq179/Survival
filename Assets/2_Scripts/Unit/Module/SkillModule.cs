@@ -243,8 +243,10 @@ public class SkillModule : MonoBehaviour
         switch (skillKey)
         {
             case SkillKey.Health:
+                float heal = owner.MaxHp * value;
                 owner.AddStatModifier(StatType.Health, value);
                 owner.UpdateHp();
+                owner.TakeHeal(heal);
                 break;
 
             case SkillKey.MoveSpeed:
@@ -306,8 +308,10 @@ public class SkillModule : MonoBehaviour
         switch (skillKey)
         {
             case SkillKey.Health_Inc:
+                float heal = owner.MaxHp * value;
                 owner.AddStatModifier(StatType.Health, value);
                 owner.UpdateHp();
+                owner.TakeHeal(heal);
                 break;
             case SkillKey.MoveSpeed_Inc:
                 owner.AddStatModifier(StatType.MoveSpeed, value);

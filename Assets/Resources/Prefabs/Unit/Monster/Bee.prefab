@@ -2195,7 +2195,7 @@ Transform:
   m_GameObject: {fileID: 1653112355089260}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7510341, y: -0.02627222, z: -0.052171186, w: 0.65767455}
-  m_LocalPosition: {x: -0.000000002717934, y: 0, z: -0.000000015987796}
+  m_LocalPosition: {x: 0.02, y: 0.55, z: -0.07}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2479,7 +2479,7 @@ GameObject:
   - component: {fileID: 4205835698289562}
   - component: {fileID: 5696829833923267141}
   - component: {fileID: 95212052626076970}
-  - component: {fileID: 3523123466923268506}
+  - component: {fileID: 3187248452699600711}
   m_Layer: 8
   m_Name: Bee
   m_TagString: Untagged
@@ -2595,8 +2595,8 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!135 &3523123466923268506
-SphereCollider:
+--- !u!136 &3187248452699600711
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -2610,12 +2610,14 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
+  serializedVersion: 2
+  m_Radius: 0.4
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &1698306973309258
 GameObject:
   m_ObjectHideFlags: 0
@@ -3635,6 +3637,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4205835698289562}
     m_Modifications:
+    - target: {fileID: 1581815130776077409, guid: a2d774c1986fbb246878a1161644b567, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3566629706250433636, guid: a2d774c1986fbb246878a1161644b567, type: 3}
       propertyPath: m_Name
       value: HealthBar
@@ -3645,7 +3651,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7707971084563570402, guid: a2d774c1986fbb246878a1161644b567, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7707971084563570402, guid: a2d774c1986fbb246878a1161644b567, type: 3}
       propertyPath: m_LocalPosition.z

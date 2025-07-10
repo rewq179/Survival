@@ -3,6 +3,8 @@ using System.Collections;
 
 public abstract class HealthBarBase : MonoBehaviour
 {
+    [SerializeField] private GameObject panelObject;
+
     protected AnimationCurve curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
     protected const float DAMAGE_DURATION = 0.5f;
     protected const float DAMAGE_INV_DURATION = 1f / DAMAGE_DURATION;
@@ -10,22 +12,28 @@ public abstract class HealthBarBase : MonoBehaviour
 
     public virtual void UpdateHealthBar(float prevRatio, float nextRatio)
     {
-        SetHealthBar(nextRatio);
-
         if (damageCoroutine != null)
+        {
             StopCoroutine(damageCoroutine);
+            damageCoroutine = null;
+        }
 
-        damageCoroutine = StartCoroutine(AnimateDamageBar(prevRatio, nextRatio));
+        SetHealthBar(nextRatio);
+        if (nextRatio > prevRatio)
+            SetDamageBar(nextRatio);
+
+        else
+            damageCoroutine = StartCoroutine(AnimateDamageBar(prevRatio, nextRatio));
     }
 
     private IEnumerator AnimateDamageBar(float prevRatio, float endRatio)
     {
-        float elapsed = 0f;
-        while (elapsed < DAMAGE_DURATION)
+        float time = 0f;
+        while (time < DAMAGE_DURATION)
         {
-            elapsed += Time.deltaTime;
-            float ease = curve.Evaluate(Mathf.Clamp01(elapsed * DAMAGE_INV_DURATION));
-            SetDamageBar(Mathf.Lerp(prevRatio, endRatio, ease));
+            time += Time.deltaTime;
+            float e = curve.Evaluate(Mathf.Clamp01(time * DAMAGE_INV_DURATION));
+            SetDamageBar(Mathf.Lerp(prevRatio, endRatio, e));
             yield return null;
         }
 

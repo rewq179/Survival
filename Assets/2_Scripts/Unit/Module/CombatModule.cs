@@ -36,9 +36,7 @@ public class CombatModule
     public void UpdateHp()
     {
         maxHp = owner.MaxHp;
-        float preInvHp = maxInvHp;
         maxInvHp = 1f / maxHp;
-        OnHpChanged?.Invoke(curHp * preInvHp, curHp * maxInvHp);
     }
 
     public void TakeHeal(float healAmount)

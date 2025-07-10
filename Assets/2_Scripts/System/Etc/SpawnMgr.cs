@@ -114,7 +114,7 @@ public class SpawnMgr : MonoBehaviour
             
             if (wave.isCompleted)
                 completedWaves.Add(wave);
-            else if(wave.isTimeExceeded)
+            else if(wave.waveID == nextWaveIndex - 1 && wave.isTimeExceeded)
                 canNextWave = true;
         }
         

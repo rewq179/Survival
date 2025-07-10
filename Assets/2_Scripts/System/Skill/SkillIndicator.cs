@@ -223,8 +223,6 @@ public class SkillIndicator : MonoBehaviour
     public static Vector3 GetElementEndPoint(Vector3 startPoint, Vector3 mouse, SkillElement element)
     {
         Vector3 direction = (mouse - startPoint).normalized;
-        if (direction == Vector3.zero)
-            direction = Vector3.forward;
 
         switch (element.type)
         {

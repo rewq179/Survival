@@ -72,6 +72,19 @@ public class SkillMgr : MonoBehaviour
             {
                 skillKey = indicator.Element.skillKey;
                 targetPosition = SkillIndicator.GetElementEndPoint(startPosition, playerController.GetMouseWorldPosition(), indicator.Element);
+
+                if (indicator.Element.type == SkillIndicatorType.Line)
+                {
+                    startPosition.y = 1f;
+                    targetPosition.y = 1f;
+                }
+
+                else
+                {
+                    startPosition.y = 0f;
+                    targetPosition.y = 0f;
+                }
+
                 break;
             }
         }
@@ -222,8 +235,8 @@ public class SkillMgr : MonoBehaviour
 
     private SkillLauncher CreateSkillLauncher(SkillInstance skillInstance, Vector3 startPos, Vector3 targetPos, Unit caster, Unit target = null)
     {
-        targetPos.y = 0f;
         Vector3 direction = (targetPos - startPos).normalized;
+
         SkillLauncher launcher = PopSkillLauncher();
         SkillParticleController particle = PopParticle(skillInstance.skillKey, launcher.transform);
         launcher.Init(skillInstance, startPos, direction, particle, caster, target);

@@ -95,7 +95,9 @@ public class ProjectileComponent : ISkillComponent
                 isHit = false;
 
                 startPos = launcher.Position;
-                direction = (nextTarget.transform.position - launcher.Position).normalized;
+                Vector3 targetPos = nextTarget.transform.position;
+                targetPos.y = startPos.y;
+                direction = (targetPos - startPos).normalized;
                 launcher.SetTransform(startPos, direction);
                 return;
             }
@@ -128,7 +130,10 @@ public class ProjectileComponent : ISkillComponent
             if (unit == null || hittedUnitIDs.Contains(unit.UniqueID))
                 continue;
 
-            float dist = (position - unit.transform.position).sqrMagnitude;
+            Vector3 targetPos = unit.transform.position;
+            targetPos.y = position.y;
+            float dist = (position - targetPos).sqrMagnitude;
+            
             if (dist < maxDist)
             {
                 maxDist = dist;

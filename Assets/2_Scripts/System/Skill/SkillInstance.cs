@@ -189,13 +189,13 @@ public class SkillInstance
 
     private void SetFixValue()
     {
-        SkillData baseData = DataMgr.GetSkillData(skillKey);
-        cooldownFix = baseData.cooldown;
+        SkillData data = DataMgr.GetSkillData(skillKey);
+        cooldownFix = data.cooldown;
 
-        for (int i = 0; i < baseData.skillElements.Count; i++)
+        for (int i = 0; i < data.skillElements.Count; i++)
         {
             InstanceValue value = new InstanceValue();
-            value.SetFix(baseData.skillElements.Get(i));
+            value.SetFix(data.skillElements.Get(i));
             values.Add(value);
         }
     }
