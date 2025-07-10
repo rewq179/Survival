@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum AIState
@@ -9,7 +10,7 @@ public enum AIState
 
 public class BehaviourMonsterModule : BehaviourModule
 {
-    private Transform playerTransform;
+    private Unit target;
     private AIState currentState = AIState.Chasing;
 
     // 이동 관련
@@ -19,7 +20,6 @@ public class BehaviourMonsterModule : BehaviourModule
 
     // 애니메이션 관련
     private bool isAttacking;
-
 
     // 성능 관련
     private Vector3 lastPlayerPosition;
@@ -34,17 +34,18 @@ public class BehaviourMonsterModule : BehaviourModule
     public override void Init(Unit unit)
     {
         owner = unit;
-        playerTransform = GameMgr.Instance.PlayerUnit.transform;
+        target = GameMgr.Instance.PlayerUnit;
         moveSpeed = unit.MoveSpeed;
     }
 
     public override void Update()
     {
-        if (owner.IsDead)
+        if (owner.IsDead || target.IsDead)
             return;
 
         if (IsCheckPlayerPosition())
             UpdatePlayerPosition();
+
         UpdateState();
         UpdateMovement();
     }
@@ -56,7 +57,7 @@ public class BehaviourMonsterModule : BehaviourModule
 
     private void UpdatePlayerPosition()
     {
-        lastPlayerPosition = playerTransform.position;
+        lastPlayerPosition = target.transform.position;
         lastPlayerUpdateTime = Time.time;
     }
 
@@ -109,14 +110,23 @@ public class BehaviourMonsterModule : BehaviourModule
             transform.rotation = GetRotation(transform.rotation, direction, 2f);
         }
 
-        AttackTarget(GameMgr.Instance.PlayerUnit, SkillKey.StingAttack);
+        owner.SkillModule.UseRandomSkill(target);
     }
 
-    public override void OnAttackAnimationEnd()
+    public override void OnAnimationEnd(AnimEvent animEvent)
     {
-        isAttacking = false;
-        UpdatePlayerPosition();
-        ChangeState(AIState.Chasing);
+        switch (animEvent)
+        {
+            case AnimEvent.Attack:
+                isAttacking = false;
+                UpdatePlayerPosition();
+                ChangeState(AIState.Chasing);
+                break;
+
+            case AnimEvent.Die:
+                GameMgr.Instance.spawnMgr.RemoveEnemy(owner);
+                break;
+        }
     }
 
     #region 유틸리티

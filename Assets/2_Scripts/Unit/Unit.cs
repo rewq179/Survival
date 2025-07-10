@@ -2,6 +2,12 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
+public enum AnimEvent
+{
+    Attack,
+    Die,
+}
+
 public class Unit : MonoBehaviour
 {
     [Header("Components")]
@@ -27,6 +33,7 @@ public class Unit : MonoBehaviour
     public int UniqueID => uniqueID;
     public int UnitID => unitID;
     public bool IsPlayer => isPlayer;
+    public SkillModule SkillModule => skillModule;
 
     public void Reset()
     {
@@ -97,7 +104,7 @@ public class Unit : MonoBehaviour
     public void AddStatModifier(StatType statType, float value) => statModule.AddStatModifier(statType, value);
 
     // BehaviourModule
-    public void OnAttackAnimationEnd() => behaviourModule.OnAttackAnimationEnd();
+    public void OnAnimationEnd(AnimEvent animEvent) => behaviourModule.OnAnimationEnd(animEvent);
 
     // CombatModule
     public bool IsDead => combatModule.IsDead;

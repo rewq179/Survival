@@ -5,7 +5,6 @@ public class CombatModule
 {
     private DamageTextMgr damageTextMgr;
     private RewardMgr rewardMgr;
-    private SpawnMgr spawnMgr;
 
     private Unit owner;
     private float maxHp;
@@ -28,7 +27,6 @@ public class CombatModule
         this.owner = owner;
         damageTextMgr = GameMgr.Instance.damageTextMgr;
         rewardMgr = GameMgr.Instance.rewardMgr;
-        spawnMgr = GameMgr.Instance.spawnMgr;
         UpdateHp();
         curHp = maxHp;
     }
@@ -57,7 +55,14 @@ public class CombatModule
         SetHp(curHp - damage);
 
         if (curHp <= 0)
+        {
             OnDead();
+        }
+
+        else
+        {
+            owner.PlayAnimation("Take Damage");
+        }
     }
 
     private void SetHp(float hp)
@@ -74,6 +79,6 @@ public class CombatModule
         if (!owner.IsPlayer)
             rewardMgr.CreateItem(owner);
 
-        spawnMgr.RemoveEnemy(owner);
+        owner.PlayAnimation("Die");
     }
 }

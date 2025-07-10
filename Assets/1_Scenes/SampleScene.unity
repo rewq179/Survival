@@ -7270,6 +7270,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51d1c567a01eff64ab2359ea3c803826, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  panelObject: {fileID: 0}
   healthBar: {fileID: 8084836395119841124}
   damageBar: {fileID: 672023332480598164}
 --- !u!114 &3128406116041264533

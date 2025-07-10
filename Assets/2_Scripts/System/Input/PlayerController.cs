@@ -75,6 +75,9 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (owner.IsDead)
+            return;
+
         Vector3 movement = new Vector3(moveInput.x, 0, moveInput.y);
         rigidBody.linearVelocity = movement * moveSpeed;
 

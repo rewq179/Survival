@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
-using Google.GData.Spreadsheets;
 
 /// <summary>
 /// 개별 스킬 관리 모듈
@@ -229,6 +228,16 @@ public class SkillModule : MonoBehaviour
         }
 
         return cnt;
+    }
+
+    public void UseRandomSkill(Unit target)
+    {
+        if (activeSkills.Count == 0)
+            return;
+
+        SkillKey skillKey = activeSkills[UnityEngine.Random.Range(0, activeSkills.Count)];
+        owner.PlayAnimation(skillKey.ToString());
+        GameMgr.Instance.skillMgr.ActivateSkill(skillKey, owner, target);
     }
 
     #region 스킬 효과 적용

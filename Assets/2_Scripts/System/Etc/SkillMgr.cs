@@ -98,6 +98,17 @@ public class SkillMgr : MonoBehaviour
         RemoveIndicatorsByskillKey(skillKey);
     }
 
+    /// <summary>
+    /// 지정된 스킬 시전
+    /// </summary>
+    public void ActivateSkill(SkillKey skillKey, Unit caster, Unit target)
+    {
+        Vector3 startPos = caster.transform.position;
+        Vector3 targetPos = target.transform.position;
+        SkillInstance inst = caster.GetSkillInstance(skillKey);
+        CreateSkillLauncher(inst, startPos, targetPos, caster, target);
+    }
+
     #region Indicator
 
     private void UpdateIndicator()
@@ -248,35 +259,6 @@ public class SkillMgr : MonoBehaviour
     {
         PushLauncher(launcher);
         activeLaunchers.Remove(launcher);
-    }
-
-    /// <summary>
-    /// 몬스터 공격용
-    /// </summary>
-    public void ExecuteMonsterAttack(SkillKey skillKey, Unit caster, Unit target)
-    {
-        Vector3 startPos = caster.transform.position;
-        Vector3 targetPos = target.transform.position;
-        SkillInstance inst = caster.GetSkillInstance(skillKey);
-        CreateSkillLauncher(inst, startPos, targetPos, caster, target);
-    }
-
-    /// <summary>
-    /// 몬스터 공격용 임시 런처 (GameObject 없이 동작)
-    /// </summary>
-    private class TempSkillLauncher
-    {
-        public Unit Caster { get; }
-        public Vector3 Position { get; }
-        public bool IsAffectCaster => false;
-
-        public TempSkillLauncher(Unit caster, Vector3 position)
-        {
-            Caster = caster;
-            Position = position;
-        }
-
-        public void Deactivate() { }
     }
 
     #endregion
