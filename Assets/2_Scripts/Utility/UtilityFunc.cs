@@ -2,8 +2,6 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 using System.Linq;
-using Unity.Burst.Intrinsics;
-
 
 public static class UtilityFunc
 {
@@ -13,6 +11,20 @@ public static class UtilityFunc
             return default;
 
         return list[index];
+    }
+
+    public static int GetInt(this float num)
+    {
+        int intPart = Mathf.FloorToInt(num);
+        float decPart = num - intPart;
+
+        if (decPart <= 0f)
+            return intPart;
+
+        if (UnityEngine.Random.Range(0f, 1f) <= decPart)
+            intPart++;
+
+        return intPart;
     }
 }
 

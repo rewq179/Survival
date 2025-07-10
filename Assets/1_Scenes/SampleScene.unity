@@ -355,6 +355,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7865ef75e33a324e8fdac4a6455d2f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerUnitPrefab: {fileID: 1425089820019533571, guid: 057bea8c2316a6d479085c6d6f723dbb, type: 3}
 --- !u!1 &177755131
 GameObject:
   m_ObjectHideFlags: 0
@@ -715,12 +716,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e51032e36ecb4d4facc4db07c198eb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerUnitPrefab: {fileID: 3091725795815606636, guid: 057bea8c2316a6d479085c6d6f723dbb, type: 3}
   dataManager: {fileID: 267096342}
   resourceMgr: {fileID: 170821100}
-  skillManager: {fileID: 880473370}
+  skillMgr: {fileID: 880473370}
   spawnMgr: {fileID: 2143306119}
-  cameraManager: {fileID: 330585548}
+  cameraMgr: {fileID: 330585548}
   damageTextMgr: {fileID: 948412577}
   rewardMgr: {fileID: 1668415284}
 --- !u!4 &267096341

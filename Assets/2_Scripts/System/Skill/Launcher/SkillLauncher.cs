@@ -63,10 +63,10 @@ public class SkillLauncher : MonoBehaviour
         }
     }
 
-    public virtual void Initialize(SkillInstance skillInstance, Vector3 startPos, Vector3 dir, SkillParticleController particleController,
+    public virtual void Init(SkillInstance inst, Vector3 startPos, Vector3 dir, SkillParticleController particleController,
         Unit caster, Unit fixedTarget = null)
     {
-        skillKey = skillInstance.skillKey;
+        skillKey = inst.skillKey;
         startPosition = startPos;
         direction = dir.normalized;
         this.caster = caster;
@@ -74,13 +74,11 @@ public class SkillLauncher : MonoBehaviour
         isActive = true;
         elapsedTime = 0f;
         isAffectCaster = false;
-        transform.rotation = Quaternion.LookRotation(direction);
-        transform.position = startPos;
+        SetTransform(startPos, dir);
         gameObject.SetActive(true);
 
         // 스킬 데이터 기반으로 효과들 자동 추가
-        SkillData skillData = DataMgr.GetSkillData(skillInstance.skillKey);
-        SetupSkillEffects(skillData, fixedTarget);
+        SetupSkillEffects(inst, fixedTarget);
 
         if (particleController != null)
         {
@@ -89,32 +87,32 @@ public class SkillLauncher : MonoBehaviour
         }
     }
 
-    private void SetupSkillEffects(SkillData skillData, Unit fixedTarget)
+    public void SetTransform(Vector3 startPos, Vector3 dir)
+    {
+        transform.position = startPos;
+        transform.rotation = Quaternion.LookRotation(dir);
+    }
+
+    private void SetupSkillEffects(SkillInstance inst, Unit fixedTarget)
     {
         skillEffects.Clear();
 
-        for (int i = 0; i < skillData.skillElements.Count; i++)
+        foreach (InstanceValue instValue in inst.Values)
         {
-            switch (skillData.launcherType)
+            ISkillEffect effect = instValue.launcherType switch
             {
-                case SkillLauncherType.Projectile:
-                    skillEffects.Add(new ProjectileMovementEffect(skillData, i));
-                    break;
+                SkillLauncherType.Projectile => new ProjectileEffect(instValue),
+                SkillLauncherType.InstantAOE => new AOEDamageEffect(instValue),
+                SkillLauncherType.PersistentAOE => new PeriodicDamageEffect(instValue),
+                SkillLauncherType.InstantAttack => new InstantAttackEffect(instValue, fixedTarget),
+                _ => null,
+            };
 
-                case SkillLauncherType.InstantAOE:
-                    skillEffects.Add(new AOEDamageEffect(skillData, i));
-                    break;
+            if (effect == null)
+                continue;
 
-                case SkillLauncherType.PersistentAOE:
-                    skillEffects.Add(new PeriodicDamageEffect(skillData, i));
-                    break;
-
-                case SkillLauncherType.InstantAttack:
-                    skillEffects.Add(new InstantAttackEffect(skillData, i, fixedTarget));
-                    break;
-            }
-
-            skillEffects[i].OnInitialize(this);
+            skillEffects.Add(effect);
+            effect.OnInitialize(this);
         }
     }
 

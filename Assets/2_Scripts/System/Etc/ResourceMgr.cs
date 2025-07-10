@@ -28,6 +28,7 @@ public class ResourceMgr : MonoBehaviour
     private string collectibleItemPath = "CollectibleItem";
     private string unitPrefabPath = "Prefabs/Unit/Monster";
 
+    [SerializeField] private Unit playerUnitPrefab;
     private Dictionary<SkillKey, Sprite> skillIcons = new();
     private Dictionary<string, Sprite> equipmentIcons = new();
     private Dictionary<string, Sprite> itemIcons = new();
@@ -139,7 +140,8 @@ public class ResourceMgr : MonoBehaviour
         return null;
     }
 
-    public Unit GetUnitPrefab(int unitID)
+    public Unit GetPlayerUnit() => Instantiate(playerUnitPrefab);
+    public Unit GetEnemyPrefab(int unitID)
     {
         if (unitPrefabs.TryGetValue(unitID, out Unit prefab))
             return prefab;

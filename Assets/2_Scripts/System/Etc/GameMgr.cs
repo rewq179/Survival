@@ -5,7 +5,6 @@ public class GameMgr : MonoBehaviour
 {
     public static GameMgr Instance { get; private set; }
 
-    [SerializeField] private GameObject playerUnitPrefab;
     [SerializeField] private DataMgr dataManager;
     public ResourceMgr resourceMgr;
     public SkillMgr skillMgr;
@@ -39,6 +38,7 @@ public class GameMgr : MonoBehaviour
 
     private void InitializeGame()
     {
+        ResetStaticValues();
         resourceMgr.LoadAllIcons();
         dataManager.Init();
 
@@ -48,20 +48,25 @@ public class GameMgr : MonoBehaviour
         InputMgr.Instance.EnablePlayerInput();
     }
 
+    private void ResetStaticValues()
+    {
+        SpawnMgr.UNIT_UNIQUE_ID = 0;
+    }
+
     private void CreatePlayerUnit()
     {
         if (playerUnit == null)
         {
-            playerUnit = Instantiate(playerUnitPrefab, Vector3.zero, Quaternion.identity).GetComponent<Unit>();
+            playerUnit = resourceMgr.GetPlayerUnit();
             spawnMgr.SetPlayerTransform(playerUnit.transform);
             cameraMgr.SetTarget(playerUnit.transform);
-
         }
-        
+
         skillMgr.Init(playerUnit);
         rewardMgr.Init(playerUnit);
         UIMgr.Instance.Init(playerUnit);
-        playerUnit.Init(100, Vector3.zero);
+        playerUnit.Init(SpawnMgr.UNIT_UNIQUE_ID++, 100, Vector3.zero);
+
         UIMgr.Instance.UpdateUI();
     }
 

@@ -19,6 +19,7 @@ public enum SubSkillType
     Duration,               // 지속 시간 증가
     Radius,                 // 범위 증가
     DamageTick,             // 데미지 틱 증가
+    MoveSpeed,              // 이동 속도 증가
 
     // 패시브 스킬 타입들
     HealthInc,              // 체력 증가

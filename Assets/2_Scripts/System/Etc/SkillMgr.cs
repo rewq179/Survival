@@ -225,11 +225,9 @@ public class SkillMgr : MonoBehaviour
         targetPos.y = 0f;
         Vector3 direction = (targetPos - startPos).normalized;
         SkillLauncher launcher = PopSkillLauncher();
-        activeLaunchers.Add(launcher);
         SkillParticleController particle = PopParticle(skillInstance.skillKey, launcher.transform);
-        
-        // 스킬 인스턴스 데이터 전달
-        launcher.Initialize(skillInstance, startPos, direction, particle, caster, target);
+        launcher.Init(skillInstance, startPos, direction, particle, caster, target);
+        activeLaunchers.Add(launcher);
         return launcher;
     }
 
@@ -298,7 +296,7 @@ public class SkillMgr : MonoBehaviour
 
         return element.type switch
         {
-            SkillIndicatorType.Line => SkillIndicator.CreateLineMesh(element.length, element.width),
+            SkillIndicatorType.Line => SkillIndicator.CreateLineMesh(GameValue.PROJECTILE_MAX_LENGTH, GameValue.PROJECTILE_MAX_WIDTH),
             SkillIndicatorType.Sector => SkillIndicator.CreateSectorMesh(element.angle, element.radius),
             SkillIndicatorType.Circle => SkillIndicator.CreateCircleMesh(element.radius),
             _ => null,

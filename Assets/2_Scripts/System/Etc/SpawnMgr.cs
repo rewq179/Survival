@@ -12,7 +12,7 @@ public class SpawnMgr : MonoBehaviour
         Random,
     }
 
-    private float SPAWN_RADIUS = 6f;
+    private float SPAWN_RADIUS = 12f;
 
     // 웨이브 관리
     private int nextWaveIndex;
@@ -21,6 +21,7 @@ public class SpawnMgr : MonoBehaviour
     public const float WAVE_ADDITIVE_TIME = 5f; // 웨이브 추가 시간
 
     // 스폰 관리
+    public static int UNIT_UNIQUE_ID = 0;
     private Transform playerTransform;
     private List<Unit> aliveEnemies = new();
     private Dictionary<int, Stack<Unit>> enemyPools = new();
@@ -155,11 +156,12 @@ public class SpawnMgr : MonoBehaviour
     {
         Vector3 spawnPosition = GetSpawnPosition(pattern);
         Unit enemy = PopEnemy(unitID);
-        enemy.Init(unitID, spawnPosition);
+        enemy.Init(UNIT_UNIQUE_ID++, unitID, spawnPosition);
 
         aliveEnemies.Add(enemy);
         return enemy;
     }
+
 
     public void RemoveEnemy(Unit enemy)
     {
@@ -291,7 +293,7 @@ public class SpawnMgr : MonoBehaviour
         if (enemyPools.TryGetValue(unitID, out Stack<Unit> pool) && pool.Count > 0)
             return pool.Pop();
 
-        Unit unit = GameMgr.Instance.resourceMgr.GetUnitPrefab(unitID);
+        Unit unit = GameMgr.Instance.resourceMgr.GetEnemyPrefab(unitID);
         return Instantiate(unit, Vector3.zero, Quaternion.identity);
     }
 

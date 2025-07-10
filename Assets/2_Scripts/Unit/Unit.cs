@@ -1,7 +1,6 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using UnityEngine.Experimental.AI;
 
 public class Unit : MonoBehaviour
 {
@@ -18,12 +17,14 @@ public class Unit : MonoBehaviour
 
     // 기본 정보
     private PlayerSaveData playerSaveData = new();
+    private int uniqueID;
     private int unitID;
     private bool isPlayer;
 
     // 기타
     private Camera mainCam;
 
+    public int UniqueID => uniqueID;
     public int UnitID => unitID;
     public bool IsPlayer => isPlayer;
 
@@ -38,8 +39,9 @@ public class Unit : MonoBehaviour
         healthBar?.ShowHealthBar(false);
     }
 
-    public void Init(int unitID, Vector3 position)
+    public void Init(int uniqueID, int unitID, Vector3 position)
     {
+        this.uniqueID = uniqueID;
         this.unitID = unitID;
         isPlayer = unitID < 1000;
         InitModule();

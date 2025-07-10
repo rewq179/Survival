@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class InstanceValue
 {
+    public SkillLauncherType launcherType;
+
     // 데미지
     private float damageFix;
     private float damageAdditive;
@@ -42,6 +44,13 @@ public class InstanceValue
     private float piercingAdditive;
     public float piercingFinal;
 
+    private float moveSpeedFix;
+    private float moveSpeedAdditive;
+    private float moveSpeedMultiplier;
+    public float moveSpeedFinal;
+
+    public float angle; 
+
     public void SetFix(SkillElement skillElement)
     {
         if (skillElement != null)
@@ -50,11 +59,20 @@ public class InstanceValue
             durationFix = skillElement.duration;
             damageTickFix = skillElement.interval;
             radiusFix = skillElement.radius;
+            moveSpeedFix = skillElement.moveSpeed;
+            ricochetFix = skillElement.ricochet;
+            piercingFix = skillElement.piercing;
         }
 
         projectileCountFix = 1;
-        ricochetFix = 0;
-        piercingFix = 0;
+        angle = skillElement.angle;
+        launcherType = skillElement.type switch
+        {
+            SkillIndicatorType.Line => SkillLauncherType.Projectile,
+            SkillIndicatorType.Sector => SkillLauncherType.InstantAOE,
+            SkillIndicatorType.Circle => SkillLauncherType.InstantAOE,
+            SkillIndicatorType.InstantAttack => SkillLauncherType.InstantAttack,
+        };
     }
 
     public void Reset()
@@ -94,6 +112,10 @@ public class InstanceValue
             case SubSkillType.Piercing:
                 piercingAdditive += value;
                 break;
+
+            case SubSkillType.MoveSpeed:
+                moveSpeedAdditive += value;
+                break;
         }
     }
 
@@ -116,6 +138,10 @@ public class InstanceValue
             case SubSkillType.DamageTick:
                 damageTickMultiplier += value;
                 break;
+
+            case SubSkillType.MoveSpeed:
+                moveSpeedMultiplier += value;
+                break;
         }
     }
 
@@ -128,6 +154,7 @@ public class InstanceValue
         projectileCountFinal = projectileCountFix + projectileCountAdditive;
         ricochetFinal = ricochetFix + ricochetAdditive;
         piercingFinal = piercingFix + piercingAdditive;
+        moveSpeedFinal = (moveSpeedFix + moveSpeedAdditive) * (1 + moveSpeedMultiplier);
     }
 }
 
@@ -140,6 +167,8 @@ public class SkillInstance
     private float cooldownMultiplier;
     public float cooldownFinal;
     private List<InstanceValue> values = new();
+
+    public List<InstanceValue> Values => values;
 
     private void ResetValue()
     {

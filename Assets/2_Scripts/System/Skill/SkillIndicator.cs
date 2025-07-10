@@ -9,7 +9,7 @@ public class SkillElement
 
     public SkillIndicatorType type;
     public float moveSpeed;
-    public float length;
+    public float height;
     public float width;
     public float angle;
     public float radius;
@@ -17,24 +17,28 @@ public class SkillElement
     public float damage;
     public float duration;
     public float interval;
+    public float ricochet;
+    public float piercing;
 
     public bool IsMainIndicator => index == 0;
 
-    public void Init(SkillKey skillKey, int index, float speed, float length, float width,
-        float angle, float radius, float damage, float duration, float interval)
+    public void Init(SkillKey skillKey, int index, float speed, float height, float width,
+        float angle, float radius, float damage, float duration, float interval, float ricochet, float piercing)
     {
         this.skillKey = skillKey;
         this.index = index;
         this.moveSpeed = speed;
-        this.length = length;
+        this.height = height;
         this.width = width;
         this.angle = angle;
         this.radius = radius;
         this.damage = damage;
         this.duration = duration;
         this.interval = interval;
+        this.ricochet = ricochet;
+        this.piercing = piercing;
 
-        if (length > 0)
+        if (height > 0)
             type = SkillIndicatorType.Line;
         else if (angle == 0)
             type = SkillIndicatorType.InstantAttack;
@@ -225,7 +229,7 @@ public class SkillIndicator : MonoBehaviour
         switch (element.type)
         {
             case SkillIndicatorType.Line:
-                return startPoint + direction * element.length;
+                return startPoint + direction * GameValue.PROJECTILE_MAX_LENGTH;
 
             case SkillIndicatorType.Sector:
                 float halfAngleRad = element.angle * 0.5f * Mathf.Deg2Rad;

@@ -206,11 +206,13 @@ public class SkillDataReader : BaseReader
         float damage = 0f;
         float duration = 0f;
         float interval = 0f;
-        float length = 0f;
+        float height = 0f;
         float width = 0f;
         float angle = 0f;
         float radius = 0f;
         float speed = 0f;
+        float ricochet = 0f;
+        float piercing = 0f;
 
         // Dmg : 12 / Int : 0.5
         string[] splits = str.Split('/');
@@ -241,8 +243,8 @@ public class SkillDataReader : BaseReader
                         interval = parsedValue;
                         break;
 
-                    case "length":
-                        length = parsedValue;
+                    case "height":
+                        height = parsedValue;
                         break;
 
                     case "width":
@@ -260,12 +262,21 @@ public class SkillDataReader : BaseReader
                     case "movespeed":
                         speed = parsedValue;
                         break;
+
+                    case "ricochet":
+                        ricochet = parsedValue;
+                        break;
+
+                    case "piercing":
+                        piercing = parsedValue;
+                        break;
                 }
             }
         }
 
         SkillElement element = new();
-        element.Init(skillKey, index, speed, length, width, angle, radius, damage, duration, interval);
+        element.Init(skillKey, index, speed, height, width, angle, radius, damage, duration, 
+            interval, ricochet, piercing);
         return element;
     }
 }

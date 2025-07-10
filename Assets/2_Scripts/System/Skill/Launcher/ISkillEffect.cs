@@ -14,31 +14,37 @@ public interface ISkillEffect
 }
 
 /// <summary>
-/// 발사체 이동 효과
+/// 투사체 효과
 /// </summary>
-public class ProjectileMovementEffect : ISkillEffect
+public class ProjectileEffect : ISkillEffect
 {
+    private SkillLauncher launcher;
     private float damage;
     private float moveSpeed;
-    private float maxRange;
-    private Vector3 startPosition;
+    private float maxLength;
+    private int richocet;
+    private int piercing;
+    private Vector3 startPos;
     private Vector3 direction;
     private bool isHit;
-    private SkillLauncher launcher;
+    private HashSet<int> hittedUnitIDs = new();
 
-    public ProjectileMovementEffect(SkillData skillData, int index)
+    public ProjectileEffect(InstanceValue inst)
     {
-        damage = skillData.skillElements[index].damage;
-        SkillElement element = skillData.skillElements[index];
-        moveSpeed = element.moveSpeed;
-        maxRange = element.length;
+        damage = inst.damageFinal;
+        moveSpeed = inst.moveSpeedFinal;
+        richocet = inst.ricochetFinal.GetInt();
+        piercing = inst.piercingFinal.GetInt();
+        maxLength = GameValue.PROJECTILE_MAX_LENGTH_POW;
+        hittedUnitIDs.Clear();
     }
 
     public void OnInitialize(SkillLauncher launcher)
     {
         this.launcher = launcher;
-        startPosition = launcher.Position;
+        startPos = launcher.Position;
         direction = launcher.transform.forward;
+        hittedUnitIDs.Add(launcher.Caster.UniqueID);
     }
 
     public void OnUpdate(float deltaTime)
@@ -50,8 +56,8 @@ public class ProjectileMovementEffect : ISkillEffect
         launcher.transform.position += direction * moveDistance;
 
         // 최대 거리 체크
-        float currentDistance = (launcher.Position - startPosition).sqrMagnitude;
-        if (currentDistance >= maxRange * maxRange)
+        float currentDistance = (launcher.Position - startPos).sqrMagnitude;
+        if (currentDistance >= maxLength)
         {
             launcher.Deactivate();
             return;
@@ -69,10 +75,63 @@ public class ProjectileMovementEffect : ISkillEffect
         if (target == null)
             return;
 
+        if (hittedUnitIDs.Contains(target.UniqueID))
+            return;
+
+        hittedUnitIDs.Add(target.UniqueID);
         target.TakeDamage(damage);
         isHit = true;
-        launcher.transform.position = target.transform.position;
+
+        if (richocet > 0)
+        {
+            Unit nextTarget = FindRicochetTarget(launcher.Position, 8f);
+            if (nextTarget != null)
+            {
+                richocet--;
+                isHit = false;
+
+                startPos = launcher.Position;
+                direction = (nextTarget.transform.position - launcher.Position).normalized;
+                launcher.SetTransform(startPos, direction);
+                return;
+            }
+        }
+
+        if (piercing > 0)
+        {
+            isHit = false;
+            piercing--;
+            return;
+        }
+
         launcher.Deactivate();
+    }
+
+    /// <summary>
+    /// 도탄 대상(가장 가까운 유닛) 찾기
+    /// </summary>
+    private Unit FindRicochetTarget(Vector3 position, float radius)
+    {
+        Collider[] colliders = Physics.OverlapSphere(position, radius, GameValue.UNIT_LAYERS);
+
+        Unit target = null;
+        float maxDist = float.MaxValue;
+
+        foreach (Collider col in colliders)
+        {
+            Unit unit = col.GetComponent<Unit>();
+            if (unit == null || hittedUnitIDs.Contains(unit.UniqueID))
+                continue;
+
+            float dist = (position - unit.transform.position).sqrMagnitude;
+            if (dist < maxDist)
+            {
+                maxDist = dist;
+                target = unit;
+            }
+        }
+
+        return target;
     }
 
     public void OnDestroy() { }
@@ -85,31 +144,18 @@ public class AOEDamageEffect : ISkillEffect
 {
     protected SkillLauncher launcher;
     protected SkillIndicatorType type;
+    protected float damage;
+    protected float angle;
     protected float radius;
     protected float maxDistance;
-    protected float length;
-    protected float width;
-    protected float angle;
-    protected float damage;
 
-    public AOEDamageEffect(SkillData skillData, int index)
+    public AOEDamageEffect(InstanceValue inst)
     {
-        damage = skillData.skillElements[index].damage;
-
-        SkillElement element = skillData.skillElements[index];
-        type = element.type;
-        radius = element.radius;
-        length = element.length;
-        width = element.width;
-        angle = element.angle;
-
-        maxDistance = type switch
-        {
-            SkillIndicatorType.Line => length * length,
-            SkillIndicatorType.Sector => radius * radius,
-            SkillIndicatorType.Circle => radius * radius,
-            _ => 0f,
-        };
+        damage = inst.damageFinal;
+        radius = inst.radiusFinal;
+        angle = inst.angle;
+        maxDistance = radius * radius;
+        type = angle == 360f ? SkillIndicatorType.Circle : SkillIndicatorType.Sector;
     }
 
     public void OnInitialize(SkillLauncher launcher)
@@ -183,9 +229,9 @@ public class PeriodicDamageEffect : AOEDamageEffect
     private float interval;
     private float lastDamageTime;
 
-    public PeriodicDamageEffect(SkillData skillData, int index) : base(skillData, index)
+    public PeriodicDamageEffect(InstanceValue inst) : base(inst)
     {
-        interval = skillData.skillElements[index].interval;
+        interval = inst.damageTickFinal;
     }
 
     public override void OnUpdate(float deltaTime)
@@ -212,9 +258,9 @@ public class InstantAttackEffect : ISkillEffect
     private Unit target;
     private SkillLauncher launcher;
 
-    public InstantAttackEffect(SkillData skillData, int index, Unit target)
+    public InstantAttackEffect(InstanceValue inst, Unit target)
     {
-        damage = skillData.skillElements[index].damage;
+        damage = inst.damageFinal;
         this.target = target;
     }
 
