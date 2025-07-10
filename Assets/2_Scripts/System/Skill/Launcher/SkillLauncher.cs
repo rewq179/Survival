@@ -22,7 +22,7 @@ public class SkillLauncher : MonoBehaviour
     protected bool isActive = false;
     protected float elapsedTime;
 
-    protected List<ISkillEffect> skillEffects = new();
+    protected List<ISkillComponent> components = new();
     protected SkillParticleController particleController;
 
     public bool IsActive => isActive;
@@ -35,7 +35,7 @@ public class SkillLauncher : MonoBehaviour
     {
         isActive = false;
         elapsedTime = 0f;
-        skillEffects.Clear();
+        components.Clear();
         particleController = null;
         transform.position = Vector3.zero;
         transform.rotation = Quaternion.identity;
@@ -49,11 +49,11 @@ public class SkillLauncher : MonoBehaviour
 
         elapsedTime += Time.deltaTime;
 
-        for (int i = skillEffects.Count - 1; i >= 0; i--)
+        for (int i = components.Count - 1; i >= 0; i--)
         {
-            if (skillEffects[i] != null)
+            if (components[i] != null)
             {
-                skillEffects[i].OnUpdate(Time.deltaTime);
+                components[i].OnUpdate(Time.deltaTime);
             }
         }
 
@@ -78,7 +78,7 @@ public class SkillLauncher : MonoBehaviour
         gameObject.SetActive(true);
 
         // 스킬 데이터 기반으로 효과들 자동 추가
-        SetupSkillEffects(inst, fixedTarget);
+        SetupComponents(inst, fixedTarget);
 
         if (particleController != null)
         {
@@ -93,26 +93,26 @@ public class SkillLauncher : MonoBehaviour
         transform.rotation = Quaternion.LookRotation(dir);
     }
 
-    private void SetupSkillEffects(SkillInstance inst, Unit fixedTarget)
+    private void SetupComponents(SkillInstance inst, Unit fixedTarget)
     {
-        skillEffects.Clear();
+        components.Clear();
 
         foreach (InstanceValue instValue in inst.Values)
         {
-            ISkillEffect effect = instValue.launcherType switch
+            ISkillComponent component = instValue.launcherType switch
             {
-                SkillLauncherType.Projectile => new ProjectileEffect(instValue),
-                SkillLauncherType.InstantAOE => new AOEDamageEffect(instValue),
-                SkillLauncherType.PersistentAOE => new PeriodicDamageEffect(instValue),
-                SkillLauncherType.InstantAttack => new InstantAttackEffect(instValue, fixedTarget),
+                SkillLauncherType.Projectile => new ProjectileComponent(instValue),
+                SkillLauncherType.InstantAOE => new AOEComponent(instValue),
+                SkillLauncherType.PersistentAOE => new PeriodicAOEComponent(instValue),
+                SkillLauncherType.InstantAttack => new InstantComponent(instValue, fixedTarget),
                 _ => null,
             };
 
-            if (effect == null)
+            if (component == null)
                 continue;
 
-            skillEffects.Add(effect);
-            effect.OnInitialize(this);
+            components.Add(component);
+            component.OnInitialize(this);
         }
     }
 
@@ -123,11 +123,11 @@ public class SkillLauncher : MonoBehaviour
 
         isActive = false;
 
-        for (int i = skillEffects.Count - 1; i >= 0; i--)
+        for (int i = components.Count - 1; i >= 0; i--)
         {
-            if (skillEffects[i] != null)
+            if (components[i] != null)
             {
-                skillEffects[i].OnDestroy();
+                components[i].OnDestroy();
             }
         }
 

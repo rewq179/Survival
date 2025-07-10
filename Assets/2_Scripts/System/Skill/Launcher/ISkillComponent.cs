@@ -5,7 +5,7 @@ using UnityEngine.Video;
 /// <summary>
 /// 스킬 효과 인터페이스
 /// </summary>
-public interface ISkillEffect
+public interface ISkillComponent
 {
     void OnInitialize(SkillLauncher launcher);
     void OnUpdate(float deltaTime);
@@ -16,7 +16,7 @@ public interface ISkillEffect
 /// <summary>
 /// 투사체 효과
 /// </summary>
-public class ProjectileEffect : ISkillEffect
+public class ProjectileComponent : ISkillComponent
 {
     private SkillLauncher launcher;
     private float damage;
@@ -29,7 +29,7 @@ public class ProjectileEffect : ISkillEffect
     private bool isHit;
     private HashSet<int> hittedUnitIDs = new();
 
-    public ProjectileEffect(InstanceValue inst)
+    public ProjectileComponent(InstanceValue inst)
     {
         damage = inst.damageFinal;
         moveSpeed = inst.moveSpeedFinal;
@@ -138,9 +138,9 @@ public class ProjectileEffect : ISkillEffect
 }
 
 /// <summary>
-/// 범위 데미지 효과
+/// 범위 효과
 /// </summary>
-public class AOEDamageEffect : ISkillEffect
+public class AOEComponent : ISkillComponent
 {
     protected SkillLauncher launcher;
     protected SkillIndicatorType type;
@@ -149,7 +149,7 @@ public class AOEDamageEffect : ISkillEffect
     protected float radius;
     protected float maxDistance;
 
-    public AOEDamageEffect(InstanceValue inst)
+    public AOEComponent(InstanceValue inst)
     {
         damage = inst.damageFinal;
         radius = inst.radiusFinal;
@@ -224,12 +224,12 @@ public class AOEDamageEffect : ISkillEffect
 /// <summary>
 /// 주기적 데미지 효과
 /// </summary>
-public class PeriodicDamageEffect : AOEDamageEffect
+public class PeriodicAOEComponent : AOEComponent
 {
     private float interval;
     private float lastDamageTime;
 
-    public PeriodicDamageEffect(InstanceValue inst) : base(inst)
+    public PeriodicAOEComponent(InstanceValue inst) : base(inst)
     {
         interval = inst.damageTickFinal;
     }
@@ -252,13 +252,13 @@ public class PeriodicDamageEffect : AOEDamageEffect
 /// <summary>
 /// 즉시 공격 효과
 /// </summary>
-public class InstantAttackEffect : ISkillEffect
+public class InstantComponent : ISkillComponent
 {
     private float damage;
     private Unit target;
     private SkillLauncher launcher;
 
-    public InstantAttackEffect(InstanceValue inst, Unit target)
+    public InstantComponent(InstanceValue inst, Unit target)
     {
         damage = inst.damageFinal;
         this.target = target;
