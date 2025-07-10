@@ -150,8 +150,14 @@ public class RewardMgr : MonoBehaviour
             pool.Enqueue(item);
     }
 
-    public float GetMagnetRange() => baseMagnetRange + magnetRangeBonus;
+    public float GetMagnetRange()
+    {
+        float multiplier = 1 + playerUnit.GetFinalStat(StatType.MagnetRange);
+        return (baseMagnetRange + magnetRangeBonus) * multiplier;
+    }
+
     public void AddMagnetRangeBonus(float bonus) => magnetRangeBonus += bonus;
+
     public float GetMagnetSpeed() => baseMagnetSpeed + magnetSpeedBonus;
     public void AddMagnetSpeedBonus(float bonus) => magnetSpeedBonus += bonus;
 }

@@ -30,13 +30,15 @@ public class CombatModule
         rewardMgr = GameMgr.Instance.rewardMgr;
         spawnMgr = GameMgr.Instance.spawnMgr;
         UpdateHp();
+        curHp = maxHp;
     }
 
     public void UpdateHp()
     {
         maxHp = owner.MaxHp;
+        float preInvHp = maxInvHp;
         maxInvHp = 1f / maxHp;
-        curHp = maxHp;
+        OnHpChanged?.Invoke(curHp * preInvHp, curHp * maxInvHp);
     }
 
     public void TakeHeal(float healAmount)

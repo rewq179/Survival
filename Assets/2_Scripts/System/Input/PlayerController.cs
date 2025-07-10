@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour
     private Vector2 moveInput;
     private bool isAttacking;
     private Rigidbody rigidBody;
-    private float moveSpeed = 5f;
+    private float moveSpeed;
     private float rotationSpeed = 10f;
 
     // 스킬 관련
@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour
     {
         this.owner = owner;
         skillManager = GameMgr.Instance.skillMgr;
+        UpdateMoveSpeed();
     }
 
     private void OnEnable()
@@ -88,6 +89,11 @@ public class PlayerController : MonoBehaviour
         {
             // 공격 로직
         }
+    }
+
+    public void UpdateMoveSpeed()
+    {
+        moveSpeed = owner.MoveSpeed;
     }
 
     public Vector3 GetMouseWorldPosition()

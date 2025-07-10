@@ -78,10 +78,14 @@ public class ProjectileComponent : ISkillComponent
         if (hittedUnitIDs.Contains(target.UniqueID))
             return;
 
+        // 피해 적용
         hittedUnitIDs.Add(target.UniqueID);
-        target.TakeDamage(damage);
+        DamageInfo damageInfo = CombatMgr.PopDamageInfo();
+        damageInfo.Init(launcher.Caster, target, damage, launcher.Position, launcher.SkillKey);
+        CombatMgr.ProcessDamage(damageInfo);
         isHit = true;
-
+ 
+        // 도탄
         if (richocet > 0)
         {
             Unit nextTarget = FindRicochetTarget(launcher.Position, 8f);
@@ -97,6 +101,7 @@ public class ProjectileComponent : ISkillComponent
             }
         }
 
+        // 관통
         if (piercing > 0)
         {
             isHit = false;
@@ -217,7 +222,13 @@ public class AOEComponent : ISkillComponent
     }
 
     public virtual void OnUpdate(float deltaTime) { }
-    public virtual void OnHit(Unit target) { target.TakeDamage(damage); }
+    public void OnHit(Unit target)
+    {
+        DamageInfo damageInfo = CombatMgr.PopDamageInfo();
+        damageInfo.Init(launcher.Caster, target, damage, launcher.Position, launcher.SkillKey);
+        CombatMgr.ProcessDamage(damageInfo);
+    }
+
     public void OnDestroy() { }
 }
 
@@ -273,7 +284,10 @@ public class InstantComponent : ISkillComponent
     public void OnUpdate(float deltaTime) { }
     public void OnHit(Unit target)
     {
-        target.TakeDamage(damage);
+        DamageInfo damageInfo = CombatMgr.PopDamageInfo();
+        damageInfo.Init(launcher.Caster, target, damage, launcher.Position, launcher.SkillKey);
+        CombatMgr.ProcessDamage(damageInfo);
+
         launcher.Deactivate();
     }
 

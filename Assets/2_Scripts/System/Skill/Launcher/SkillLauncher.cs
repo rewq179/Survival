@@ -25,10 +25,11 @@ public class SkillLauncher : MonoBehaviour
     protected List<ISkillComponent> components = new();
     protected SkillParticleController particleController;
 
+    public SkillKey SkillKey => skillKey;
     public bool IsActive => isActive;
-    public Vector3 Position => transform.position;
     public Unit Caster => caster;
     public bool IsAffectCaster => isAffectCaster;
+    public Vector3 Position => transform.position;
     public Vector3 Direction => direction;
 
     public void Reset()

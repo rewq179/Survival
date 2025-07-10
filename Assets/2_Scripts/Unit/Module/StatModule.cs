@@ -24,8 +24,8 @@ public class StatModule
     private float moveSpeed;
     private Dictionary<StatType, float> statModifiers = new();
 
-    public float MaxHP => health;
-    public float MoveSpeed => moveSpeed;
+    public float MaxHP => health * (1 + statModifiers[StatType.Health]);
+    public float MoveSpeed => moveSpeed * (1 + statModifiers[StatType.MoveSpeed]);
 
     public void Init(UnitData unitData)
     {

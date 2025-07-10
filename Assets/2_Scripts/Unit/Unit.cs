@@ -109,6 +109,7 @@ public class Unit : MonoBehaviour
     }
 
     public void UpdateHp() => combatModule.UpdateHp();
+    public void UpdateMoveSpeed() => playerController.UpdateMoveSpeed();
     public void TakeHealRate(float healRate) => combatModule.TakeHeal(MaxHp * healRate);
     public void TakeHeal(float healAmount) => combatModule.TakeHeal(healAmount);
     public void TakeDamage(float damage) => combatModule.TakeDamage(damage);

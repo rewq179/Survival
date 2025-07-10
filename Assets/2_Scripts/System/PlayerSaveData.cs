@@ -28,7 +28,7 @@ public class PlayerSaveData
     public int AddExp(float amount)
     {
         int levelUpCount = 0;
-        exp += amount;
+        exp += amount * (1 + unit.GetFinalStat(StatType.ExpGain));
 
         while (true)
         {
@@ -42,7 +42,7 @@ public class PlayerSaveData
         }
 
         OnExpChanged?.Invoke(exp);
-        
+
         if (levelUpCount > 0)
         {
             UIMgr.Instance.selectionPanel.AddLevelUpCount(levelUpCount);
@@ -55,7 +55,7 @@ public class PlayerSaveData
 
     public void AddGold(int amount)
     {
-        gold += amount;
+        gold += (int)(amount * (1 + unit.GetFinalStat(StatType.GoldGain)));
         OnGoldChanged?.Invoke(gold);
     }
 }

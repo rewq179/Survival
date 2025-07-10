@@ -272,9 +272,9 @@ MonoBehaviour:
   titleText: {fileID: 8422185660309756268}
   nameText: {fileID: 182347664909591501}
   descText: {fileID: 3039632311572753149}
+  clickButton: {fileID: 8461958151979165041}
   iconSlot: {fileID: 4954237359670320749}
   detailInfo: {fileID: 770431342534719069}
-  clickButton: {fileID: 8461958151979165041}
 --- !u!1 &4177925798874619359
 GameObject:
   m_ObjectHideFlags: 0
@@ -899,7 +899,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC124\uBA85 \uC124\uBA85 \uC124\uBA85 \uC124\uBA85"
+  m_text: "0.1 \uCD08 \uAC10\uC18C"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 70108bda537648543bab68f09e60e80a, type: 2}
   m_sharedMaterial: {fileID: 9162152671384806544, guid: 70108bda537648543bab68f09e60e80a, type: 2}

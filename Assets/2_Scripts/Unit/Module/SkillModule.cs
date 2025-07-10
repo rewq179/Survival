@@ -244,10 +244,12 @@ public class SkillModule : MonoBehaviour
         {
             case SkillKey.Health:
                 owner.AddStatModifier(StatType.Health, value);
+                owner.UpdateHp();
                 break;
 
             case SkillKey.MoveSpeed:
                 owner.AddStatModifier(StatType.MoveSpeed, value);
+                owner.UpdateMoveSpeed();
                 break;
 
             case SkillKey.Defense:
@@ -305,9 +307,11 @@ public class SkillModule : MonoBehaviour
         {
             case SkillKey.Health_Inc:
                 owner.AddStatModifier(StatType.Health, value);
+                owner.UpdateHp();
                 break;
             case SkillKey.MoveSpeed_Inc:
                 owner.AddStatModifier(StatType.MoveSpeed, value);
+                owner.UpdateMoveSpeed();
                 break;
             case SkillKey.Defense_Inc:
                 owner.AddStatModifier(StatType.Defense, value);
