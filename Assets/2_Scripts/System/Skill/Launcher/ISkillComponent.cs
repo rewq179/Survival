@@ -1,17 +1,27 @@
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.Video;
+using System.Linq;
 
-public abstract class BaseComponent
+public abstract class SkillComponent
 {
     protected SkillLauncher launcher;
+    protected SkillParticleController particleController;
     protected UnitType enemyType;
     protected float damage;
 
-    public virtual void OnInitialize(SkillLauncher launcher)
+    public virtual void OnInitialize(SkillLauncher launcher, SkillParticleController particle)
     {
         this.launcher = launcher;
         enemyType = launcher.Caster.UnitType == UnitType.Player ? UnitType.Monster : UnitType.Player;
+
+        if (particle == null)
+            return;
+
+        particleController = particle;
+        particleController.OnParticleFinished += launcher.Deactivate;
+
+        if (!IsWaitAction)
+            particleController.Play();
     }
 
     protected void ApplyDamage(Unit target)
@@ -21,6 +31,7 @@ public abstract class BaseComponent
         CombatMgr.ProcessDamage(damageInfo);
     }
 
+    public virtual bool IsWaitAction => false;
     public abstract void OnUpdate(float deltaTime);
     public abstract void OnHit(Unit target);
     public bool IsHittable(Unit target) => target != null && !target.IsDead && target.UnitType == enemyType;
@@ -30,7 +41,7 @@ public abstract class BaseComponent
 /// <summary>
 /// 투사체 효과
 /// </summary>
-public class ProjectileComponent : BaseComponent
+public class ProjectileComponent : SkillComponent
 {
     private float moveSpeed;
     private float maxLength;
@@ -51,9 +62,9 @@ public class ProjectileComponent : BaseComponent
         hittedUnitIDs.Clear();
     }
 
-    public override void OnInitialize(SkillLauncher launcher)
+    public override void OnInitialize(SkillLauncher launcher, SkillParticleController particle)
     {
-        base.OnInitialize(launcher);
+        base.OnInitialize(launcher, particle);
         startPos = launcher.Position;
         direction = launcher.transform.forward;
         hittedUnitIDs.Add(launcher.Caster.UniqueID);
@@ -158,26 +169,49 @@ public class ProjectileComponent : BaseComponent
 /// <summary>
 /// 범위 효과
 /// </summary>
-public class AOEComponent : BaseComponent
+public class AOEComponent : SkillComponent
 {
     private SkillIndicatorType type;
     private float angle;
     private float radius;
     private float maxDistance;
+    private bool isWaitAction;
+    private bool canAction;
 
-    public AOEComponent(InstanceValue inst)
+    public override bool IsWaitAction => isWaitAction;
+
+    public AOEComponent(InstanceValue inst, bool isWait)
     {
         damage = inst.damageFinal;
         radius = inst.radiusFinal;
         angle = inst.angle;
         maxDistance = radius * radius;
+        this.isWaitAction = isWait;
+        canAction = false;
         type = angle == 360f ? SkillIndicatorType.Circle : SkillIndicatorType.Sector;
     }
 
-    public override void OnInitialize(SkillLauncher launcher)
+    public override void OnInitialize(SkillLauncher launcher, SkillParticleController particle)
     {
-        base.OnInitialize(launcher);
+        base.OnInitialize(launcher, particle);
 
+        if (!IsWaitAction)
+            ExecuteAttack();
+    }
+
+    public void SetCanAction(bool canAction) => this.canAction = canAction;
+    public override void OnUpdate(float deltaTime)
+    {
+        if (isWaitAction && canAction)
+        {
+            particleController.Play();
+            isWaitAction = false;
+            ExecuteAttack();
+        }
+    }
+
+    public void ExecuteAttack()
+    {
         List<Unit> targets = GetHitTargets(launcher.Position, launcher.Direction, launcher.IsAffectCaster);
         foreach (Unit target in targets)
         {
@@ -230,7 +264,6 @@ public class AOEComponent : BaseComponent
         return sqrDistance <= maxDistance;
     }
 
-    public override void OnUpdate(float deltaTime) { }
     public override void OnHit(Unit target) => ApplyDamage(target);
     public override void OnDestroy() { }
 }
@@ -243,7 +276,7 @@ public class PeriodicAOEComponent : AOEComponent
     private float interval;
     private float lastDamageTime;
 
-    public PeriodicAOEComponent(InstanceValue inst) : base(inst)
+    public PeriodicAOEComponent(InstanceValue inst) : base(inst, false)
     {
         interval = inst.damageTickFinal;
         lastDamageTime = Time.time;
@@ -267,7 +300,7 @@ public class PeriodicAOEComponent : AOEComponent
 /// <summary>
 /// 즉시 공격 효과
 /// </summary>
-public class InstantComponent : BaseComponent
+public class InstantComponent : SkillComponent
 {
     private Unit target;
 
@@ -277,9 +310,9 @@ public class InstantComponent : BaseComponent
         this.target = target;
     }
 
-    public override void OnInitialize(SkillLauncher launcher)
+    public override void OnInitialize(SkillLauncher launcher, SkillParticleController particle)
     {
-        base.OnInitialize(launcher);
+        base.OnInitialize(launcher, particle);
         OnHit(target);
     }
 
@@ -289,4 +322,78 @@ public class InstantComponent : BaseComponent
         ApplyDamage(target);
         launcher.Deactivate();
     }
+}
+
+/// <summary>
+/// 도약 이동 컴포넌트
+/// </summary>
+public class LeapComponent : SkillComponent
+{
+    private SkillIndicator indicator;
+    private Vector3 startPos;
+    private Vector3 targetPos;
+    private Vector3 casterAdjustedPos;
+    private float time;
+    private AnimationCurve curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+    private bool isLeapCompleted = false;
+
+    private const float LEAP_DURATION = 0.6f;
+    private const float LEAP_INV_DURATION = 1f / LEAP_DURATION;
+
+    public LeapComponent(SkillKey skillKey, Vector3 startPos, Vector3 targetPos)
+    {
+        this.startPos = startPos;
+        this.targetPos = targetPos;
+
+        Vector3 dir = (startPos - targetPos).normalized;
+        casterAdjustedPos = dir * 2f;
+
+        SkillData data = DataMgr.GetSkillData(skillKey);
+        SkillElement element = data.skillElements[0];
+        indicator = GameMgr.Instance.skillMgr.CreateIndicator(element, false);
+        indicator.DrawIndicator(targetPos, targetPos);
+    }
+
+    public override void OnInitialize(SkillLauncher launcher, SkillParticleController particle)
+    {
+        base.OnInitialize(launcher, particle);
+        startPos = launcher.Position;
+        time = 0f;
+        isLeapCompleted = false;
+    }
+
+    public override void OnUpdate(float deltaTime)
+    {
+        if (isLeapCompleted)
+            return;
+
+        time += deltaTime;
+        float p = Mathf.Clamp01(time * LEAP_INV_DURATION);
+
+        // 도약 이동
+        float e = curve.Evaluate(p);
+        Vector3 newPos = Vector3.Lerp(startPos, targetPos, e);
+        newPos.y = Mathf.Sin(p * Mathf.PI);
+
+        launcher.SetTransform(newPos, launcher.Direction);
+        launcher.Caster.transform.position = newPos + casterAdjustedPos;
+
+        if (p >= 1f)
+        {
+            isLeapCompleted = true;
+            ActivateAOEComponents();
+            GameMgr.Instance.skillMgr.RemoveIndicator(indicator);
+        }
+    }
+
+    private void ActivateAOEComponents()
+    {
+        foreach (SkillComponent component in launcher.Components)
+        {
+            if (component is AOEComponent aoeComponent)
+                aoeComponent.SetCanAction(true);
+        }
+    }
+
+    public override void OnHit(Unit target) { }
 }

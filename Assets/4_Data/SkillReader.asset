@@ -20,7 +20,7 @@ MonoBehaviour:
     skillType: 0
     name: Arrow
     desc: "\uD654\uC0B4\uC744 \uB0A0\uB9BD\uB2C8\uB2E4."
-    cooldown: 2
+    cooldown: 0.7
     baseValue: 0
     skillElements:
     - skillKey: 0
@@ -36,13 +36,13 @@ MonoBehaviour:
       damage: 12
       duration: 0
       interval: 0
-      ricochet: 0
-      piercing: 0
+      ricochet: 2
+      piercing: 1
   - skillKey: 5
     skillType: 0
     name: Dagger
     desc: "\uD68C\uC218\uB418\uB294 \uCE7C\uC744 \uB358\uC9D1\uB2C8\uB2E4."
-    cooldown: 4
+    cooldown: 0.8
     baseValue: 0
     skillElements:
     - skillKey: 5
@@ -64,7 +64,7 @@ MonoBehaviour:
     skillType: 0
     name: FrontSpike
     desc: "\uBD80\uCC44\uAF34 \uD615\uD0DC\uC758 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
-    cooldown: 4
+    cooldown: 3
     baseValue: 0
     skillElements:
     - skillKey: 10
@@ -86,7 +86,7 @@ MonoBehaviour:
     skillType: 0
     name: EnergyExplosion
     desc: "\uB2E8\uBC1C\uC131 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
-    cooldown: 7.5
+    cooldown: 4.2
     baseValue: 0
     skillElements:
     - skillKey: 13
@@ -108,7 +108,7 @@ MonoBehaviour:
     skillType: 0
     name: Meteor
     desc: "\uC9C0\uC18D\uC801\uC778 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
-    cooldown: 12
+    cooldown: 6
     baseValue: 0
     skillElements:
     - skillKey: 17
@@ -544,14 +544,14 @@ MonoBehaviour:
       interval: 0
       ricochet: 0
       piercing: 0
-  - skillKey: 56
+  - skillKey: 54
     skillType: 0
     name: '-'
     desc: '-'
     cooldown: 0.5
     baseValue: 0
     skillElements:
-    - skillKey: 56
+    - skillKey: 54
       index: 0
       launcherType: 3
       indicatorType: 3

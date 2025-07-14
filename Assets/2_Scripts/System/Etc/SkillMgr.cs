@@ -49,7 +49,7 @@ public class SkillMgr : MonoBehaviour
     {
         if (caster.CanUseSkill(skillKey))
         {
-            RemoveIndicatorsByskillKey(skillKey);
+            RemoveIndicatorByKey(skillKey);
             ShowIndicator(skillKey, caster.transform.position, true);
         }
     }
@@ -69,12 +69,14 @@ public class SkillMgr : MonoBehaviour
         SkillKey skillKey = element.skillKey;
         Vector3 startPos = caster.transform.position;
         Vector3 endPos = SkillIndicator.GetElementEndPoint(startPos, playerController.GetMouseWorldPosition(), element);
-        GetSkillAdjustedPos(element, ref startPos, ref endPos);
+        SetPosYAdjust(element, ref startPos, ref endPos);
+        if (element.indicatorType == SkillIndicatorType.Circle)
+            startPos = endPos;
 
         // 생성
         SkillInstance inst = caster.GetSkillInstance(skillKey);
         CreateSkillLauncher(inst, startPos, endPos, caster);
-        RemoveIndicatorsByskillKey(skillKey);
+        RemoveIndicatorByKey(skillKey);
     }
 
     private SkillElement GetWaitedPlayerSkillElement()
@@ -88,7 +90,7 @@ public class SkillMgr : MonoBehaviour
         return null;
     }
 
-    private void GetSkillAdjustedPos(SkillElement element, ref Vector3 startPos, ref Vector3 endPos)
+    private void SetPosYAdjust(SkillElement element, ref Vector3 startPos, ref Vector3 endPos)
     {
         switch (element.indicatorType)
         {
@@ -104,7 +106,6 @@ public class SkillMgr : MonoBehaviour
 
             case SkillIndicatorType.Circle:
                 endPos.y = 0f;
-                startPos = endPos;
                 break;
         }
     }
@@ -118,7 +119,7 @@ public class SkillMgr : MonoBehaviour
         Vector3 endPos = target.transform.position;
 
         SkillData skillData = DataMgr.GetSkillData(skillKey);
-        GetSkillAdjustedPos(skillData.skillElements[0], ref startPos, ref endPos);
+        SetPosYAdjust(skillData.skillElements[0], ref startPos, ref endPos);
 
         SkillInstance inst = caster.GetSkillInstance(skillKey);
         CreateSkillLauncher(inst, startPos, endPos, caster, target);
@@ -128,25 +129,47 @@ public class SkillMgr : MonoBehaviour
 
     private void UpdateIndicator()
     {
-        if (activeIndicators.Count > 0)
-        {
-            Vector3 playerPos = playerController.transform.position;
-            Vector3 mousePos = playerController.GetMouseWorldPosition();
+        if (activeIndicators.Count <= 0)
+            return;
 
-            foreach (var group in indicatorGroups)
-            {
-                UpdateSkillIndicators(playerPos, mousePos, group.Value);
-            }
+        Vector3 playerPos = playerController.transform.position;
+        Vector3 mousePos = playerController.GetMouseWorldPosition();
+
+        foreach (var group in indicatorGroups)
+        {
+            UpdateSkillIndicators(playerPos, mousePos, group.Value);
         }
     }
 
     private void UpdateSkillIndicators(Vector3 player, Vector3 mouse, List<SkillIndicator> indicators)
     {
+        if (indicators.Count == 0)
+            return;
+
+        if (indicators[0].isPlayerIndicator)
+            UpdatePlayerIndicators(player, mouse, indicators);
+        else
+            UpdateMonsterIndicators(indicators);
+    }
+
+    private void UpdatePlayerIndicators(Vector3 player, Vector3 mouse, List<SkillIndicator> indicators)
+    {
         if (indicators.Count == 1) // 단일 인디케이터
             indicators[0].DrawIndicator(player, mouse);
-
         else // 복합 인디케이터
             UpdateMultipleIndicators(player, mouse, indicators);
+    }
+
+    private void UpdateMonsterIndicators(List<SkillIndicator> indicators)
+    {
+        // 몬스터 인디케이터는 시간에 따른 연출 처리
+        // TODO: 몬스터 인디케이터 구현 시 여기에 로직 추가
+        foreach (SkillIndicator indicator in indicators)
+        {
+            // 몬스터 인디케이터는 시간에 따라 범위 표시
+            // 예: 발동 시간에 가까워질수록 원형 범위 강조
+            // indicator.UpdateMonsterIndicator();
+        }
     }
 
     private void UpdateMultipleIndicators(Vector3 player, Vector3 mouse, List<SkillIndicator> indicators)
@@ -162,23 +185,11 @@ public class SkillMgr : MonoBehaviour
             {
                 indicator.DrawIndicator(player, mouse);
             }
-
             else
             {
                 SkillElement previousElement = indicators[i - 1].Element;
                 Vector3 previousEndPoint = SkillIndicator.GetElementEndPoint(player, mouse, previousElement);
                 indicator.DrawIndicator(previousEndPoint, mouse);
-            }
-        }
-    }
-
-    private void RemoveIndicatorsByskillKey(SkillKey skillKey)
-    {
-        for (int i = activeIndicators.Count - 1; i >= 0; i--)
-        {
-            if (activeIndicators[i].Element.skillKey == skillKey)
-            {
-                RemoveIndicator(i);
             }
         }
     }
@@ -218,7 +229,7 @@ public class SkillMgr : MonoBehaviour
         }
     }
 
-    private SkillIndicator CreateIndicator(SkillElement element, bool isPlayerIndicator)
+    public SkillIndicator CreateIndicator(SkillElement element, bool isPlayerIndicator)
     {
         SkillIndicator indicator = PopIndicator();
         indicator.Init(element, indicatorMaterial, PopMesh(element), isPlayerIndicator);
@@ -233,13 +244,21 @@ public class SkillMgr : MonoBehaviour
         return indicator;
     }
 
-    private void RemoveIndicator(int index)
+    private void RemoveIndicatorByKey(SkillKey skillKey)
     {
-        if (activeIndicators.Count <= index)
-            return;
+        for (int i = activeIndicators.Count - 1; i >= 0; i--)
+        {
+            if (activeIndicators[i].Element.skillKey == skillKey)
+            {
+                RemoveIndicator(activeIndicators[i]);
+                break;
+            }
+        }
+    }
 
-        SkillIndicator indicator = activeIndicators[index];
-        activeIndicators.RemoveAt(index);
+    public void RemoveIndicator(SkillIndicator indicator)
+    {
+        activeIndicators.Remove(indicator);
         PushMesh(indicator.Element.indicatorType, indicator.Mesh);
         PushIndicator(indicator);
     }
@@ -273,6 +292,7 @@ public class SkillMgr : MonoBehaviour
 
     public void RemoveLauncher(SkillLauncher launcher)
     {
+        launcher.Reset();
         PushLauncher(launcher);
         activeLaunchers.Remove(launcher);
     }
@@ -316,7 +336,6 @@ public class SkillMgr : MonoBehaviour
 
     private void PushLauncher(SkillLauncher launcher)
     {
-        launcher.Reset();
         launcherPools.Push(launcher);
     }
 

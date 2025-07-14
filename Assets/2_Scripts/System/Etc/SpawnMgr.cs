@@ -153,9 +153,8 @@ public class SpawnMgr : MonoBehaviour
         if (spawnGroup.startDelay > 0f)
             yield return new WaitForSeconds(spawnGroup.startDelay);
 
-        // 반복 횟수만큼 스폰
-        int total = spawnGroup.repeat + 1;
-        for (int i = 0; i < total; i++)
+        // 반복 횟수만큼 추가 스폰
+        for (int i = 0; i < spawnGroup.repeat; i++)
         {
             for (int j = 0; j < spawnGroup.count; j++)
             {

@@ -13,8 +13,8 @@ public enum MonsterType
 {
     Bee = 1001,        // 벌
     Bat = 1002,        // 박쥐
-    Golem = 1003,      // 골렘
-    Cobra = 1004,      // 코브라
+    Cobra = 1003,      // 코브라
+    Golem = 1004,      // 골렘
     Dragon = 1005      // 드래곤
 }
 

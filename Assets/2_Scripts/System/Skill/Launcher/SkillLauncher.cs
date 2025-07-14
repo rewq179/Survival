@@ -22,7 +22,7 @@ public class SkillLauncher : MonoBehaviour
     protected bool isActive = false;
     protected float elapsedTime;
 
-    protected List<BaseComponent> components = new();
+    protected List<SkillComponent> components = new();
     protected SkillParticleController particleController;
 
     public SkillKey SkillKey => skillKey;
@@ -31,6 +31,8 @@ public class SkillLauncher : MonoBehaviour
     public bool IsAffectCaster => isAffectCaster;
     public Vector3 Position => transform.position;
     public Vector3 Direction => direction;
+    public List<SkillComponent> Components => components;
+    public SkillParticleController ParticleController => particleController;
 
     public void Reset()
     {
@@ -79,13 +81,8 @@ public class SkillLauncher : MonoBehaviour
         gameObject.SetActive(true);
 
         // 스킬 데이터 기반으로 효과들 자동 추가
-        SetupComponents(inst, fixedTarget);
-
-        if (particleController != null)
-        {
-            particleController.OnParticleFinished += OnParticleFinished;
-            particleController.Play();
-        }
+        bool isWaitAction = inst.skillKey == SkillKey.HitGroundAttack;
+        SetupComponents(inst, fixedTarget, isWaitAction);
     }
 
     public void SetTransform(Vector3 startPos, Vector3 dir)
@@ -94,16 +91,16 @@ public class SkillLauncher : MonoBehaviour
         transform.rotation = Quaternion.LookRotation(dir);
     }
 
-    private void SetupComponents(SkillInstance inst, Unit fixedTarget)
+    private void SetupComponents(SkillInstance inst, Unit fixedTarget, bool isWaitAction)
     {
         components.Clear();
 
         foreach (InstanceValue instValue in inst.Values)
         {
-            BaseComponent component = instValue.launcherType switch
+            SkillComponent component = instValue.launcherType switch
             {
                 SkillLauncherType.Projectile => new ProjectileComponent(instValue),
-                SkillLauncherType.InstantAOE => new AOEComponent(instValue),
+                SkillLauncherType.InstantAOE => new AOEComponent(instValue, isWaitAction),
                 SkillLauncherType.PeriodicAOE => new PeriodicAOEComponent(instValue),
                 SkillLauncherType.InstantAttack => new InstantComponent(instValue, fixedTarget),
                 _ => null,
@@ -113,7 +110,16 @@ public class SkillLauncher : MonoBehaviour
                 continue;
 
             components.Add(component);
-            component.OnInitialize(this);
+            component.OnInitialize(this, particleController);
+        }
+
+        switch (inst.skillKey)
+        {
+            case SkillKey.HitGroundAttack:
+                LeapComponent component = new LeapComponent(skillKey, startPosition, fixedTarget.transform.position);
+                components.Add(component);
+                component.OnInitialize(this, null);
+                break;
         }
     }
 
@@ -132,19 +138,8 @@ public class SkillLauncher : MonoBehaviour
             }
         }
 
-        // 파티클 정지 및 이벤트 구독 해제
         if (particleController != null)
-        {
-            particleController.OnParticleFinished -= OnParticleFinished;
-            particleController.Stop();
-        }
-
-        GameMgr.Instance.skillMgr.PushParticle(skillKey, particleController);
+            GameMgr.Instance.skillMgr.PushParticle(skillKey, particleController);
         GameMgr.Instance.skillMgr.RemoveLauncher(this);
-    }
-
-    private void OnParticleFinished()
-    {
-        Deactivate();
     }
 }

@@ -15,4 +15,46 @@ MonoBehaviour:
   sheetAddress: 15RA8mCckMbGIXxx5Ukfmtih0TxDTEGkXiAVyrHf8Blw
   startRow: 2
   endRow: 7
-  unitDatas: []
+  unitDatas:
+  - id: 100
+    name: "\uD50C\uB808\uC774\uC5B4"
+    hp: 300
+    moveSpeed: 7
+    skills: 00000000
+    exp: 0
+    gold: 0
+  - id: 1001
+    name: "\uBC8C"
+    hp: 5
+    moveSpeed: 5.5
+    skills: 2f000000
+    exp: 10
+    gold: 5
+  - id: 1002
+    name: "\uBC15\uC950"
+    hp: 8
+    moveSpeed: 6
+    skills: 3100000030000000
+    exp: 15
+    gold: 8
+  - id: 1003
+    name: "\uCF54\uBE0C\uB77C"
+    hp: 17
+    moveSpeed: 4.5
+    skills: 3200000033000000
+    exp: 35
+    gold: 20
+  - id: 1004
+    name: "\uACE8\uB818"
+    hp: 22
+    moveSpeed: 3.8
+    skills: 3400000035000000
+    exp: 50
+    gold: 30
+  - id: 1005
+    name: "\uC6A9"
+    hp: 150
+    moveSpeed: 3.5
+    skills: 3600000037000000
+    exp: 200
+    gold: 150
