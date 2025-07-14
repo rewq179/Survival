@@ -19,57 +19,58 @@ MonoBehaviour:
   - skillKey: 0
     skillType: 0
     name: Arrow
-    description: "\uD654\uC0B4\uC744 \uB0A0\uB9BD\uB2C8\uB2E4."
+    desc: "\uD654\uC0B4\uC744 \uB0A0\uB9BD\uB2C8\uB2E4."
     cooldown: 2
     baseValue: 0
     skillElements:
     - skillKey: 0
       index: 0
-      type: 0
+      launcherType: 0
+      indicatorType: 0
       moveSpeed: 15
       height: 0
-      width: 0.4
+      width: 0
       angle: 0
       radius: 0
-      maxDistance: 0.64000005
+      maxDistance: 0
       damage: 12
       duration: 0
       interval: 0
-      ricochet: 1
-      piercing: 1
-    launcherType: 0
+      ricochet: 0
+      piercing: 0
   - skillKey: 5
     skillType: 0
     name: Dagger
-    description: "\uD68C\uC218\uB418\uB294 \uCE7C\uC744 \uB358\uC9D1\uB2C8\uB2E4."
+    desc: "\uD68C\uC218\uB418\uB294 \uCE7C\uC744 \uB358\uC9D1\uB2C8\uB2E4."
     cooldown: 4
     baseValue: 0
     skillElements:
     - skillKey: 5
       index: 0
-      type: 0
+      launcherType: 0
+      indicatorType: 0
       moveSpeed: 18
       height: 0
-      width: 0.8
+      width: 0
       angle: 0
       radius: 0
-      maxDistance: 1.2800001
+      maxDistance: 0
       damage: 10
       duration: 0
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 0
   - skillKey: 10
     skillType: 0
     name: FrontSpike
-    description: "\uBD80\uCC44\uAF34 \uD615\uD0DC\uC758 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
+    desc: "\uBD80\uCC44\uAF34 \uD615\uD0DC\uC758 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
     cooldown: 4
     baseValue: 0
     skillElements:
     - skillKey: 10
       index: 0
-      type: 1
+      launcherType: 1
+      indicatorType: 1
       moveSpeed: 0
       height: 0
       width: 0
@@ -81,17 +82,17 @@ MonoBehaviour:
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 1
   - skillKey: 13
     skillType: 0
     name: EnergyExplosion
-    description: "\uB2E8\uBC1C\uC131 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
+    desc: "\uB2E8\uBC1C\uC131 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
     cooldown: 7.5
     baseValue: 0
     skillElements:
     - skillKey: 13
       index: 0
-      type: 2
+      launcherType: 1
+      indicatorType: 2
       moveSpeed: 0
       height: 0
       width: 0
@@ -103,39 +104,39 @@ MonoBehaviour:
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 1
   - skillKey: 17
     skillType: 0
     name: Meteor
-    description: "\uC9C0\uC18D\uC801\uC778 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
+    desc: "\uC9C0\uC18D\uC801\uC778 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
     cooldown: 12
     baseValue: 0
     skillElements:
     - skillKey: 17
       index: 0
-      type: 2
+      launcherType: 2
+      indicatorType: 2
       moveSpeed: 0
       height: 0
       width: 0
       angle: 360
       radius: 3.1
       maxDistance: 6.2
-      damage: 0
+      damage: 20
       duration: 2
-      interval: 0
+      interval: 0.5
       ricochet: 0
       piercing: 0
-    launcherType: 2
   - skillKey: 23
     skillType: 1
     name: "\uCCB4\uB825 \uC99D\uAC00"
-    description: "\uCD5C\uB300 \uCCB4\uB825 +{P0}"
+    desc: "\uCD5C\uB300 \uCCB4\uB825 +{P0}"
     cooldown: 0
     baseValue: 0.15
     skillElements:
     - skillKey: 23
       index: 0
-      type: 3
+      launcherType: 0
+      indicatorType: 0
       moveSpeed: 0
       height: 0
       width: 0
@@ -147,17 +148,17 @@ MonoBehaviour:
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 0
   - skillKey: 25
     skillType: 1
     name: "\uC774\uB3D9 \uC18D\uB3C4 \uC99D\uAC00"
-    description: "\uC774\uB3D9 \uC18D\uB3C4 +{P0}"
+    desc: "\uC774\uB3D9 \uC18D\uB3C4 +{P0}"
     cooldown: 0
     baseValue: 0.1
     skillElements:
     - skillKey: 25
       index: 0
-      type: 3
+      launcherType: 0
+      indicatorType: 0
       moveSpeed: 0
       height: 0
       width: 0
@@ -169,17 +170,17 @@ MonoBehaviour:
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 0
   - skillKey: 27
     skillType: 1
     name: "\uBC29\uC5B4\uB825 \uC99D\uAC00"
-    description: "\uBC1B\uB294 \uD53C\uD574 -{P0}"
+    desc: "\uBC1B\uB294 \uD53C\uD574 -{P0}"
     cooldown: 0
     baseValue: 0.1
     skillElements:
     - skillKey: 27
       index: 0
-      type: 3
+      launcherType: 0
+      indicatorType: 0
       moveSpeed: 0
       height: 0
       width: 0
@@ -191,17 +192,17 @@ MonoBehaviour:
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 0
   - skillKey: 29
     skillType: 1
     name: "\uC790\uC11D \uBC94\uC704 \uC99D\uAC00"
-    description: "\uC544\uC774\uD15C \uC790\uC11D \uBC94\uC704 +{P0}"
+    desc: "\uC544\uC774\uD15C \uC790\uC11D \uBC94\uC704 +{P0}"
     cooldown: 0
     baseValue: 0.2
     skillElements:
     - skillKey: 29
       index: 0
-      type: 3
+      launcherType: 0
+      indicatorType: 0
       moveSpeed: 0
       height: 0
       width: 0
@@ -213,17 +214,17 @@ MonoBehaviour:
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 0
   - skillKey: 31
     skillType: 1
     name: "\uACBD\uD5D8\uCE58 \uD68D\uB4DD \uC99D\uAC00"
-    description: "\uACBD\uD5D8\uCE58 \uD68D\uB4DD\uB7C9 +{P0}"
+    desc: "\uACBD\uD5D8\uCE58 \uD68D\uB4DD\uB7C9 +{P0}"
     cooldown: 0
     baseValue: 0.15
     skillElements:
     - skillKey: 31
       index: 0
-      type: 3
+      launcherType: 0
+      indicatorType: 0
       moveSpeed: 0
       height: 0
       width: 0
@@ -235,17 +236,17 @@ MonoBehaviour:
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 0
   - skillKey: 33
     skillType: 1
     name: "\uACE8\uB4DC \uD68D\uB4DD \uC99D\uAC00"
-    description: "\uACE8\uB4DC \uD68D\uB4DD\uB7C9 +{P0}"
+    desc: "\uACE8\uB4DC \uD68D\uB4DD\uB7C9 +{P0}"
     cooldown: 0
     baseValue: 0.2
     skillElements:
     - skillKey: 33
       index: 0
-      type: 3
+      launcherType: 0
+      indicatorType: 0
       moveSpeed: 0
       height: 0
       width: 0
@@ -257,17 +258,17 @@ MonoBehaviour:
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 0
   - skillKey: 35
     skillType: 1
     name: "\uCE58\uBA85\uD0C0 \uD655\uB960 \uC99D\uAC00"
-    description: "\uCE58\uBA85\uD0C0 \uD655\uB960 +{P0}"
+    desc: "\uCE58\uBA85\uD0C0 \uD655\uB960 +{P0}"
     cooldown: 0
     baseValue: 0.05
     skillElements:
     - skillKey: 35
       index: 0
-      type: 3
+      launcherType: 0
+      indicatorType: 0
       moveSpeed: 0
       height: 0
       width: 0
@@ -279,17 +280,17 @@ MonoBehaviour:
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 0
   - skillKey: 37
     skillType: 1
     name: "\uCE58\uBA85\uD0C0 \uD53C\uD574 \uC99D\uAC00"
-    description: "\uCE58\uBA85\uD0C0 \uD53C\uD574 +{P0}"
+    desc: "\uCE58\uBA85\uD0C0 \uD53C\uD574 +{P0}"
     cooldown: 0
     baseValue: 0.2
     skillElements:
     - skillKey: 37
       index: 0
-      type: 3
+      launcherType: 0
+      indicatorType: 0
       moveSpeed: 0
       height: 0
       width: 0
@@ -301,17 +302,17 @@ MonoBehaviour:
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 0
   - skillKey: 39
     skillType: 1
     name: "\uC2A4\uD0AC \uBC94\uC704 \uC99D\uAC00"
-    description: "\uBAA8\uB4E0 \uC2A4\uD0AC \uBC94\uC704 +{P0}"
+    desc: "\uBAA8\uB4E0 \uC2A4\uD0AC \uBC94\uC704 +{P0}"
     cooldown: 0
     baseValue: 0.1
     skillElements:
     - skillKey: 39
       index: 0
-      type: 3
+      launcherType: 0
+      indicatorType: 0
       moveSpeed: 0
       height: 0
       width: 0
@@ -323,17 +324,17 @@ MonoBehaviour:
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 0
   - skillKey: 41
     skillType: 1
     name: "\uC2A4\uD0AC \uCFE8\uB2E4\uC6B4 \uAC10\uC18C"
-    description: "\uBAA8\uB4E0 \uC2A4\uD0AC \uCFE8\uB2E4\uC6B4 -{P0}"
+    desc: "\uBAA8\uB4E0 \uC2A4\uD0AC \uCFE8\uB2E4\uC6B4 -{P0}"
     cooldown: 0
     baseValue: 0.05
     skillElements:
     - skillKey: 41
       index: 0
-      type: 3
+      launcherType: 0
+      indicatorType: 0
       moveSpeed: 0
       height: 0
       width: 0
@@ -345,17 +346,17 @@ MonoBehaviour:
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 0
   - skillKey: 43
     skillType: 1
     name: "\uC2A4\uD0AC \uB370\uBBF8\uC9C0 \uC99D\uAC00"
-    description: "\uBAA8\uB4E0 \uC2A4\uD0AC \uB370\uBBF8\uC9C0 +{P0}"
+    desc: "\uBAA8\uB4E0 \uC2A4\uD0AC \uB370\uBBF8\uC9C0 +{P0}"
     cooldown: 0
     baseValue: 0.1
     skillElements:
     - skillKey: 43
       index: 0
-      type: 3
+      launcherType: 0
+      indicatorType: 0
       moveSpeed: 0
       height: 0
       width: 0
@@ -367,17 +368,17 @@ MonoBehaviour:
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 0
   - skillKey: 45
     skillType: 1
     name: "\uC2A4\uD0AC \uC9C0\uC18D\uC2DC\uAC04 \uC99D\uAC00"
-    description: "\uBAA8\uB4E0 \uC2A4\uD0AC \uC9C0\uC18D\uC2DC\uAC04 +{P0}"
+    desc: "\uBAA8\uB4E0 \uC2A4\uD0AC \uC9C0\uC18D\uC2DC\uAC04 +{P0}"
     cooldown: 0
     baseValue: 0.2
     skillElements:
     - skillKey: 45
       index: 0
-      type: 3
+      launcherType: 0
+      indicatorType: 0
       moveSpeed: 0
       height: 0
       width: 0
@@ -389,149 +390,149 @@ MonoBehaviour:
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 0
   - skillKey: 47
     skillType: 0
     name: "\uB3C5\uCE68"
-    description: "\uC989\uC2DC \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
+    desc: "\uC989\uC2DC \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
     cooldown: 0.5
     baseValue: 0
     skillElements:
     - skillKey: 47
       index: 0
-      type: 3
+      launcherType: 3
+      indicatorType: 3
       moveSpeed: 0
       height: 0
       width: 0
       angle: 0
       radius: 0
       maxDistance: 0
-      damage: 10
+      damage: 3
       duration: 0
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 3
   - skillKey: 48
     skillType: 0
     name: "\uD654\uC5FC \uD22C\uC0AC\uCCB4"
-    description: "\uD654\uC5FC\uC744 \uB0A0\uB9BD\uB2C8\uB2E4"
+    desc: "\uD654\uC5FC\uC744 \uB0A0\uB9BD\uB2C8\uB2E4"
     cooldown: 5
     baseValue: 0
     skillElements:
     - skillKey: 48
       index: 0
-      type: 0
-      moveSpeed: 15
+      launcherType: 0
+      indicatorType: 0
+      moveSpeed: 10
       height: 0
-      width: 0.4
+      width: 0
       angle: 0
       radius: 0
-      maxDistance: 0.64000005
-      damage: 8
+      maxDistance: 0
+      damage: 4
       duration: 0
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 0
   - skillKey: 49
     skillType: 0
     name: "\uADFC\uC811 \uACF5\uACA9"
-    description: "\uC989\uC2DC \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
+    desc: "\uC989\uC2DC \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
     cooldown: 0.5
     baseValue: 0
     skillElements:
     - skillKey: 49
       index: 0
-      type: 3
+      launcherType: 3
+      indicatorType: 3
       moveSpeed: 0
       height: 0
       width: 0
       angle: 0
       radius: 0
       maxDistance: 0
-      damage: 10
+      damage: 3
       duration: 0
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 3
   - skillKey: 50
     skillType: 0
     name: '-'
-    description: '-'
+    desc: '-'
     cooldown: 0.5
     baseValue: 0
     skillElements:
     - skillKey: 50
       index: 0
-      type: 3
+      launcherType: 3
+      indicatorType: 3
       moveSpeed: 0
       height: 0
       width: 0
       angle: 0
       radius: 0
       maxDistance: 0
-      damage: 12
+      damage: 5
       duration: 0
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 3
   - skillKey: 51
     skillType: 0
     name: '-'
-    description: '-'
+    desc: '-'
     cooldown: 1.5
     baseValue: 0
     skillElements:
     - skillKey: 51
       index: 0
-      type: 0
+      launcherType: 0
+      indicatorType: 0
       moveSpeed: 15
       height: 0
-      width: 0.4
+      width: 0
       angle: 0
       radius: 0
-      maxDistance: 0.64000005
-      damage: 8
+      maxDistance: 0
+      damage: 5
       duration: 0
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 0
   - skillKey: 52
     skillType: 0
     name: '-'
-    description: '-'
+    desc: '-'
     cooldown: 0.6
     baseValue: 0
     skillElements:
     - skillKey: 52
       index: 0
-      type: 3
+      launcherType: 3
+      indicatorType: 3
       moveSpeed: 0
       height: 0
       width: 0
       angle: 0
       radius: 0
       maxDistance: 0
-      damage: 10
+      damage: 7
       duration: 0
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 3
   - skillKey: 53
     skillType: 0
     name: '-'
-    description: '-'
+    desc: '-'
     cooldown: 2.5
     baseValue: 0
     skillElements:
     - skillKey: 53
       index: 0
-      type: 3
+      launcherType: 1
+      indicatorType: 3
       moveSpeed: 30
       height: 0
       width: 0
@@ -543,17 +544,17 @@ MonoBehaviour:
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 1
-  - skillKey: 54
+  - skillKey: 56
     skillType: 0
     name: '-'
-    description: '-'
+    desc: '-'
     cooldown: 0.5
     baseValue: 0
     skillElements:
-    - skillKey: 54
+    - skillKey: 56
       index: 0
-      type: 3
+      launcherType: 3
+      indicatorType: 3
       moveSpeed: 0
       height: 0
       width: 0
@@ -565,19 +566,19 @@ MonoBehaviour:
       interval: 0
       ricochet: 0
       piercing: 0
-    launcherType: 3
   - skillKey: 55
     skillType: 0
     name: '-'
-    description: '-'
+    desc: '-'
     cooldown: 8
     baseValue: 0
     skillElements:
     - skillKey: 55
       index: 0
-      type: 0
+      launcherType: 0
+      indicatorType: 0
       moveSpeed: 0
-      height: 0
+      height: 15
       width: 0.4
       angle: 0
       radius: 0
@@ -587,4 +588,3 @@ MonoBehaviour:
       interval: 0.2
       ricochet: 0
       piercing: 0
-    launcherType: 2

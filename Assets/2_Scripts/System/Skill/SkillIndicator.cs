@@ -7,7 +7,8 @@ public class SkillElement
     public SkillKey skillKey;
     public int index;
 
-    public SkillIndicatorType type;
+    public SkillLauncherType launcherType;
+    public SkillIndicatorType indicatorType;
     public float moveSpeed;
     public float height;
     public float width;
@@ -22,8 +23,9 @@ public class SkillElement
 
     public bool IsMainIndicator => index == 0;
 
-    public void Init(SkillKey skillKey, int index, float speed, float height, float width,
-        float angle, float radius, float damage, float duration, float interval, float ricochet, float piercing)
+    public void Init(SkillKey skillKey, int index, float speed, float height, float width, float angle, 
+        float radius, float damage, float duration, float interval, float ricochet, float piercing,
+        SkillLauncherType launcherType)
     {
         this.skillKey = skillKey;
         this.index = index;
@@ -37,15 +39,16 @@ public class SkillElement
         this.interval = interval;
         this.ricochet = ricochet;
         this.piercing = piercing;
+        this.launcherType = launcherType;
 
-        if (height > 0)
-            type = SkillIndicatorType.Line;
+        if (launcherType == SkillLauncherType.Projectile)
+            indicatorType = SkillIndicatorType.Line;
         else if (angle == 0)
-            type = SkillIndicatorType.InstantAttack;
+            indicatorType = SkillIndicatorType.InstantAttack;
         else if (angle < 360)
-            type = SkillIndicatorType.Sector;
+            indicatorType = SkillIndicatorType.Sector;
         else
-            type = SkillIndicatorType.Circle;
+            indicatorType = SkillIndicatorType.Circle;
 
         maxDistance = radius > 0 ? radius * 2f : width * 1.6f;
     }
@@ -104,7 +107,7 @@ public class SkillIndicator : MonoBehaviour
     {
         if (isMainIndicator)
         {
-            switch (skillElement.type)
+            switch (skillElement.indicatorType)
             {
                 case SkillIndicatorType.Line:
                     transform.position = start;
@@ -127,7 +130,7 @@ public class SkillIndicator : MonoBehaviour
 
         else
         {
-            switch (skillElement.type)
+            switch (skillElement.indicatorType)
             {
                 case SkillIndicatorType.Line:
                     transform.position = start;
@@ -224,7 +227,7 @@ public class SkillIndicator : MonoBehaviour
     {
         Vector3 direction = (mouse - startPoint).normalized;
 
-        switch (element.type)
+        switch (element.indicatorType)
         {
             case SkillIndicatorType.Line:
                 return startPoint + direction * GameValue.PROJECTILE_MAX_LENGTH;

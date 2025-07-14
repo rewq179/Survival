@@ -30,17 +30,22 @@ public class SpawnMgr : MonoBehaviour
     public class ActiveWave
     {
         public int waveID;
-        private float waveTime;
         public float waveDuration;
+        public int groupCount;
+        private int groupMaxCount;
+
+        private float waveTime;
         public bool isTimeExceeded;
         public bool isCompleted;
         public List<Unit> waveEnemies = new();
 
-        public ActiveWave(int waveID, float waveDuration)
+        public ActiveWave(int waveID, float waveDuration, int groupMaxCount)
         {
             this.waveID = waveID;
-            this.waveTime = 0f;
             this.waveDuration = waveDuration;
+            this.groupCount = 0;
+            this.groupMaxCount = groupMaxCount;
+            this.waveTime = 0f;
             this.isTimeExceeded = false;
             this.isCompleted = false;
         }
@@ -53,6 +58,19 @@ public class SpawnMgr : MonoBehaviour
             waveTime += time;
             if (waveTime >= waveDuration)
                 isTimeExceeded = true;
+        }
+
+        public void AddGroupCount() => groupCount++;
+
+        /// <summary>
+        /// 웨이브 완료 여부 확인
+        /// </summary>
+        public bool IsWaveClear()
+        {
+            if (waveEnemies.Count > 0)
+                return false;
+
+            return groupCount >= groupMaxCount;
         }
     }
 
@@ -73,7 +91,7 @@ public class SpawnMgr : MonoBehaviour
         nextWaveIndex = 0;
         waveDatas.Clear();
         activeWaves.Clear();
-        
+
         waveDatas = DataMgr.GetWaveDatas();
         StartNextWave();
     }
@@ -84,49 +102,46 @@ public class SpawnMgr : MonoBehaviour
 
     public void StartNextWave()
     {
-        WaveData waveData = waveDatas[nextWaveIndex++];
-        ActiveWave activeWave = new ActiveWave(waveData.waveID, GetWaveDuration(waveData));
-        activeWaves.Add(activeWave);
-        StartCoroutine(WaveCoroutine(activeWave, waveData.spawnGroupIDs));
-    }
+        if (nextWaveIndex >= waveDatas.Count)
+            return;
 
-    private IEnumerator WaveCoroutine(ActiveWave activeWave, List<int> spawnGroupIDs)
-    {
-        // 웨이브 내 스폰 그룹들을 순차적으로 실행
+        WaveData waveData = waveDatas[nextWaveIndex++];
+        List<int> spawnGroupIDs = waveData.spawnGroupIDs;
+        int groupMaxCount = spawnGroupIDs.Count;
+
+        // 웨이브 생성
+        ActiveWave activeWave = new ActiveWave(waveData.waveID, GetWaveDuration(waveData), groupMaxCount);
+        activeWaves.Add(activeWave);
+
+        // 웨이브 내 스폰될 그룹 유닛들 생성
         foreach (int groupID in spawnGroupIDs)
         {
             SpawnGroupData spawnGroup = DataMgr.GetSpawnGroupData(groupID);
-            yield return StartCoroutine(SpawnGroupCoroutine(spawnGroup, activeWave));
+            StartCoroutine(SpawnGroupCoroutine(spawnGroup, activeWave));
         }
-
-        yield return null;
     }
 
     private void CheckWaveCompletion()
     {
         float time = Time.deltaTime;
-        
+
         bool canNextWave = false;
         List<ActiveWave> completedWaves = new();
         foreach (ActiveWave wave in activeWaves)
         {
             wave.Update(time);
-            
+
             if (wave.isCompleted)
                 completedWaves.Add(wave);
-            else if(wave.waveID == nextWaveIndex - 1 && wave.isTimeExceeded)
+            else if (wave.waveID == nextWaveIndex - 1 && wave.isTimeExceeded)
                 canNextWave = true;
         }
-        
+
         foreach (ActiveWave wave in completedWaves)
-        {
             activeWaves.Remove(wave);
-        }
-        
+
         if (canNextWave)
-        {
             StartNextWave();
-        }
     }
 
     #endregion
@@ -139,7 +154,8 @@ public class SpawnMgr : MonoBehaviour
             yield return new WaitForSeconds(spawnGroup.startDelay);
 
         // 반복 횟수만큼 스폰
-        for (int i = 0; i < spawnGroup.repeat; i++)
+        int total = spawnGroup.repeat + 1;
+        for (int i = 0; i < total; i++)
         {
             for (int j = 0; j < spawnGroup.count; j++)
             {
@@ -150,6 +166,9 @@ public class SpawnMgr : MonoBehaviour
             if (spawnGroup.repeatInterval > 0f)
                 yield return new WaitForSeconds(spawnGroup.repeatInterval);
         }
+
+        activeWave.AddGroupCount();
+        yield return null;
     }
 
     private Unit CreateEnemy(int unitID, SpawnPattern pattern)
@@ -169,7 +188,7 @@ public class SpawnMgr : MonoBehaviour
         {
             if (wave.waveEnemies.Remove(enemy))
             {
-                if (wave.waveEnemies.Count == 0)
+                if (wave.IsWaveClear())
                 {
                     wave.isCompleted = true;
                     StartNextWave();
@@ -258,17 +277,6 @@ public class SpawnMgr : MonoBehaviour
     #endregion
 
     #region 유틸
-
-    private ActiveWave GetActiveWaveData(int waveID)
-    {
-        foreach (ActiveWave activeWave in activeWaves)
-        {
-            if (activeWave.waveID == waveID)
-                return activeWave;
-        }
-
-        return null;
-    }
 
     public float GetWaveDuration(WaveData waveData)
     {

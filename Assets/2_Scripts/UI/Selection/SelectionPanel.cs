@@ -28,7 +28,7 @@ public class SelectionPanel : MonoBehaviour
     private const int SELECTION_COUNT = 3;
     private const float ACTIVE_WEIGHT = 1.2f;
     private const float PASSIVE_WEIGHT = 0.7f;
-    private const float SUB_WEIGHT = 1.5f;
+    private const float SUB_WEIGHT = 0.5f;
     private const float FADE_IN_DURATION = 0.3f;
     private const float FADE_IN_INV_DURATION = 1 / FADE_IN_DURATION;
     private const float FADE_OUT_DURATION = 0.2f;
@@ -82,7 +82,7 @@ public class SelectionPanel : MonoBehaviour
     {
         SkillData skillData = DataMgr.GetSkillData(key);
         SelectionData data = PopSelectionData();
-        data.Init(key, skillData.skillType, skillData.name, skillData.description, GameMgr.Instance.resourceMgr.GetSkillIcon(key));
+        data.Init(key, skillData.skillType, skillData.name, skillData.desc, GameMgr.Instance.resourceMgr.GetSkillIcon(key));
         return data;
     }
 

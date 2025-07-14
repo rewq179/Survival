@@ -68,6 +68,8 @@ public class GameMgr : MonoBehaviour
         playerUnit.Init(SpawnMgr.UNIT_UNIQUE_ID++, 100, Vector3.zero);
 
         UIMgr.Instance.UpdateUI();
+        playerUnit.LearnSkill(SkillKey.Meteor);
+        playerUnit.LearnSkill(SkillKey.EnergyExplosion);
     }
 
     public void OnGameResume()
@@ -84,6 +86,6 @@ public class GameMgr : MonoBehaviour
 
     public void Test()
     {
-        playerUnit.AddExp(250);
+        playerUnit.AddExp(playerUnit.MaxExp);
     }
 }

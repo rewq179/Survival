@@ -14,54 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UnitDataReader
   sheetAddress: 15RA8mCckMbGIXxx5Ukfmtih0TxDTEGkXiAVyrHf8Blw
   startRow: 2
-  endRow: 8
-  unitDatas:
-  - id: 100
-    name: "\uD50C\uB808\uC774\uC5B4"
-    hp: 300
-    moveSpeed: 7
-    skillKey: 0
-    exp: 0
-    gold: 0
-  - id: 1001
-    name: "\uBC8C"
-    hp: 5
-    moveSpeed: 5.5
-    skillKey: 47
-    exp: 10
-    gold: 5
-  - id: 1002
-    name: "\uBC15\uC950"
-    hp: 8
-    moveSpeed: 6
-    skillKey: -1
-    exp: 15
-    gold: 8
-  - id: 1003
-    name: "\uB291\uB300"
-    hp: 10
-    moveSpeed: 7
-    skillKey: -1
-    exp: 20
-    gold: 12
-  - id: 1004
-    name: "\uB098\uBB34 \uC815\uB839"
-    hp: 17
-    moveSpeed: 4.5
-    skillKey: -1
-    exp: 35
-    gold: 20
-  - id: 1005
-    name: "\uACE8\uB818"
-    hp: 22
-    moveSpeed: 3.8
-    skillKey: -1
-    exp: 50
-    gold: 30
-  - id: 1006
-    name: "\uC6A9"
-    hp: 150
-    moveSpeed: 3.5
-    skillKey: -1
-    exp: 200
-    gold: 150
+  endRow: 7
+  unitDatas: []

@@ -49,7 +49,7 @@ public class InstanceValue
     private float moveSpeedMultiplier;
     public float moveSpeedFinal;
 
-    public float angle; 
+    public float angle;
 
     public void SetFix(SkillElement skillElement)
     {
@@ -66,13 +66,7 @@ public class InstanceValue
 
         projectileCountFix = 1;
         angle = skillElement.angle;
-        launcherType = skillElement.type switch
-        {
-            SkillIndicatorType.Line => SkillLauncherType.Projectile,
-            SkillIndicatorType.Sector => SkillLauncherType.InstantAOE,
-            SkillIndicatorType.Circle => SkillLauncherType.InstantAOE,
-            SkillIndicatorType.InstantAttack => SkillLauncherType.InstantAttack,
-        };
+        launcherType = skillElement.launcherType;
     }
 
     public void Reset()

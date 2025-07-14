@@ -16,17 +16,17 @@ public class UnitData
     public string name;
     public float hp;
     public float moveSpeed;
-    public SkillKey skillKey;
+    public List<SkillKey> skills;
     public float exp;
     public int gold;
 
-    public UnitData(int id, string name, float hp, float moveSpeed, SkillKey skillKey, float exp, int gold)
+    public UnitData(int id, string name, float hp, float moveSpeed, List<SkillKey> skills, float exp, int gold)
     {
         this.id = id;
         this.name = name;
         this.hp = hp;
         this.moveSpeed = moveSpeed;
-        this.skillKey = skillKey;
+        this.skills = skills;
         this.exp = exp;
         this.gold = gold;
     }
@@ -46,7 +46,7 @@ public class UnitDataReader : BaseReader
         string name = string.Empty;
         float health = 0;
         float moveSpeed = 0;
-        SkillKey skillKey = SkillKey.None;
+        List<SkillKey> skills = new List<SkillKey>();
         float exp = 0;
         int gold = 0;
 
@@ -91,8 +91,12 @@ public class UnitDataReader : BaseReader
 
                 case "skills":
                     {
-                        if (Enum.TryParse(cells[i].value, out SkillKey parsedSkillKey))
-                            skillKey = parsedSkillKey;
+                        string[] keys = cells[i].value.Split('/');
+                        foreach (string key in keys)
+                        {
+                            if (Enum.TryParse(key, out SkillKey parsedKey))
+                                skills.Add(parsedKey);
+                        }
                         break;
                     }
 
@@ -116,7 +120,7 @@ public class UnitDataReader : BaseReader
             }
         }
 
-        unitDatas.Add(new UnitData(id, name, health, moveSpeed, skillKey, exp, gold));
+        unitDatas.Add(new UnitData(id, name, health, moveSpeed, skills, exp, gold));
     }
 }
 

@@ -1278,8 +1278,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4203030995968696}
+  - component: {fileID: -9187813253768749091}
   - component: {fileID: 95117915527138606}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Dragon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1347,6 +1348,21 @@ Transform:
   - {fileID: 8523075738175363974}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-9187813253768749091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1317515324939390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9044eb9597e70a47ba698d18aa6fa98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 95117915527138606}
+  healthBar: {fileID: 6931703582803920411}
+  playerController: {fileID: 0}
 --- !u!95 &95117915527138606
 Animator:
   serializedVersion: 7
@@ -3820,6 +3836,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a2d774c1986fbb246878a1161644b567, type: 3}
+--- !u!114 &6931703582803920411 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8971840370220532607, guid: a2d774c1986fbb246878a1161644b567, type: 3}
+  m_PrefabInstance: {fileID: 2067216992335922532}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4944be887d3e28f4d8cdcf861cc4bcc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &8523075738175363974 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7707971084563570402, guid: a2d774c1986fbb246878a1161644b567, type: 3}

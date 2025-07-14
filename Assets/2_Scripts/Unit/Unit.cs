@@ -8,6 +8,12 @@ public enum AnimEvent
     Die,
 }
 
+public enum UnitType
+{
+    Player,
+    Monster,
+}
+
 public class Unit : MonoBehaviour
 {
     [Header("Components")]
@@ -25,14 +31,15 @@ public class Unit : MonoBehaviour
     private PlayerSaveData playerSaveData = new();
     private int uniqueID;
     private int unitID;
-    private bool isPlayer;
+    private UnitType unitType;
 
     // 기타
     private Camera mainCam;
 
     public int UniqueID => uniqueID;
     public int UnitID => unitID;
-    public bool IsPlayer => isPlayer;
+    public bool IsPlayer => unitType == UnitType.Player;
+    public UnitType UnitType => unitType;
     public SkillModule SkillModule => skillModule;
 
     public void Reset()
@@ -41,6 +48,7 @@ public class Unit : MonoBehaviour
             OnHpChanged -= healthBar.UpdateHealthBar;
 
         combatModule.Reset();
+        behaviourModule.Reset();
         transform.position = Vector3.zero;
         gameObject.SetActive(false);
         healthBar?.ShowHealthBar(false);
@@ -50,7 +58,7 @@ public class Unit : MonoBehaviour
     {
         this.uniqueID = uniqueID;
         this.unitID = unitID;
-        isPlayer = unitID < 1000;
+        unitType = unitID < 1000 ? UnitType.Player : UnitType.Monster;
         InitModule();
         InitHealthBar();
         playerSaveData.Init(this);
@@ -58,18 +66,23 @@ public class Unit : MonoBehaviour
         transform.position = position;
         mainCam = Camera.main;
         gameObject.SetActive(true);
+
+#if UNITY_EDITOR
+        UnitData data = DataMgr.GetUnitData(unitID);
+        gameObject.name = $"{data.name}_{uniqueID}";
+#endif
     }
 
     private void InitModule()
     {
         if (behaviourModule == null)
-            behaviourModule = isPlayer ? new BehaviourPlayerModule() : new BehaviourMonsterModule();
+            behaviourModule = IsPlayer ? new BehaviourPlayerModule() : new BehaviourMonsterModule();
 
         UnitData data = DataMgr.GetUnitData(unitID);
         statModule.Init(data);
         combatModule.Init(this);
-        behaviourModule.Init(this);
         skillModule.Init(this, data);
+        behaviourModule.Init(this);
     }
 
     private void InitHealthBar()

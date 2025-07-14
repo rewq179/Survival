@@ -2,24 +2,36 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.Video;
 
-/// <summary>
-/// 스킬 효과 인터페이스
-/// </summary>
-public interface ISkillComponent
+public abstract class BaseComponent
 {
-    void OnInitialize(SkillLauncher launcher);
-    void OnUpdate(float deltaTime);
-    void OnHit(Unit target);
-    void OnDestroy();
+    protected SkillLauncher launcher;
+    protected UnitType enemyType;
+    protected float damage;
+
+    public virtual void OnInitialize(SkillLauncher launcher)
+    {
+        this.launcher = launcher;
+        enemyType = launcher.Caster.UnitType == UnitType.Player ? UnitType.Monster : UnitType.Player;
+    }
+
+    protected void ApplyDamage(Unit target)
+    {
+        DamageInfo damageInfo = CombatMgr.PopDamageInfo();
+        damageInfo.Init(launcher.Caster, target, damage, launcher.Position, launcher.SkillKey);
+        CombatMgr.ProcessDamage(damageInfo);
+    }
+
+    public abstract void OnUpdate(float deltaTime);
+    public abstract void OnHit(Unit target);
+    public bool IsHittable(Unit target) => target != null && !target.IsDead && target.UnitType == enemyType;
+    public virtual void OnDestroy() { }
 }
 
 /// <summary>
 /// 투사체 효과
 /// </summary>
-public class ProjectileComponent : ISkillComponent
+public class ProjectileComponent : BaseComponent
 {
-    private SkillLauncher launcher;
-    private float damage;
     private float moveSpeed;
     private float maxLength;
     private int richocet;
@@ -39,15 +51,15 @@ public class ProjectileComponent : ISkillComponent
         hittedUnitIDs.Clear();
     }
 
-    public void OnInitialize(SkillLauncher launcher)
+    public override void OnInitialize(SkillLauncher launcher)
     {
-        this.launcher = launcher;
+        base.OnInitialize(launcher);
         startPos = launcher.Position;
         direction = launcher.transform.forward;
         hittedUnitIDs.Add(launcher.Caster.UniqueID);
     }
 
-    public void OnUpdate(float deltaTime)
+    public override void OnUpdate(float deltaTime)
     {
         if (isHit)
             return;
@@ -70,9 +82,9 @@ public class ProjectileComponent : ISkillComponent
         }
     }
 
-    public void OnHit(Unit target)
+    public override void OnHit(Unit target)
     {
-        if (target == null)
+        if (!IsHittable(target))
             return;
 
         if (hittedUnitIDs.Contains(target.UniqueID))
@@ -80,11 +92,9 @@ public class ProjectileComponent : ISkillComponent
 
         // 피해 적용
         hittedUnitIDs.Add(target.UniqueID);
-        DamageInfo damageInfo = CombatMgr.PopDamageInfo();
-        damageInfo.Init(launcher.Caster, target, damage, launcher.Position, launcher.SkillKey);
-        CombatMgr.ProcessDamage(damageInfo);
+        ApplyDamage(target);
         isHit = true;
- 
+
         // 도탄
         if (richocet > 0)
         {
@@ -127,13 +137,13 @@ public class ProjectileComponent : ISkillComponent
         foreach (Collider col in colliders)
         {
             Unit unit = col.GetComponent<Unit>();
-            if (unit == null || hittedUnitIDs.Contains(unit.UniqueID))
+            if (!IsHittable(unit) || hittedUnitIDs.Contains(unit.UniqueID))
                 continue;
 
             Vector3 targetPos = unit.transform.position;
             targetPos.y = position.y;
             float dist = (position - targetPos).sqrMagnitude;
-            
+
             if (dist < maxDist)
             {
                 maxDist = dist;
@@ -143,21 +153,17 @@ public class ProjectileComponent : ISkillComponent
 
         return target;
     }
-
-    public void OnDestroy() { }
 }
 
 /// <summary>
 /// 범위 효과
 /// </summary>
-public class AOEComponent : ISkillComponent
+public class AOEComponent : BaseComponent
 {
-    protected SkillLauncher launcher;
-    protected SkillIndicatorType type;
-    protected float damage;
-    protected float angle;
-    protected float radius;
-    protected float maxDistance;
+    private SkillIndicatorType type;
+    private float angle;
+    private float radius;
+    private float maxDistance;
 
     public AOEComponent(InstanceValue inst)
     {
@@ -168,9 +174,9 @@ public class AOEComponent : ISkillComponent
         type = angle == 360f ? SkillIndicatorType.Circle : SkillIndicatorType.Sector;
     }
 
-    public void OnInitialize(SkillLauncher launcher)
+    public override void OnInitialize(SkillLauncher launcher)
     {
-        this.launcher = launcher;
+        base.OnInitialize(launcher);
 
         List<Unit> targets = GetHitTargets(launcher.Position, launcher.Direction, launcher.IsAffectCaster);
         foreach (Unit target in targets)
@@ -187,13 +193,11 @@ public class AOEComponent : ISkillComponent
         foreach (Collider col in colliders)
         {
             Unit target = col.GetComponent<Unit>();
-            if (target == null || (!isAffectCaster && target == launcher.Caster))
+            if (!IsHittable(target) || (!isAffectCaster && target == launcher.Caster))
                 continue;
 
             if (IsTargetInSkillArea(position, direction, target.transform.position))
-            {
                 hitTargets.Add(target);
-            }
         }
 
         return hitTargets;
@@ -226,15 +230,9 @@ public class AOEComponent : ISkillComponent
         return sqrDistance <= maxDistance;
     }
 
-    public virtual void OnUpdate(float deltaTime) { }
-    public void OnHit(Unit target)
-    {
-        DamageInfo damageInfo = CombatMgr.PopDamageInfo();
-        damageInfo.Init(launcher.Caster, target, damage, launcher.Position, launcher.SkillKey);
-        CombatMgr.ProcessDamage(damageInfo);
-    }
-
-    public void OnDestroy() { }
+    public override void OnUpdate(float deltaTime) { }
+    public override void OnHit(Unit target) => ApplyDamage(target);
+    public override void OnDestroy() { }
 }
 
 /// <summary>
@@ -248,6 +246,7 @@ public class PeriodicAOEComponent : AOEComponent
     public PeriodicAOEComponent(InstanceValue inst) : base(inst)
     {
         interval = inst.damageTickFinal;
+        lastDamageTime = Time.time;
     }
 
     public override void OnUpdate(float deltaTime)
@@ -268,11 +267,9 @@ public class PeriodicAOEComponent : AOEComponent
 /// <summary>
 /// 즉시 공격 효과
 /// </summary>
-public class InstantComponent : ISkillComponent
+public class InstantComponent : BaseComponent
 {
-    private float damage;
     private Unit target;
-    private SkillLauncher launcher;
 
     public InstantComponent(InstanceValue inst, Unit target)
     {
@@ -280,21 +277,16 @@ public class InstantComponent : ISkillComponent
         this.target = target;
     }
 
-    public void OnInitialize(SkillLauncher launcher)
+    public override void OnInitialize(SkillLauncher launcher)
     {
-        this.launcher = launcher;
+        base.OnInitialize(launcher);
         OnHit(target);
     }
 
-    public void OnUpdate(float deltaTime) { }
-    public void OnHit(Unit target)
+    public override void OnUpdate(float deltaTime) { }
+    public override void OnHit(Unit target)
     {
-        DamageInfo damageInfo = CombatMgr.PopDamageInfo();
-        damageInfo.Init(launcher.Caster, target, damage, launcher.Position, launcher.SkillKey);
-        CombatMgr.ProcessDamage(damageInfo);
-
+        ApplyDamage(target);
         launcher.Deactivate();
     }
-
-    public void OnDestroy() { }
 }

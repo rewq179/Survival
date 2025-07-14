@@ -4,31 +4,33 @@ using UnityEngine;
 public enum AIState
 {
     Chasing,
-    Attacking,
+    MeleeAttack,
+    RangedAttack,
     Stun
 }
 
 public class BehaviourMonsterModule : BehaviourModule
 {
     private Unit target;
+    private SkillModule skillModule;
     private AIState currentState = AIState.Chasing;
-
-    // 이동 관련
     private float moveSpeed;
-    private const float ROTATION_SPEED = 5f;
-    private const float ATTACK_RANGE = 1.5f * 1.5f;
-
-    // 애니메이션 관련
     private bool isAttacking;
-
-    // 성능 관련
     private Vector3 lastPlayerPosition;
-    private const float POSITION_UPDATE_INTERVAL = 0.1f;
-    private float lastPlayerUpdateTime;
+
+    // 상수
+    private const float ROTATION_SPEED = 5f;
+    private const float CHASE_ROTION_SPEED_FACTOR = 1f;
+    private const float ATTACK_ROTION_SPEED_FACTOR = 2f;
+    private const float MELEE_ATTACK_RANGE = 1.5f;
+    private const float MELEE_ATTACK_RANGE_SQR = MELEE_ATTACK_RANGE * MELEE_ATTACK_RANGE;
+    private const float RANGED_ATTACK_RANGE = 8f;
+    private const float RANGED_ATTACK_RANGE_SQR = RANGED_ATTACK_RANGE * RANGED_ATTACK_RANGE;
 
     public override void Reset()
     {
         currentState = AIState.Chasing;
+        isAttacking = false;
     }
 
     public override void Init(Unit unit)
@@ -36,6 +38,7 @@ public class BehaviourMonsterModule : BehaviourModule
         owner = unit;
         target = GameMgr.Instance.PlayerUnit;
         moveSpeed = unit.MoveSpeed;
+        skillModule = unit.SkillModule;
     }
 
     public override void Update()
@@ -43,29 +46,23 @@ public class BehaviourMonsterModule : BehaviourModule
         if (owner.IsDead || target.IsDead)
             return;
 
-        if (IsCheckPlayerPosition())
-            UpdatePlayerPosition();
-
+        UpdatePlayerPosition();
         UpdateState();
         UpdateMovement();
-    }
-
-    private bool IsCheckPlayerPosition()
-    {
-        return Time.time - lastPlayerUpdateTime > POSITION_UPDATE_INTERVAL;
     }
 
     private void UpdatePlayerPosition()
     {
         lastPlayerPosition = target.transform.position;
-        lastPlayerUpdateTime = Time.time;
     }
 
     private void UpdateState()
     {
         float distanceSqr = (owner.transform.position - lastPlayerPosition).sqrMagnitude;
-        if (distanceSqr <= ATTACK_RANGE)
-            ChangeState(AIState.Attacking);
+        if (distanceSqr <= MELEE_ATTACK_RANGE_SQR && skillModule.CanUseMeleeSkill())
+            ChangeState(AIState.MeleeAttack);
+        else if (distanceSqr <= RANGED_ATTACK_RANGE_SQR && skillModule.CanUseRangedSkill())
+            ChangeState(AIState.RangedAttack);
         else
             ChangeState(AIState.Chasing);
     }
@@ -78,7 +75,8 @@ public class BehaviourMonsterModule : BehaviourModule
                 ChasePlayer();
                 break;
 
-            case AIState.Attacking:
+            case AIState.MeleeAttack:
+            case AIState.RangedAttack:
                 AttackPlayer();
                 break;
         }
@@ -89,11 +87,7 @@ public class BehaviourMonsterModule : BehaviourModule
         Vector3 direction = GetDirection();
         Transform transform = owner.transform;
         transform.position += direction * moveSpeed * Time.deltaTime;
-
-        if (direction != Vector3.zero)
-        {
-            transform.rotation = GetRotation(transform.rotation, direction);
-        }
+        transform.rotation = GetRotation(transform.rotation, direction, CHASE_ROTION_SPEED_FACTOR);
     }
 
     private void AttackPlayer()
@@ -104,13 +98,9 @@ public class BehaviourMonsterModule : BehaviourModule
         isAttacking = true;
         Vector3 direction = GetDirection();
 
-        if (direction != Vector3.zero)
-        {
-            Transform transform = owner.transform;
-            transform.rotation = GetRotation(transform.rotation, direction, 2f);
-        }
-
-        owner.SkillModule.UseRandomSkill(target);
+        Transform transform = owner.transform;
+        transform.rotation = GetRotation(transform.rotation, direction, ATTACK_ROTION_SPEED_FACTOR);
+        skillModule.UseRandomSkill(target, currentState);
     }
 
     public override void OnAnimationEnd(AnimEvent animEvent)
@@ -138,7 +128,7 @@ public class BehaviourMonsterModule : BehaviourModule
         return direction;
     }
 
-    private Quaternion GetRotation(Quaternion rotation, Vector3 direction, float speedFactor = 1f)
+    private Quaternion GetRotation(Quaternion rotation, Vector3 direction, float speedFactor)
     {
         Quaternion targetRotation = Quaternion.LookRotation(direction);
         return Quaternion.Slerp(rotation, targetRotation, ROTATION_SPEED * speedFactor * Time.deltaTime);

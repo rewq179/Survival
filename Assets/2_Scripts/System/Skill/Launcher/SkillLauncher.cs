@@ -5,7 +5,7 @@ public enum SkillLauncherType
 {
     Projectile,
     InstantAOE,
-    PersistentAOE,
+    PeriodicAOE,
     InstantAttack,
     Max,
 }
@@ -22,7 +22,7 @@ public class SkillLauncher : MonoBehaviour
     protected bool isActive = false;
     protected float elapsedTime;
 
-    protected List<ISkillComponent> components = new();
+    protected List<BaseComponent> components = new();
     protected SkillParticleController particleController;
 
     public SkillKey SkillKey => skillKey;
@@ -100,11 +100,11 @@ public class SkillLauncher : MonoBehaviour
 
         foreach (InstanceValue instValue in inst.Values)
         {
-            ISkillComponent component = instValue.launcherType switch
+            BaseComponent component = instValue.launcherType switch
             {
                 SkillLauncherType.Projectile => new ProjectileComponent(instValue),
                 SkillLauncherType.InstantAOE => new AOEComponent(instValue),
-                SkillLauncherType.PersistentAOE => new PeriodicAOEComponent(instValue),
+                SkillLauncherType.PeriodicAOE => new PeriodicAOEComponent(instValue),
                 SkillLauncherType.InstantAttack => new InstantComponent(instValue, fixedTarget),
                 _ => null,
             };

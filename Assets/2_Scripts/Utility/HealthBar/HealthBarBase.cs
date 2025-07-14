@@ -31,7 +31,7 @@ public abstract class HealthBarBase : MonoBehaviour
         float time = 0f;
         while (time < DAMAGE_DURATION)
         {
-            time += Time.deltaTime;
+            time += Time.unscaledDeltaTime;
             float e = curve.Evaluate(Mathf.Clamp01(time * DAMAGE_INV_DURATION));
             SetDamageBar(Mathf.Lerp(prevRatio, endRatio, e));
             yield return null;

@@ -62,40 +62,51 @@ public class SkillMgr : MonoBehaviour
         if (activeIndicators.Count == 0)
             return;
 
-        SkillKey skillKey = SkillKey.None;
-        Vector3 startPosition = caster.transform.position;
-        Vector3 targetPosition = Vector3.zero;
+        SkillElement element = GetWaitedPlayerSkillElement();
+        if (element == null)
+            return;
 
+        SkillKey skillKey = element.skillKey;
+        Vector3 startPos = caster.transform.position;
+        Vector3 endPos = SkillIndicator.GetElementEndPoint(startPos, playerController.GetMouseWorldPosition(), element);
+        GetSkillAdjustedPos(element, ref startPos, ref endPos);
+
+        // 생성
+        SkillInstance inst = caster.GetSkillInstance(skillKey);
+        CreateSkillLauncher(inst, startPos, endPos, caster);
+        RemoveIndicatorsByskillKey(skillKey);
+    }
+
+    private SkillElement GetWaitedPlayerSkillElement()
+    {
         foreach (SkillIndicator indicator in activeIndicators)
         {
             if (indicator.isPlayerIndicator)
-            {
-                skillKey = indicator.Element.skillKey;
-                targetPosition = SkillIndicator.GetElementEndPoint(startPosition, playerController.GetMouseWorldPosition(), indicator.Element);
-
-                if (indicator.Element.type == SkillIndicatorType.Line)
-                {
-                    startPosition.y = 1f;
-                    targetPosition.y = 1f;
-                }
-
-                else
-                {
-                    startPosition.y = 0f;
-                    targetPosition.y = 0f;
-                }
-
-                break;
-            }
+                return indicator.Element;
         }
 
-        // 스킬 인스턴스 생성
-        SkillInstance inst = caster.GetSkillInstance(skillKey);
-        caster.StartCooldown(skillKey);
+        return null;
+    }
 
-        // 스킬 런처 생성
-        CreateSkillLauncher(inst, startPosition, targetPosition, caster);
-        RemoveIndicatorsByskillKey(skillKey);
+    private void GetSkillAdjustedPos(SkillElement element, ref Vector3 startPos, ref Vector3 endPos)
+    {
+        switch (element.indicatorType)
+        {
+            case SkillIndicatorType.Line:
+                startPos.y = 1f;
+                endPos.y = 1f;
+                break;
+
+            case SkillIndicatorType.Sector:
+                startPos.y = 0f;
+                endPos.y = 0f;
+                break;
+
+            case SkillIndicatorType.Circle:
+                endPos.y = 0f;
+                startPos = endPos;
+                break;
+        }
     }
 
     /// <summary>
@@ -104,9 +115,13 @@ public class SkillMgr : MonoBehaviour
     public void ActivateSkill(SkillKey skillKey, Unit caster, Unit target)
     {
         Vector3 startPos = caster.transform.position;
-        Vector3 targetPos = target.transform.position;
+        Vector3 endPos = target.transform.position;
+
+        SkillData skillData = DataMgr.GetSkillData(skillKey);
+        GetSkillAdjustedPos(skillData.skillElements[0], ref startPos, ref endPos);
+
         SkillInstance inst = caster.GetSkillInstance(skillKey);
-        CreateSkillLauncher(inst, startPos, targetPos, caster, target);
+        CreateSkillLauncher(inst, startPos, endPos, caster, target);
     }
 
     #region Indicator
@@ -225,7 +240,7 @@ public class SkillMgr : MonoBehaviour
 
         SkillIndicator indicator = activeIndicators[index];
         activeIndicators.RemoveAt(index);
-        PushMesh(indicator.Element.type, indicator.Mesh);
+        PushMesh(indicator.Element.indicatorType, indicator.Mesh);
         PushIndicator(indicator);
     }
 
@@ -251,6 +266,7 @@ public class SkillMgr : MonoBehaviour
         SkillLauncher launcher = PopSkillLauncher();
         SkillParticleController particle = PopParticle(skillInstance.skillKey, launcher.transform);
         launcher.Init(skillInstance, startPos, direction, particle, caster, target);
+        caster.StartCooldown(skillInstance.skillKey);
         activeLaunchers.Add(launcher);
         return launcher;
     }
@@ -286,10 +302,10 @@ public class SkillMgr : MonoBehaviour
 
     private Mesh PopMesh(SkillElement element)
     {
-        if (meshPools[element.type].TryPop(out Mesh mesh))
+        if (meshPools[element.indicatorType].TryPop(out Mesh mesh))
             return mesh;
 
-        return element.type switch
+        return element.indicatorType switch
         {
             SkillIndicatorType.Line => SkillIndicator.CreateLineMesh(GameValue.PROJECTILE_MAX_LENGTH, GameValue.PROJECTILE_MAX_WIDTH),
             SkillIndicatorType.Sector => SkillIndicator.CreateSectorMesh(element.angle, element.radius),

@@ -13,10 +13,9 @@ public enum MonsterType
 {
     Bee = 1001,        // 벌
     Bat = 1002,        // 박쥐
-    Wolf = 1003,       // 늑대
-    Treant = 1004,     // 나무 정령
-    Golem = 1005,      // 골렘
-    Dragon = 1006      // 드래곤
+    Golem = 1003,      // 골렘
+    Cobra = 1004,      // 코브라
+    Dragon = 1005      // 드래곤
 }
 
 public class ResourceMgr : MonoBehaviour
@@ -93,9 +92,7 @@ public class ResourceMgr : MonoBehaviour
         foreach (Unit unit in units)
         {
             if (Enum.TryParse(unit.name, out MonsterType type))
-            {
                 unitPrefabs[(int)type] = unit;
-            }
         }
     }
 

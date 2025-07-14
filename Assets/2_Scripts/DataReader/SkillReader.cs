@@ -76,7 +76,7 @@ public enum SkillKey
     SpitPoisonAttack,
     PunchAttack,
     HitGroundAttack,
-    DradonBiteAttack,
+    DragonBiteAttack,
     BreathAttack,
 
     Max,
@@ -96,23 +96,21 @@ public class SkillData
     public SkillKey skillKey;
     public SkillType skillType;
     public string name;
-    public string description;
+    public string desc;
     public float cooldown;
     public float baseValue;
     public List<SkillElement> skillElements;
-    public SkillLauncherType launcherType;
 
     public SkillData(SkillKey skillKey, SkillType skillType, string name, string description, float cooldown, float baseValue,
-        List<SkillElement> elements, SkillLauncherType launcherType)
+        List<SkillElement> elements)
     {
         this.skillKey = skillKey;
         this.skillType = skillType;
         this.name = name;
-        this.description = description;
+        this.desc = description;
         this.cooldown = cooldown;
         this.baseValue = baseValue;
         skillElements = elements;
-        this.launcherType = launcherType;
     }
 }
 
@@ -133,7 +131,6 @@ public class SkillDataReader : BaseReader
         float cooldown = 0;
         float baseValue = 0;
         List<SkillElement> elements = new();
-        SkillLauncherType launcherType = SkillLauncherType.Projectile;
 
         for (int i = 0; i < cells.Count; i++)
         {
@@ -175,15 +172,11 @@ public class SkillDataReader : BaseReader
                         elements = DecodeSkillElement(cells[i].value, skillKey);
                     }
                     break;
-
-                case "launchertype":
-                    if (Enum.TryParse(cells[i].value, true, out SkillLauncherType parsedLauncherType))
-                        launcherType = parsedLauncherType;
-                    break;
             }
         }
 
-        skillDatas.Add(new SkillData(skillKey, skillType, name, description, cooldown, baseValue, elements, launcherType));
+        skillDatas.Add(new SkillData(skillKey, skillType, name, description, cooldown,
+            baseValue, elements));
     }
 
     private List<SkillElement> DecodeSkillElement(string skillString, SkillKey skillKey)
@@ -210,9 +203,10 @@ public class SkillDataReader : BaseReader
         float width = 0f;
         float angle = 0f;
         float radius = 0f;
-        float speed = 0f;
+        float moveSpeed = 0f;
         float ricochet = 0f;
         float piercing = 0f;
+        SkillLauncherType type = SkillLauncherType.Projectile;
 
         // Dmg : 12 / Int : 0.5
         string[] splits = str.Split('/');
@@ -220,104 +214,110 @@ public class SkillDataReader : BaseReader
         {
             string trimmedPart = part.Trim();
             string[] keyValue = trimmedPart.Split(':');
-
-            if (keyValue.Length != 2)
-                continue;
-
             string key = keyValue[0].Trim().ToLowerInvariant();
-            string value = keyValue[1].Trim();
 
-            if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedValue))
+            if (keyValue.Length == 1)
             {
-                switch (key)
+                if (Enum.TryParse(key, true, out SkillLauncherType parsedType))
+                    type = parsedType;
+            }
+
+            else if (keyValue.Length == 2)
+            {
+                string value = keyValue[1].Trim();
+
+                if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedValue))
                 {
-                    case "dmg":
-                        damage = parsedValue;
-                        break;
+                    switch (key)
+                    {
+                        case "dmg":
+                            damage = parsedValue;
+                            break;
 
-                    case "duration":
-                        duration = parsedValue;
-                        break;
+                        case "duration":
+                            duration = parsedValue;
+                            break;
 
-                    case "interval":
-                        interval = parsedValue;
-                        break;
+                        case "interval":
+                            interval = parsedValue;
+                            break;
 
-                    case "height":
-                        height = parsedValue;
-                        break;
+                        case "height":
+                            height = parsedValue;
+                            break;
 
-                    case "width":
-                        width = parsedValue;
-                        break;
+                        case "width":
+                            width = parsedValue;
+                            break;
 
-                    case "angle":
-                        angle = parsedValue;
-                        break;
+                        case "angle":
+                            angle = parsedValue;
+                            break;
 
-                    case "radius":
-                        radius = parsedValue;
-                        break;
+                        case "radius":
+                            radius = parsedValue;
+                            break;
 
-                    case "movespeed":
-                        speed = parsedValue;
-                        break;
+                        case "movespeed":
+                            moveSpeed = parsedValue;
+                            break;
 
-                    case "ricochet":
-                        ricochet = parsedValue;
-                        break;
+                        case "ricochet":
+                            ricochet = parsedValue;
+                            break;
 
-                    case "piercing":
-                        piercing = parsedValue;
-                        break;
+                        case "piercing":
+                            piercing = parsedValue;
+                            break;
+                    }
                 }
             }
         }
 
         SkillElement element = new();
-        element.Init(skillKey, index, speed, height, width, angle, radius, damage, duration, 
-            interval, ricochet, piercing);
+        element.Init(skillKey, index, moveSpeed, height, width, angle, radius, damage, duration,
+            interval, ricochet, piercing, type);
         return element;
     }
-}
 
 #if UNITY_EDITOR
-[CustomEditor(typeof(SkillDataReader))]
-public class SkillDataReaderEditor : Editor
-{
-    SkillDataReader dataReader;
-
-    private void OnEnable()
+    [CustomEditor(typeof(SkillDataReader))]
+    public class SkillDataReaderEditor : Editor
     {
-        dataReader = (SkillDataReader)target;
-    }
+        SkillDataReader dataReader;
 
-    public override void OnInspectorGUI()
-    {
-        base.OnInspectorGUI();
-
-        GUILayout.Label("\n\n스프레드 시트 읽어오기");
-
-        if (GUILayout.Button("데이터 읽기(API 호출)"))
+        private void OnEnable()
         {
-            UpdateStats(UpdateMethodOne);
-            dataReader.skillDatas.Clear();
-        }
-    }
-
-    void UpdateStats(UnityAction<GstuSpreadSheet> callback, bool mergedCells = false)
-    {
-        SpreadsheetManager.Read(new GSTU_Search(dataReader.sheetAddress, dataReader.sheetName), callback, mergedCells);
-    }
-
-    void UpdateMethodOne(GstuSpreadSheet ss)
-    {
-        for (int i = dataReader.startRow; i <= dataReader.endRow; ++i)
-        {
-            dataReader.SetData(ss.rows[i]);
+            dataReader = (SkillDataReader)target;
         }
 
-        EditorUtility.SetDirty(target);
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+
+            GUILayout.Label("\n\n스프레드 시트 읽어오기");
+
+            if (GUILayout.Button("데이터 읽기(API 호출)"))
+            {
+                UpdateStats(UpdateMethodOne);
+                dataReader.skillDatas.Clear();
+            }
+        }
+
+        void UpdateStats(UnityAction<GstuSpreadSheet> callback, bool mergedCells = false)
+        {
+            SpreadsheetManager.Read(new GSTU_Search(dataReader.sheetAddress, dataReader.sheetName), callback, mergedCells);
+        }
+
+        void UpdateMethodOne(GstuSpreadSheet ss)
+        {
+            for (int i = dataReader.startRow; i <= dataReader.endRow; ++i)
+            {
+                dataReader.SetData(ss.rows[i]);
+            }
+
+            EditorUtility.SetDirty(target);
+        }
     }
 }
 #endif

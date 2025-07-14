@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using NUnit.Framework.Constraints;
 
 /// <summary>
 /// 개별 스킬 관리 모듈
@@ -8,9 +9,13 @@ using System;
 public class SkillModule : MonoBehaviour
 {
     private Unit owner;
+
+    // 스킬 관련
     private Dictionary<SkillKey, SkillInstance> skillInstances = new();
     private Dictionary<SkillKey, int> skillLevels = new();
     private List<SkillKey> activeSkills = new();
+    private List<SkillKey> rangedAttackSkills = new();
+    private List<SkillKey> meleeAttackSkills = new();
     private List<SkillKey> passiveSkills = new();
     // Key: 부모 스킬, Value: 서브 스킬 리스트
     private Dictionary<SkillKey, List<SkillKey>> subSkills = new();
@@ -47,8 +52,15 @@ public class SkillModule : MonoBehaviour
         cooldownTimes.Clear();
         activatedSkills.Clear();
         skillInstances.Clear();
+        rangedAttackSkills.Clear();
+        meleeAttackSkills.Clear();
+        passiveSkills.Clear();
+        subSkills.Clear();
 
-        LearnSkill(data.skillKey);
+        foreach (SkillKey skillKey in data.skills)
+        {
+            LearnSkill(skillKey);
+        }
     }
 
     public void UpdateCooldowns()
@@ -100,6 +112,13 @@ public class SkillModule : MonoBehaviour
                 activeSkills.Add(skillKey);
                 cooldownTimes[skillKey] = GetSkillInstance(skillKey).cooldownFinal;
                 cooldowns[skillKey] = 0f;
+
+                SkillInstance inst = GetSkillInstance(skillKey);
+                if (inst.Values[0].launcherType == SkillLauncherType.InstantAttack)
+                    meleeAttackSkills.Add(skillKey);
+                else
+                    rangedAttackSkills.Add(skillKey);
+
                 OnSkillAdded?.Invoke(skillKey);
                 break;
 
@@ -149,6 +168,21 @@ public class SkillModule : MonoBehaviour
     public SkillInstance GetSkillInstance(SkillKey skillKey)
     {
         return skillInstances.ContainsKey(skillKey) ? skillInstances[skillKey] : null;
+    }
+    public bool CanUseRangedSkill() => CaseUseTypedSkill(rangedAttackSkills);
+    public bool CanUseMeleeSkill() => CaseUseTypedSkill(meleeAttackSkills);
+    private bool CaseUseTypedSkill(List<SkillKey> skills)
+    {
+        if (skills.Count == 0)
+            return false;
+
+        foreach (SkillKey key in skills)
+        {
+            if (CanUseSkill(key))
+                return true;
+        }
+
+        return false;
     }
 
     public bool CanUseSkill(SkillKey skillKey)
@@ -229,13 +263,22 @@ public class SkillModule : MonoBehaviour
 
         return cnt;
     }
-
-    public void UseRandomSkill(Unit target)
+    public void UseRandomSkill(Unit target, AIState state)
     {
         if (activeSkills.Count == 0)
             return;
 
-        SkillKey skillKey = activeSkills[UnityEngine.Random.Range(0, activeSkills.Count)];
+        List<SkillKey> skills = state switch
+        {
+            AIState.MeleeAttack => meleeAttackSkills.FindAll(x => CanUseSkill(x)),
+            AIState.RangedAttack => rangedAttackSkills.FindAll(x => CanUseSkill(x)),
+            _ => null
+        };
+
+        if (skills == null || skills.Count == 0)
+            return;
+
+        SkillKey skillKey = skills[UnityEngine.Random.Range(0, skills.Count)];
         owner.PlayAnimation(skillKey.ToString());
         GameMgr.Instance.skillMgr.ActivateSkill(skillKey, owner, target);
     }
