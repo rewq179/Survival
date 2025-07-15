@@ -251,6 +251,7 @@ MonoBehaviour:
   animator: {fileID: 95811217926661648}
   healthBar: {fileID: 6599309502815392097}
   playerController: {fileID: 0}
+  firePoint: {fileID: 4135281912390560}
 --- !u!95 &95811217926661648
 Animator:
   serializedVersion: 7

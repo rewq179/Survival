@@ -1,11 +1,12 @@
 using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 public class SkillParticleController : MonoBehaviour
 {
     [SerializeField] private ParticleSystem mainParticle;
-    [SerializeField] private ParticleSystem[] subParticles;
+    [SerializeField] private List<ParticleSystem> subParticles = new();
 
     private bool isPlaying = false;
     public event Action OnParticleFinished;
@@ -17,7 +18,8 @@ public class SkillParticleController : MonoBehaviour
         transform.position = Vector3.zero;
         transform.rotation = Quaternion.identity;
 
-        mainParticle.Stop();
+        if (mainParticle != null)
+            mainParticle.Stop();
 
         foreach (ParticleSystem particle in subParticles)
         {

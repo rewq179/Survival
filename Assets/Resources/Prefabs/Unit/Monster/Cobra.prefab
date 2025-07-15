@@ -2034,6 +2034,7 @@ GameObject:
   - component: {fileID: 4492295918115996}
   - component: {fileID: 7057282573064370036}
   - component: {fileID: 95019900275580416}
+  - component: {fileID: 9199592220312817953}
   m_Layer: 8
   m_Name: Cobra
   m_TagString: Untagged
@@ -2104,6 +2105,7 @@ MonoBehaviour:
   animator: {fileID: 95019900275580416}
   healthBar: {fileID: 1600153233234101067}
   playerController: {fileID: 0}
+  firePoint: {fileID: 4940375815709782}
 --- !u!95 &95019900275580416
 Animator:
   serializedVersion: 7
@@ -2126,6 +2128,29 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!136 &9199592220312817953
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1900050543388296}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.3
+  m_Height: 1.6
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.8, z: 0}
 --- !u!1 &1910660291993258
 GameObject:
   m_ObjectHideFlags: 0

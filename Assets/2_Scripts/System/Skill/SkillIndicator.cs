@@ -23,7 +23,7 @@ public class SkillElement
 
     public bool IsMainIndicator => index == 0;
 
-    public void Init(SkillKey skillKey, int index, float speed, float height, float width, float angle, 
+    public void Init(SkillKey skillKey, int index, float speed, float height, float width, float angle,
         float radius, float damage, float duration, float interval, float ricochet, float piercing,
         SkillLauncherType launcherType)
     {
@@ -57,6 +57,7 @@ public class SkillElement
 public enum SkillIndicatorType
 {
     Line,
+    Rectangle,
     Sector,
     Circle,
     InstantAttack,
@@ -76,6 +77,7 @@ public class SkillIndicator : MonoBehaviour
 
     private const float SEGMENTS = 32;      // 원/부채꼴 세분화
     private const float INV_SEGMENTS = 1 / SEGMENTS;
+    private Vector3 originalScale = Vector3.one;
 
     public SkillElement Element => skillElement;
     public Mesh Mesh => mesh;
@@ -91,6 +93,9 @@ public class SkillIndicator : MonoBehaviour
         gameObject.SetActive(true);
     }
 
+    public void SetMaxSize() => transform.localScale = originalScale;
+    public void SetMinSize() => transform.localScale = Vector3.zero;
+
     public void Reset()
     {
         if (meshFilter.mesh != null)
@@ -101,55 +106,6 @@ public class SkillIndicator : MonoBehaviour
         transform.localScale = Vector3.one;
         mesh = null;
         gameObject.SetActive(false);
-    }
-
-    public void DrawIndicator(Vector3 start, Vector3 mouse)
-    {
-        if (isMainIndicator)
-        {
-            switch (skillElement.indicatorType)
-            {
-                case SkillIndicatorType.Line:
-                    transform.position = start;
-                    Vector3 lineDir = (mouse - start).normalized;
-                    transform.rotation = Quaternion.LookRotation(lineDir);
-                    break;
-
-                case SkillIndicatorType.Sector:
-                    transform.position = start;
-                    Vector3 sectorDir = (mouse - start).normalized;
-                    transform.rotation = Quaternion.LookRotation(sectorDir);
-                    break;
-
-                case SkillIndicatorType.Circle:
-                    transform.position = GetElementEndPoint(start, mouse, skillElement);
-                    transform.rotation = Quaternion.identity;
-                    break;
-            }
-        }
-
-        else
-        {
-            switch (skillElement.indicatorType)
-            {
-                case SkillIndicatorType.Line:
-                    transform.position = start;
-                    transform.rotation = Quaternion.identity;
-                    break;
-
-                case SkillIndicatorType.Sector:
-                    transform.position = start;
-                    transform.rotation = Quaternion.identity;
-                    break;
-
-                case SkillIndicatorType.Circle:
-                    transform.position = start;
-                    transform.rotation = Quaternion.identity;
-                    break;
-            }
-        }
-
-        meshFilter.mesh = mesh;
     }
 
     /// <summary>
@@ -223,6 +179,79 @@ public class SkillIndicator : MonoBehaviour
         return CreateSectorMesh(360f, radius);
     }
 
+    public void DrawIndicator(Vector3 start, Vector3 mouse)
+    {
+        if (isMainIndicator)
+        {
+            switch (skillElement.indicatorType)
+            {
+                case SkillIndicatorType.Line:
+                case SkillIndicatorType.Rectangle:
+                    transform.position = start;
+                    Vector3 lineDir = (mouse - start).normalized;
+                    transform.rotation = Quaternion.LookRotation(lineDir);
+                    break;
+
+                case SkillIndicatorType.Sector:
+                    transform.position = start;
+                    Vector3 sectorDir = (mouse - start).normalized;
+                    transform.rotation = Quaternion.LookRotation(sectorDir);
+                    break;
+
+                case SkillIndicatorType.Circle:
+                    transform.position = GetElementEndPoint(start, mouse, skillElement);
+                    transform.rotation = Quaternion.identity;
+                    break;
+            }
+        }
+
+        else
+        {
+            switch (skillElement.indicatorType)
+            {
+                case SkillIndicatorType.Line:
+                    transform.position = start;
+                    transform.rotation = Quaternion.identity;
+                    break;
+
+                case SkillIndicatorType.Sector:
+                    transform.position = start;
+                    transform.rotation = Quaternion.identity;
+                    break;
+
+                case SkillIndicatorType.Circle:
+                    transform.position = start;
+                    transform.rotation = Quaternion.identity;
+                    break;
+            }
+        }
+
+        meshFilter.mesh = mesh;
+    }
+
+    public void UpdateIndicatorScale(float p)
+    {
+        switch (skillElement.indicatorType)
+        {
+
+            case SkillIndicatorType.Sector:
+                break;
+
+            case SkillIndicatorType.Circle:
+                transform.localScale = originalScale * p;
+                break;
+
+            case SkillIndicatorType.Rectangle:
+                Vector3 scale = originalScale;
+                scale.z = p;
+                transform.localScale = scale;
+                break;
+        }
+    }
+
+    /// <summary>
+    /// 마우스 방향에 따른 최대 길이 계산
+    /// </summary>
     public static Vector3 GetElementEndPoint(Vector3 startPoint, Vector3 mouse, SkillElement element)
     {
         Vector3 direction = (mouse - startPoint).normalized;
@@ -246,5 +275,4 @@ public class SkillIndicator : MonoBehaviour
                 return startPoint;
         }
     }
-
 }

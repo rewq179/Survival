@@ -7,6 +7,7 @@ public enum SkillLauncherType
     InstantAOE,
     PeriodicAOE,
     InstantAttack,
+    Beam,
     Max,
 }
 
@@ -32,7 +33,6 @@ public class SkillLauncher : MonoBehaviour
     public Vector3 Position => transform.position;
     public Vector3 Direction => direction;
     public List<SkillComponent> Components => components;
-    public SkillParticleController ParticleController => particleController;
 
     public void Reset()
     {
@@ -103,6 +103,7 @@ public class SkillLauncher : MonoBehaviour
                 SkillLauncherType.InstantAOE => new AOEComponent(instValue, isWaitAction),
                 SkillLauncherType.PeriodicAOE => new PeriodicAOEComponent(instValue),
                 SkillLauncherType.InstantAttack => new InstantComponent(instValue, fixedTarget),
+                SkillLauncherType.Beam => new BeamComponent(instValue, fixedTarget.transform.position),
                 _ => null,
             };
 
@@ -116,7 +117,7 @@ public class SkillLauncher : MonoBehaviour
         switch (inst.skillKey)
         {
             case SkillKey.HitGroundAttack:
-                LeapComponent component = new LeapComponent(skillKey, startPosition, fixedTarget.transform.position);
+                LeapComponent component = new LeapComponent(fixedTarget.transform.position);
                 components.Add(component);
                 component.OnInitialize(this, null);
                 break;

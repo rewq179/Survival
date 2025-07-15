@@ -17,17 +17,17 @@ MonoBehaviour:
   endRow: 15
   spawnGroupDatas:
   - groupID: 0
-    unitID: 1004
+    unitID: 1005
     count: 1
     repeat: 1
     repeatInterval: 0
     pattern: 0
     startDelay: 0
   - groupID: 1
-    unitID: 1004
+    unitID: 1005
     count: 1
     repeat: 2
-    repeatInterval: 40
+    repeatInterval: 80
     pattern: 0
     startDelay: 20
   - groupID: 2

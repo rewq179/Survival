@@ -1280,6 +1280,7 @@ GameObject:
   - component: {fileID: 4203030995968696}
   - component: {fileID: -9187813253768749091}
   - component: {fileID: 95117915527138606}
+  - component: {fileID: 8927246294297947318}
   m_Layer: 8
   m_Name: Dragon
   m_TagString: Untagged
@@ -1363,6 +1364,7 @@ MonoBehaviour:
   animator: {fileID: 95117915527138606}
   healthBar: {fileID: 6931703582803920411}
   playerController: {fileID: 0}
+  firePoint: {fileID: 4327720837845372}
 --- !u!95 &95117915527138606
 Animator:
   serializedVersion: 7
@@ -1385,6 +1387,29 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!136 &8927246294297947318
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1317515324939390}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.3
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.8, z: 0}
 --- !u!1 &1319500262593132
 GameObject:
   m_ObjectHideFlags: 0

@@ -575,8 +575,8 @@ MonoBehaviour:
     skillElements:
     - skillKey: 55
       index: 0
-      launcherType: 0
-      indicatorType: 0
+      launcherType: 4
+      indicatorType: 1
       moveSpeed: 0
       height: 15
       width: 0.4

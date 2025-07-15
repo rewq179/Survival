@@ -69,7 +69,7 @@ public class SkillMgr : MonoBehaviour
         SkillKey skillKey = element.skillKey;
         Vector3 startPos = caster.transform.position;
         Vector3 endPos = SkillIndicator.GetElementEndPoint(startPos, playerController.GetMouseWorldPosition(), element);
-        SetPosYAdjust(element, ref startPos, ref endPos);
+        AdjustSkillPosY(element, ref startPos, ref endPos);
         if (element.indicatorType == SkillIndicatorType.Circle)
             startPos = endPos;
 
@@ -90,7 +90,7 @@ public class SkillMgr : MonoBehaviour
         return null;
     }
 
-    private void SetPosYAdjust(SkillElement element, ref Vector3 startPos, ref Vector3 endPos)
+    private void AdjustSkillPosY(SkillElement element, ref Vector3 startPos, ref Vector3 endPos)
     {
         switch (element.indicatorType)
         {
@@ -100,6 +100,7 @@ public class SkillMgr : MonoBehaviour
                 break;
 
             case SkillIndicatorType.Sector:
+            case SkillIndicatorType.Rectangle:
                 startPos.y = 0f;
                 endPos.y = 0f;
                 break;
@@ -115,11 +116,11 @@ public class SkillMgr : MonoBehaviour
     /// </summary>
     public void ActivateSkill(SkillKey skillKey, Unit caster, Unit target)
     {
-        Vector3 startPos = caster.transform.position;
+        Vector3 startPos = caster.firePoint.position;
         Vector3 endPos = target.transform.position;
 
         SkillData skillData = DataMgr.GetSkillData(skillKey);
-        SetPosYAdjust(skillData.skillElements[0], ref startPos, ref endPos);
+        AdjustSkillPosY(skillData.skillElements[0], ref startPos, ref endPos);
 
         SkillInstance inst = caster.GetSkillInstance(skillKey);
         CreateSkillLauncher(inst, startPos, endPos, caster, target);
@@ -330,6 +331,7 @@ public class SkillMgr : MonoBehaviour
             SkillIndicatorType.Line => SkillIndicator.CreateLineMesh(GameValue.PROJECTILE_MAX_LENGTH, GameValue.PROJECTILE_MAX_WIDTH),
             SkillIndicatorType.Sector => SkillIndicator.CreateSectorMesh(element.angle, element.radius),
             SkillIndicatorType.Circle => SkillIndicator.CreateCircleMesh(element.radius),
+            SkillIndicatorType.Rectangle => SkillIndicator.CreateLineMesh(GameValue.PROJECTILE_MAX_LENGTH, GameValue.PROJECTILE_MAX_WIDTH),
             _ => null,
         };
     }

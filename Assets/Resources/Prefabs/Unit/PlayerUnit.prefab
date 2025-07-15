@@ -25085,6 +25085,7 @@ MonoBehaviour:
   animator: {fileID: 6055822198638736112}
   healthBar: {fileID: 0}
   playerController: {fileID: 3602605780791423684}
+  firePoint: {fileID: 6087682783070230550}
 --- !u!1 &3095888084906784569
 GameObject:
   m_ObjectHideFlags: 0

@@ -2092,6 +2092,7 @@ GameObject:
   - component: {fileID: 4188072599102264}
   - component: {fileID: -4978803034697102049}
   - component: {fileID: 95499044264112252}
+  - component: {fileID: 2272305160647121495}
   m_Layer: 8
   m_Name: Golem
   m_TagString: Untagged
@@ -2144,6 +2145,7 @@ MonoBehaviour:
   animator: {fileID: 95499044264112252}
   healthBar: {fileID: 8553807854338064801}
   playerController: {fileID: 0}
+  firePoint: {fileID: 4188072599102264}
 --- !u!95 &95499044264112252
 Animator:
   serializedVersion: 7
@@ -2166,6 +2168,29 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!136 &2272305160647121495
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1950857120261156}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.3
+  m_Height: 2.4
+  m_Direction: 1
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &1957684781534790
 GameObject:
   m_ObjectHideFlags: 0

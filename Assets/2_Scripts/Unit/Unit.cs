@@ -20,6 +20,7 @@ public class Unit : MonoBehaviour
     [SerializeField] private Animator animator;
     [SerializeField] private HealthBarBase healthBar;
     [SerializeField] private PlayerController playerController;
+    public Transform firePoint;
 
     // 모듈
     private StatModule statModule = new();
