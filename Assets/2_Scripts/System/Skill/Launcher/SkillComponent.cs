@@ -36,6 +36,25 @@ public abstract class SkillComponent
     public abstract void OnHit(Unit target);
     public bool IsHittable(Unit target) => target != null && !target.IsDead && target.UnitType == enemyType;
     public virtual void OnDestroy() { }
+
+    #region 타겟 Getter
+
+    protected List<Unit> GetHitTargetsBySphere(Vector3 position, float radius)
+    {
+        Collider[] colliders = Physics.OverlapSphere(position, radius, GameValue.UNIT_LAYERS);
+
+        List<Unit> targets = new();
+        foreach (Collider col in colliders)
+        {
+            Unit target = col.GetComponent<Unit>();
+            if (IsHittable(target))
+                targets.Add(target);
+        }
+
+        return targets;
+    }
+
+    #endregion
 }
 
 /// <summary>
@@ -171,12 +190,12 @@ public class ProjectileComponent : SkillComponent
 /// </summary>
 public class AOEComponent : SkillComponent
 {
-    private SkillIndicatorType type;
-    private float angle;
-    private float radius;
-    private float maxDistance;
-    private bool isWaitAction;
-    private bool canAction;
+    protected SkillIndicatorType type;
+    protected float angle;
+    protected float radius;
+    protected float maxDistance;
+    protected bool isWaitAction;
+    protected bool canAction;
 
     public override bool IsWaitAction => isWaitAction;
 
@@ -212,29 +231,15 @@ public class AOEComponent : SkillComponent
 
     public void ExecuteAttack()
     {
-        List<Unit> targets = GetHitTargets(launcher.Position, launcher.Direction, launcher.IsAffectCaster);
+        Vector3 position = launcher.Position;
+        Vector3 direction = launcher.Direction;
+
+        List<Unit> targets = GetHitTargetsBySphere(position, radius);
         foreach (Unit target in targets)
         {
-            OnHit(target);
-        }
-    }
-
-    protected List<Unit> GetHitTargets(Vector3 position, Vector3 direction, bool isAffectCaster)
-    {
-        Collider[] colliders = Physics.OverlapSphere(position, radius, GameValue.UNIT_LAYERS);
-
-        List<Unit> hitTargets = new();
-        foreach (Collider col in colliders)
-        {
-            Unit target = col.GetComponent<Unit>();
-            if (!IsHittable(target) || (!isAffectCaster && target == launcher.Caster))
-                continue;
-
             if (IsTargetInSkillArea(position, direction, target.transform.position))
-                hitTargets.Add(target);
+                OnHit(target);
         }
-
-        return hitTargets;
     }
 
     protected bool IsTargetInSkillArea(Vector3 position, Vector3 direction, Vector3 targetPosition)
@@ -246,7 +251,7 @@ public class AOEComponent : SkillComponent
             SkillIndicatorType.Line => false,
             SkillIndicatorType.Sector => IsTargetInSectorArea(position, direction, targetPosition, sqrDistance),
             SkillIndicatorType.Circle => IsTargetInCircleArea(sqrDistance),
-            SkillIndicatorType.Rectangle => false,
+            SkillIndicatorType.Rectangle => IsTargetInRectangleArea(position, direction, targetPosition, sqrDistance),
             _ => true,
         };
     }
@@ -263,6 +268,11 @@ public class AOEComponent : SkillComponent
     private bool IsTargetInCircleArea(float sqrDistance)
     {
         return sqrDistance <= maxDistance;
+    }
+
+    private bool IsTargetInRectangleArea(Vector3 position, Vector3 direction, Vector3 targetPosition, float sqrDistance)
+    {
+        return false; // TODO: 사각형 형태로 구현할 것
     }
 
     public override void OnHit(Unit target) => ApplyDamage(target);
@@ -287,12 +297,7 @@ public class PeriodicAOEComponent : AOEComponent
     {
         if (Time.time - lastDamageTime >= interval)
         {
-            List<Unit> targets = GetHitTargets(launcher.Position, launcher.Direction, launcher.IsAffectCaster);
-            foreach (Unit target in targets)
-            {
-                OnHit(target);
-            }
-
+            ExecuteAttack();
             lastDamageTime = Time.time;
         }
     }
@@ -580,20 +585,16 @@ public class ExplosionItemEffect : SkillComponent
     {
         base.OnInitialize(launcher, particle);
 
-        Collider[] colliders = Physics.OverlapSphere(launcher.Position, EXPLOSION_RADIUS, GameValue.UNIT_LAYERS);
-        foreach (Collider col in colliders)
+        List<Unit> targets = GetHitTargetsBySphere(launcher.Position, EXPLOSION_RADIUS);
+        foreach (Unit target in targets)
         {
-            Unit target = col.GetComponent<Unit>();
-            if (!IsHittable(target))
-                continue;
-
-            ApplyDamage(target);
+            OnHit(target);
         }
 
         launcher.Deactivate();
     }
 
     public override void OnUpdate(float deltaTime) { }
-    public override void OnHit(Unit target) { }
+    public override void OnHit(Unit target) => ApplyDamage(target);
     public override void OnDestroy() { }
 }
