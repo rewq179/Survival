@@ -527,3 +527,73 @@ public class BeamComponent : SkillComponent
         ApplyDamage(target);
     }
 }
+
+public class FreezeItemEffect : SkillComponent
+{
+    private float time;
+    private List<Unit> monsters = new();
+
+    private const float SLOW_PERCENT = -0.5f;
+    private const float DURATION = 5f;
+
+    public override void OnInitialize(SkillLauncher launcher, SkillParticleController particle)
+    {
+        time = 0f;
+
+        monsters = new List<Unit>(GameMgr.Instance.spawnMgr.AliveEnemies);
+        foreach (Unit monster in monsters)
+        {
+            monster.AddStatModifier(StatType.MoveSpeed, SLOW_PERCENT);
+            monster.UpdateMoveSpeed();
+        }
+    }
+
+    public override void OnUpdate(float deltaTime)
+    {
+        time += deltaTime;
+        if (time < DURATION)
+            return;
+
+        foreach (Unit monster in monsters)
+        {
+            monster.AddStatModifier(StatType.MoveSpeed, SLOW_PERCENT);
+        }
+
+        launcher.Deactivate();
+    }
+
+    public override void OnHit(Unit target) { }
+    public override void OnDestroy() { }
+}
+
+public class ExplosionItemEffect : SkillComponent
+{
+    private const float EXPLOSION_RADIUS = 20f;
+    private const float EXPLOSION_DAMAGE = 100f;
+
+    public ExplosionItemEffect()
+    {
+        damage = EXPLOSION_DAMAGE;
+    }
+
+    public override void OnInitialize(SkillLauncher launcher, SkillParticleController particle)
+    {
+        base.OnInitialize(launcher, particle);
+
+        Collider[] colliders = Physics.OverlapSphere(launcher.Position, EXPLOSION_RADIUS, GameValue.UNIT_LAYERS);
+        foreach (Collider col in colliders)
+        {
+            Unit target = col.GetComponent<Unit>();
+            if (!IsHittable(target))
+                continue;
+
+            ApplyDamage(target);
+        }
+
+        launcher.Deactivate();
+    }
+
+    public override void OnUpdate(float deltaTime) { }
+    public override void OnHit(Unit target) { }
+    public override void OnDestroy() { }
+}

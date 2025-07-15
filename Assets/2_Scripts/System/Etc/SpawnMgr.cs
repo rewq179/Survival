@@ -26,6 +26,8 @@ public class SpawnMgr : MonoBehaviour
     private List<Unit> aliveEnemies = new();
     private Dictionary<int, Stack<Unit>> enemyPools = new();
 
+    public List<Unit> AliveEnemies => aliveEnemies;
+
     [Serializable]
     public class ActiveWave
     {

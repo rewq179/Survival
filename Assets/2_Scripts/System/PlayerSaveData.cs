@@ -21,8 +21,7 @@ public class PlayerSaveData
 
     public float GetRequiredExp(int level)
     {
-        // 기본 공식: 100 * (현재 레벨 + 1) * 1.5
-        return 100 * (level + 1) * 1.5f;
+        return 10 * (level + 1) * 1.5f;
     }
 
     public int AddExp(float amount)

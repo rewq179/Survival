@@ -51,10 +51,8 @@ public class BehaviourMonsterModule : BehaviourModule
         UpdateMovement();
     }
 
-    private void UpdatePlayerPosition()
-    {
-        lastPlayerPosition = target.transform.position;
-    }
+    private void UpdatePlayerPosition() => lastPlayerPosition = target.transform.position;
+    public override void UpdateMoveSpeed() => moveSpeed = owner.MoveSpeed;
 
     private void UpdateState()
     {

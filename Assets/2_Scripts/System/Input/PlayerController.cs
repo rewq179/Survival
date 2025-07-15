@@ -94,11 +94,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void UpdateMoveSpeed()
-    {
-        moveSpeed = owner.MoveSpeed;
-    }
-
+    public void UpdateMoveSpeed() => moveSpeed = owner.MoveSpeed;
     public Vector3 GetMouseWorldPosition()
     {
         Vector3 mousePos = Input.mousePosition;

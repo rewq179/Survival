@@ -20,7 +20,7 @@ public class SkillLauncher : MonoBehaviour
     protected Vector3 startPosition;
     protected Vector3 direction;
     protected Unit caster;
-    protected bool isActive = false;
+    protected bool isActive;
     protected float elapsedTime;
 
     protected List<SkillComponent> components = new();
@@ -66,23 +66,28 @@ public class SkillLauncher : MonoBehaviour
         }
     }
 
-    public virtual void Init(SkillInstance inst, Vector3 startPos, Vector3 dir, SkillParticleController particleController,
+    public void Init(SkillInstance inst, Vector3 startPos, Vector3 dir, SkillParticleController particleController,
         Unit caster, Unit fixedTarget = null)
     {
         skillKey = inst.skillKey;
-        startPosition = startPos;
-        direction = dir.normalized;
-        this.caster = caster;
+        Init(caster, startPos, dir);
         this.particleController = particleController;
-        isActive = true;
-        elapsedTime = 0f;
-        isAffectCaster = false;
-        SetTransform(startPos, dir);
-        gameObject.SetActive(true);
 
         // 스킬 데이터 기반으로 효과들 자동 추가
         bool isWaitAction = inst.skillKey == SkillKey.HitGroundAttack;
         SetupComponents(inst, fixedTarget, isWaitAction);
+    }
+
+    public void Init(Unit caster, Vector3 position, Vector3 direction)
+    {
+        this.caster = caster;
+        startPosition = position;
+        this.direction = direction.normalized;
+        SetTransform(position, direction);
+        isActive = true;
+        isAffectCaster = false;
+        elapsedTime = 0f;
+        gameObject.SetActive(true);
     }
 
     public void SetTransform(Vector3 startPos, Vector3 dir)
@@ -107,21 +112,23 @@ public class SkillLauncher : MonoBehaviour
                 _ => null,
             };
 
-            if (component == null)
-                continue;
-
-            components.Add(component);
-            component.OnInitialize(this, particleController);
+            if (component != null)
+                AddSkillComponent(component);
         }
 
         switch (inst.skillKey)
         {
             case SkillKey.HitGroundAttack:
                 LeapComponent component = new LeapComponent(fixedTarget.transform.position);
-                components.Add(component);
-                component.OnInitialize(this, null);
+                AddSkillComponent(component);
                 break;
         }
+    }
+
+    public void AddSkillComponent(SkillComponent component)
+    {
+        components.Add(component);
+        component.OnInitialize(this, particleController);
     }
 
     public void Deactivate()

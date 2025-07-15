@@ -7,8 +7,6 @@ public abstract class BehaviourModule
     public abstract void Init(Unit unit);
     public abstract void Update();
 
-    public virtual void OnAnimationEnd(AnimEvent animEvent)
-    {
-
-    }
+    public virtual void UpdateMoveSpeed() { }
+    public virtual void OnAnimationEnd(AnimEvent animEvent) { }
 }

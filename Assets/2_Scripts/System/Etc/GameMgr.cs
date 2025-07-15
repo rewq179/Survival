@@ -86,6 +86,7 @@ public class GameMgr : MonoBehaviour
 
     public void Test()
     {
-        playerUnit.AddExp(playerUnit.MaxExp);
+        // playerUnit.AddExp(playerUnit.MaxExp);
+        skillMgr.ExecuteItemSkill(playerUnit, CollectibleType.Explosion);
     }
 }

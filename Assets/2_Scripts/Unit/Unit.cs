@@ -107,6 +107,14 @@ public class Unit : MonoBehaviour
             healthBar.transform.rotation = Quaternion.LookRotation(mainCam.transform.forward);
     }
 
+    public void UpdateMoveSpeed()
+    {
+        if (IsPlayer)
+            playerController.UpdateMoveSpeed();
+        else
+            behaviourModule.UpdateMoveSpeed();
+    }
+
     // 애니메이션
     public void PlayAnimation(string name) => animator.Play(name);
     public void SetTrigger(string name) => animator.SetTrigger(name);
@@ -119,7 +127,7 @@ public class Unit : MonoBehaviour
 
     // BehaviourModule
     public void OnAnimationEnd(AnimEvent animEvent) => behaviourModule.OnAnimationEnd(animEvent);
-
+    
     // CombatModule
     public bool IsDead => combatModule.IsDead;
     public float CurHp => combatModule.CurHp;
@@ -130,7 +138,6 @@ public class Unit : MonoBehaviour
     }
 
     public void UpdateHp() => combatModule.UpdateHp();
-    public void UpdateMoveSpeed() => playerController.UpdateMoveSpeed();
     public void TakeHealRate(float healRate) => combatModule.TakeHeal(MaxHp * healRate);
     public void TakeHeal(float healAmount) => combatModule.TakeHeal(healAmount);
     public void TakeDamage(float damage) => combatModule.TakeDamage(damage);

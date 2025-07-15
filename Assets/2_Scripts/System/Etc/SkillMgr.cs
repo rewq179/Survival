@@ -50,7 +50,7 @@ public class SkillMgr : MonoBehaviour
         if (caster.CanUseSkill(skillKey))
         {
             RemoveIndicatorByKey(skillKey);
-            ShowIndicator(skillKey, caster.transform.position, true);
+            ShowIndicator(skillKey, caster.firePoint.position, true);
         }
     }
 
@@ -67,7 +67,7 @@ public class SkillMgr : MonoBehaviour
             return;
 
         SkillKey skillKey = element.skillKey;
-        Vector3 startPos = caster.transform.position;
+        Vector3 startPos = caster.firePoint.position;
         Vector3 endPos = SkillIndicator.GetElementEndPoint(startPos, playerController.GetMouseWorldPosition(), element);
         AdjustSkillPosY(element, ref startPos, ref endPos);
         if (element.indicatorType == SkillIndicatorType.Circle)
@@ -296,6 +296,22 @@ public class SkillMgr : MonoBehaviour
         launcher.Reset();
         PushLauncher(launcher);
         activeLaunchers.Remove(launcher);
+    }
+
+    public void ExecuteItemSkill(Unit player, CollectibleType type)
+    {
+        Vector3 position = player.transform.position;
+        SkillLauncher launcher = PopSkillLauncher();
+        launcher.Init(player, position, Vector3.zero);
+
+        SkillComponent component = type switch
+        {
+            CollectibleType.Freeze => new FreezeItemEffect(),
+            CollectibleType.Explosion => new ExplosionItemEffect(),
+            _ => null,
+        };
+
+        launcher.AddSkillComponent(component);
     }
 
     #endregion

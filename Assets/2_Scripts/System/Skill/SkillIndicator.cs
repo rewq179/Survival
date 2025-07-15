@@ -43,6 +43,8 @@ public class SkillElement
 
         if (launcherType == SkillLauncherType.Projectile)
             indicatorType = SkillIndicatorType.Line;
+        else if (launcherType == SkillLauncherType.Beam)
+            indicatorType = SkillIndicatorType.Rectangle;
         else if (angle == 0)
             indicatorType = SkillIndicatorType.InstantAttack;
         else if (angle < 360)

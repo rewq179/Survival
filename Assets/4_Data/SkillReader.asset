@@ -70,7 +70,7 @@ MonoBehaviour:
     - skillKey: 10
       index: 0
       launcherType: 1
-      indicatorType: 1
+      indicatorType: 2
       moveSpeed: 0
       height: 0
       width: 0
@@ -92,7 +92,7 @@ MonoBehaviour:
     - skillKey: 13
       index: 0
       launcherType: 1
-      indicatorType: 2
+      indicatorType: 3
       moveSpeed: 0
       height: 0
       width: 0
@@ -114,7 +114,7 @@ MonoBehaviour:
     - skillKey: 17
       index: 0
       launcherType: 2
-      indicatorType: 2
+      indicatorType: 3
       moveSpeed: 0
       height: 0
       width: 0
@@ -400,7 +400,7 @@ MonoBehaviour:
     - skillKey: 47
       index: 0
       launcherType: 3
-      indicatorType: 3
+      indicatorType: 4
       moveSpeed: 0
       height: 0
       width: 0
@@ -444,7 +444,7 @@ MonoBehaviour:
     - skillKey: 49
       index: 0
       launcherType: 3
-      indicatorType: 3
+      indicatorType: 4
       moveSpeed: 0
       height: 0
       width: 0
@@ -466,7 +466,7 @@ MonoBehaviour:
     - skillKey: 50
       index: 0
       launcherType: 3
-      indicatorType: 3
+      indicatorType: 4
       moveSpeed: 0
       height: 0
       width: 0
@@ -510,7 +510,7 @@ MonoBehaviour:
     - skillKey: 52
       index: 0
       launcherType: 3
-      indicatorType: 3
+      indicatorType: 4
       moveSpeed: 0
       height: 0
       width: 0
@@ -532,7 +532,7 @@ MonoBehaviour:
     - skillKey: 53
       index: 0
       launcherType: 1
-      indicatorType: 2
+      indicatorType: 3
       moveSpeed: 0
       height: 0
       width: 0
@@ -554,7 +554,7 @@ MonoBehaviour:
     - skillKey: 54
       index: 0
       launcherType: 3
-      indicatorType: 3
+      indicatorType: 4
       moveSpeed: 0
       height: 0
       width: 0
@@ -578,13 +578,13 @@ MonoBehaviour:
       launcherType: 4
       indicatorType: 1
       moveSpeed: 0
-      height: 15
-      width: 0.4
+      height: 0
+      width: 0
       angle: 0
       radius: 0
-      maxDistance: 0.64000005
-      damage: 30
-      duration: 0
-      interval: 0.2
+      maxDistance: 0
+      damage: 15
+      duration: 0.9
+      interval: 0.1
       ricochet: 0
       piercing: 0

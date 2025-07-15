@@ -115,9 +115,11 @@ public class RewardMgr : MonoBehaviour
                 break;
 
             case CollectibleType.Freeze:
+                GameMgr.Instance.skillMgr.ExecuteItemSkill(playerUnit, CollectibleType.Freeze);
                 break;
 
             case CollectibleType.Explosion:
+                GameMgr.Instance.skillMgr.ExecuteItemSkill(playerUnit, CollectibleType.Explosion);
                 break;
 
             case CollectibleType.Heal:
