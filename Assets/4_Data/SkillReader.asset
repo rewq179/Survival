@@ -532,11 +532,11 @@ MonoBehaviour:
     - skillKey: 53
       index: 0
       launcherType: 1
-      indicatorType: 3
-      moveSpeed: 30
+      indicatorType: 2
+      moveSpeed: 0
       height: 0
       width: 0
-      angle: 0
+      angle: 360
       radius: 3
       maxDistance: 6
       damage: 10
