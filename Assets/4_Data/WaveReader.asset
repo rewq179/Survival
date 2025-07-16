@@ -17,17 +17,22 @@ MonoBehaviour:
   endRow: 6
   waveDatas:
   - waveID: 0
+    waveType: 0
     difficulty: 1
     spawnGroupIDs: 0000000001000000
   - waveID: 1
+    waveType: 0
     difficulty: 1.2
     spawnGroupIDs: 0200000003000000
   - waveID: 2
+    waveType: 0
     difficulty: 1.5
     spawnGroupIDs: 040000000500000006000000
   - waveID: 3
+    waveType: 0
     difficulty: 1.8
     spawnGroupIDs: 070000000800000009000000
   - waveID: 4
+    waveType: 1
     difficulty: 2
     spawnGroupIDs: 0a0000000b0000000c0000000d000000

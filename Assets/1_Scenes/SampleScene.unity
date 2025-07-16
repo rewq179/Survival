@@ -3482,6 +3482,43 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1129813428}
   m_CullTransparentMesh: 0
+--- !u!1 &1137069171
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1137069172}
+  m_Layer: 5
+  m_Name: Panel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &1137069172
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1137069171}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 6162457893934358513}
+  - {fileID: 8213169674317810502}
+  m_Father: {fileID: 6954561146700067528}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1157952657
 GameObject:
   m_ObjectHideFlags: 0
@@ -3955,6 +3992,8 @@ MonoBehaviour:
   attackJoystick: {fileID: 1745346683830522312}
   topBar: {fileID: 2074242868}
   selectionPanel: {fileID: 785997817}
+  stageUI: {fileID: 6954561146700067529}
+  warningUI: {fileID: 7626021446596266094}
 --- !u!1 &1251077493
 GameObject:
   m_ObjectHideFlags: 0
@@ -7247,7 +7286,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!222 &1298519702911498079
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -9309,7 +9348,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &4923666858191096220
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10030,7 +10069,7 @@ RectTransform:
   m_Children:
   - {fileID: 6164224836716367925}
   - {fileID: 1362196583504502966}
-  m_Father: {fileID: 6954561146700067528}
+  m_Father: {fileID: 1137069172}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
@@ -10655,8 +10694,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 6162457893934358513}
-  - {fileID: 8213169674317810502}
+  - {fileID: 1137069172}
   m_Father: {fileID: 1244545158}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -10684,6 +10722,7 @@ MonoBehaviour:
   centerStageRect: {fileID: 8213169674317810502}
   centerStageCanvasGroup: {fileID: 8213169674317810503}
   centerStageText: {fileID: 6889521172727370464}
+  panel: {fileID: 1137069172}
 --- !u!224 &6993130983151534092
 RectTransform:
   m_ObjectHideFlags: 0
@@ -11350,7 +11389,7 @@ RectTransform:
   - {fileID: 8511911558961213388}
   - {fileID: 361567833710221473}
   - {fileID: 5535793829746477911}
-  m_Father: {fileID: 6954561146700067528}
+  m_Father: {fileID: 1137069172}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}

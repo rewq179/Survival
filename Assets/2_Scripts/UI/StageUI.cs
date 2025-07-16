@@ -16,7 +16,14 @@ public class StageUI : MonoBehaviour
     [SerializeField] private RectTransform centerStageRect;
     [SerializeField] private CanvasGroup centerStageCanvasGroup;
     [SerializeField] private TextMeshProUGUI centerStageText;
+
+    [Header("Panel")]
+    [SerializeField] private RectTransform panel;
     private Vector2 centerStageEndPos;
+
+    private readonly string stageFormat = "Stage {0}";
+    private Coroutine stageSliderCoroutine;
+    private AnimationCurve curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
     // 애니메이션
     private const float FALL_DURATION = 0.25f;
@@ -26,13 +33,12 @@ public class StageUI : MonoBehaviour
     private const float BOUNCE_INV_DURATION = 1 / BOUNCE_DURATION;
     private const float FADEOUT_DURATION = 0.15f;
     private const float FADEOUT_INV_DURATION = 1 / FADEOUT_DURATION;
-    private readonly string stageFormat = "Stage {0}";
+    private const float STAGE_DURATION = 0.5f;
+    private const float STAGE_INV_DURATION = 1 / STAGE_DURATION;
 
-    private void Start()
+    private void Awake()
     {
         centerStageEndPos = centerStageRect.anchoredPosition;
-
-        Init(1);
     }
 
     public void Init(int stage)
@@ -49,6 +55,7 @@ public class StageUI : MonoBehaviour
         centerStageCanvasGroup.alpha = 0f;
 
         // 애니메이션 시작
+        panel.gameObject.SetActive(true);
         StartCoroutine(PlayStageAnimation());
     }
 
@@ -66,8 +73,8 @@ public class StageUI : MonoBehaviour
     {
         Vector2 startPos = topStageRect.anchoredPosition;
         Vector2 targetPos = centerStageEndPos;
-        float time = 0f;
 
+        float time = 0f;
         while (time < FALL_DURATION)
         {
             time += Time.deltaTime;
@@ -121,5 +128,25 @@ public class StageUI : MonoBehaviour
         yield return null;
     }
 
-    public void UpdateStageSlider(float ratio) => topStageSlider.value = ratio;
+    public void UpdateStageSlider(float ratio)
+    {
+        if (stageSliderCoroutine != null)
+            StopCoroutine(stageSliderCoroutine);
+
+        stageSliderCoroutine = StartCoroutine(AnimateStageSlider(topStageSlider.value, ratio));
+    }
+
+    private IEnumerator AnimateStageSlider(float prevRatio, float endRatio)
+    {
+        float time = 0f;
+        while (time < STAGE_DURATION)
+        {
+            time += Time.unscaledDeltaTime;
+            float e = curve.Evaluate(Mathf.Clamp01(time * STAGE_INV_DURATION));
+            topStageSlider.value = Mathf.Lerp(prevRatio, endRatio, e);
+            yield return null;
+        }
+
+        topStageSlider.value = endRatio;
+    }
 }

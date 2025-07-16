@@ -10,6 +10,8 @@ public class UIMgr : MonoBehaviour
     public AttackJoystick attackJoystick;
     public TopBar topBar;
     public SelectionPanel selectionPanel;
+    public StageUI stageUI;
+    public WarningUI warningUI;
 
     private void Awake()
     {
@@ -31,6 +33,7 @@ public class UIMgr : MonoBehaviour
         attackJoystick.Init(playerUnit);
         topBar.Init(playerUnit);
         selectionPanel.Init(playerUnit);
+        stageUI.Init(1);
     }
 
     public void UpdateUI()

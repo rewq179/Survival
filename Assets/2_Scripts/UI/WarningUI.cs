@@ -34,7 +34,6 @@ public class WarningUI : MonoBehaviour
     private void Start()
     {
         SaveWarningStartPositions();
-        ShowWarning();
     }
 
     private void SaveWarningStartPositions()

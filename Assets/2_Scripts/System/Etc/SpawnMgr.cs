@@ -16,6 +16,7 @@ public class SpawnMgr : MonoBehaviour
 
     // 웨이브 관리
     private int nextWaveIndex;
+    private float maxWaveInvIndex;
     private List<WaveData> waveDatas = new();
     private List<ActiveWave> activeWaves = new();
     public const float WAVE_ADDITIVE_TIME = 5f; // 웨이브 추가 시간
@@ -95,6 +96,7 @@ public class SpawnMgr : MonoBehaviour
         activeWaves.Clear();
 
         waveDatas = DataMgr.GetWaveDatas();
+        maxWaveInvIndex = 1f / waveDatas.Count;
         StartNextWave();
     }
 
@@ -110,10 +112,14 @@ public class SpawnMgr : MonoBehaviour
         WaveData waveData = waveDatas[nextWaveIndex++];
         List<int> spawnGroupIDs = waveData.spawnGroupIDs;
         int groupMaxCount = spawnGroupIDs.Count;
+        UIMgr.Instance.stageUI.UpdateStageSlider(nextWaveIndex * maxWaveInvIndex);
 
         // 웨이브 생성
         ActiveWave activeWave = new ActiveWave(waveData.waveID, GetWaveDuration(waveData), groupMaxCount);
         activeWaves.Add(activeWave);
+
+        if (waveData.waveType == WaveType.Boss)
+            UIMgr.Instance.warningUI.ShowWarning();
 
         // 웨이브 내 스폰될 그룹 유닛들 생성
         foreach (int groupID in spawnGroupIDs)

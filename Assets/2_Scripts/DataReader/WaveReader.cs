@@ -9,16 +9,24 @@ using UnityEngine.Events;
 using UnityEditor;
 #endif
 
+public enum WaveType
+{
+    Normal,
+    Boss,
+}
+
 [Serializable]
 public class WaveData
 {
     public int waveID;
+    public WaveType waveType;
     public float difficulty;
     public List<int> spawnGroupIDs;
 
-    public WaveData(int waveID, float difficulty, List<int> spawnGroups)
+    public WaveData(int waveID, WaveType waveType, float difficulty, List<int> spawnGroups)
     {
         this.waveID = waveID;
+        this.waveType = waveType;
         this.difficulty = difficulty;
         this.spawnGroupIDs = spawnGroups;
     }
@@ -30,59 +38,46 @@ public class WaveDataReader : BaseReader
     public override string sheetName => "Wave";
 
     [SerializeField]
-    public List<WaveData> waveDatas = new List<WaveData>();
+    public List<WaveData> waveDatas = new();
 
     internal void SetData(List<GSTU_Cell> cells)
     {
         int id = 0;
+        WaveType waveType = WaveType.Normal;
         float difficulty = 0;
-        List<int> spawnGroups = new List<int>();
+        List<int> spawnGroups = new();
 
-        for (int i = 0; i < cells.Count; i++)
+        foreach (var cell in cells)
         {
-            string columnId = cells[i].columnId.ToLowerInvariant();
-            
-            switch (columnId)
+            switch (cell.columnId.ToLowerInvariant())
             {
                 case "id":
-                    {
-                        if (int.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out int parsedId))
-                        {
-                            id = parsedId;
-                        }
-                        break;
-                    }
+                    if (int.TryParse(cell.value, NumberStyles.Any, CultureInfo.InvariantCulture, out int parsedId))
+                        id = parsedId;
+                    break;
+
+                case "type":
+                    if (Enum.TryParse(cell.value, out WaveType parsedWaveType))
+                        waveType = parsedWaveType;
+                    break;
 
                 case "difficulty":
-                    {
-                        if (float.TryParse(cells[i].value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedDifficulty))
-                        {
-                            difficulty = parsedDifficulty;
-                        }
-                        break;
-                    }
+                    if (float.TryParse(cell.value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedDifficulty))
+                        difficulty = parsedDifficulty;
+                    break;
 
                 case "spawngroups":
+                    string[] groupIds = cell.value.Split(',');
+                    foreach (string groupId in groupIds)
                     {
-                        string str = cells[i].value;
-                        if (!string.IsNullOrEmpty(str))
-                        {
-                            string[] groupIds = str.Split(',');
-                            
-                            foreach (string groupId in groupIds)
-                            {
-                                if (int.TryParse(groupId.Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out int parsedGroupId))
-                                {
-                                    spawnGroups.Add(parsedGroupId);
-                                }
-                            }
-                        }
-                        break;
+                        if (int.TryParse(groupId.Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out int parsedGroupId))
+                            spawnGroups.Add(parsedGroupId);
                     }
+                    break;
             }
         }
 
-        waveDatas.Add(new WaveData(id,  difficulty, spawnGroups));
+        waveDatas.Add(new WaveData(id, waveType, difficulty, spawnGroups));
     }
 }
 
