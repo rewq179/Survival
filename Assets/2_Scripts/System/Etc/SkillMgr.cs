@@ -279,14 +279,41 @@ public class SkillMgr : MonoBehaviour
         }
     }
 
-    private SkillLauncher CreateSkillLauncher(SkillInstance skillInstance, Vector3 startPos, Vector3 targetPos, Unit caster, Unit target = null)
+    private SkillLauncher CreateSkillLauncher(SkillInstance inst, Vector3 startPos, Vector3 targetPos, Unit caster, Unit target = null)
     {
         Vector3 direction = (targetPos - startPos).normalized;
 
+        if (inst.IsMultipleProjectile())
+            return CreateMultipleLauncher(inst, startPos, direction, caster, target);
+
+        return CreateSingleLauncher(inst, startPos, direction, caster, target);
+    }
+
+    private SkillLauncher CreateMultipleLauncher(SkillInstance inst, Vector3 startPos, Vector3 direction, Unit caster, Unit target)
+    {
+        int projectileCount = inst.Values[0].projectileCountFinal.GetInt();
+        float spreadAngle = GameValue.PROJECTILE_SPREAD_ANGLE;
+        
+        float angleStep = spreadAngle / (projectileCount - 1);
+        float startAngle = -spreadAngle * 0.5f;
+
+        for (int i = 0; i < projectileCount; i++)
+        {
+            float curAngle = startAngle + (angleStep * i);
+            Vector3 rotatedDirection = Quaternion.Euler(0, curAngle, 0) * direction;
+            CreateSingleLauncher(inst, startPos, rotatedDirection, caster, target);
+        }
+
+        caster.StartCooldown(inst.skillKey);
+        return null;
+    }
+
+    private SkillLauncher CreateSingleLauncher(SkillInstance inst, Vector3 startPos, Vector3 direction, Unit caster, Unit target)
+    {
         SkillLauncher launcher = PopSkillLauncher();
-        SkillParticleController particle = PopParticle(skillInstance.skillKey, launcher.transform);
-        launcher.Init(skillInstance, startPos, direction, particle, caster, target);
-        caster.StartCooldown(skillInstance.skillKey);
+        SkillParticleController particle = PopParticle(inst.skillKey, launcher.transform);
+        launcher.Init(inst, startPos, direction, particle, caster, target);
+        caster.StartCooldown(inst.skillKey);
         activeLaunchers.Add(launcher);
         return launcher;
     }

@@ -20,12 +20,13 @@ public class SkillElement
     public float interval;
     public float ricochet;
     public float piercing;
+    public float projectileCount;
 
     public bool IsMainIndicator => index == 0;
 
     public void Init(SkillKey skillKey, int index, float speed, float height, float width, float angle,
         float radius, float damage, float duration, float interval, float ricochet, float piercing,
-        SkillLauncherType launcherType)
+        float projectileCount, SkillLauncherType launcherType)
     {
         this.skillKey = skillKey;
         this.index = index;
@@ -39,6 +40,7 @@ public class SkillElement
         this.interval = interval;
         this.ricochet = ricochet;
         this.piercing = piercing;
+        this.projectileCount = projectileCount;
         this.launcherType = launcherType;
 
         if (launcherType == SkillLauncherType.Projectile)

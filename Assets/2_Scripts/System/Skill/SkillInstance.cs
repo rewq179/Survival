@@ -62,9 +62,9 @@ public class InstanceValue
             moveSpeedFix = skillElement.moveSpeed;
             ricochetFix = skillElement.ricochet;
             piercingFix = skillElement.piercing;
+            projectileCountFix = Mathf.Max(1, skillElement.projectileCount);
         }
 
-        projectileCountFix = 1;
         angle = skillElement.angle;
         launcherType = skillElement.launcherType;
     }
@@ -253,6 +253,17 @@ public class SkillInstance
         {
             values[i].CalculateFinalValue(caster);
         }
+    }
+
+    public bool IsMultipleProjectile()
+    {
+        foreach (InstanceValue value in values)
+        {
+            if (value.launcherType == SkillLauncherType.Projectile && value.projectileCountFinal > 1)
+                return true;
+        }
+
+        return false;
     }
 
     private void PrintDebug()

@@ -8,6 +8,8 @@ public class GameValue
     public const float PROJECTILE_MAX_LENGTH = 15f;
     public const float PROJECTILE_MAX_LENGTH_POW = PROJECTILE_MAX_LENGTH * PROJECTILE_MAX_LENGTH;
     public const float PROJECTILE_MAX_WIDTH = 0.4f;
+    public const float PROJECTILE_SPREAD_ANGLE = 15f;
+
     public const int MAX_ACTIVE_SKILL_LEVEL = 3;
     public const int MAX_PASSIVE_SKILL_LEVEL = 3;
     public const int MAX_SUB_SKILL_LEVEL = 3;

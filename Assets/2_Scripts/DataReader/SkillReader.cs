@@ -206,6 +206,7 @@ public class SkillDataReader : BaseReader
         float moveSpeed = 0f;
         float ricochet = 0f;
         float piercing = 0f;
+        float projectileCount = 0f;
         SkillLauncherType type = SkillLauncherType.Projectile;
 
         // Dmg : 12 / Int : 0.5
@@ -269,6 +270,10 @@ public class SkillDataReader : BaseReader
                         case "piercing":
                             piercing = parsedValue;
                             break;
+
+                        case "projectilecount":
+                            projectileCount = parsedValue;
+                            break;
                     }
                 }
             }
@@ -276,7 +281,7 @@ public class SkillDataReader : BaseReader
 
         SkillElement element = new();
         element.Init(skillKey, index, moveSpeed, height, width, angle, radius, damage, duration,
-            interval, ricochet, piercing, type);
+            interval, ricochet, piercing, projectileCount, type);
         return element;
     }
 

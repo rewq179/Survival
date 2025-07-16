@@ -543,6 +543,7 @@ public class FreezeItemEffect : SkillComponent
 
     public override void OnInitialize(SkillLauncher launcher, SkillParticleController particle)
     {
+        base.OnInitialize(launcher, particle);
         time = 0f;
 
         monsters = new List<Unit>(GameMgr.Instance.spawnMgr.AliveEnemies);
