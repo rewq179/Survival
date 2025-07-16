@@ -43,9 +43,7 @@ public class GameMgr : MonoBehaviour
         dataManager.Init();
 
         CreatePlayerUnit();
-
-        spawnMgr.Init();
-        InputMgr.Instance.EnablePlayerInput();
+        OnGameStart();
     }
 
     private void ResetStaticValues()
@@ -55,21 +53,25 @@ public class GameMgr : MonoBehaviour
 
     private void CreatePlayerUnit()
     {
-        if (playerUnit == null)
-        {
-            playerUnit = resourceMgr.GetPlayerUnit();
-            spawnMgr.SetPlayerTransform(playerUnit.transform);
-            cameraMgr.SetTarget(playerUnit.transform);
-        }
+        if (playerUnit != null)
+            return;
 
+        playerUnit = resourceMgr.GetPlayerUnit();
+        spawnMgr.SetPlayerTransform(playerUnit.transform);
+        cameraMgr.SetTarget(playerUnit.transform);
+    }
+
+    public void OnGameStart()
+    {
         skillMgr.Init(playerUnit);
         rewardMgr.Init(playerUnit);
         UIMgr.Instance.Init(playerUnit);
         playerUnit.Init(SpawnMgr.UNIT_UNIQUE_ID++, 100, Vector3.zero);
 
         UIMgr.Instance.UpdateUI();
-        playerUnit.LearnSkill(SkillKey.Meteor);
-        playerUnit.LearnSkill(SkillKey.EnergyExplosion);
+
+        spawnMgr.Init();
+        OnGameResume();
     }
 
     public void OnGameResume()

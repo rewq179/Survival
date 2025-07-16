@@ -76,7 +76,9 @@ public class CombatModule
     {
         isDead = true;
 
-        if (!owner.IsPlayer)
+        if (owner.IsPlayer)
+            UIMgr.Instance.gameOverUI.ShowGameOverUI();
+        else
             rewardMgr.CreateItem(owner);
 
         owner.PlayAnimation("Die");
