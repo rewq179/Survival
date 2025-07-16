@@ -259,6 +259,10 @@ public class SkillMgr : MonoBehaviour
 
     public void RemoveIndicator(SkillIndicator indicator)
     {
+        SkillKey skillKey = indicator.Element.skillKey;
+        if (indicatorGroups.TryGetValue(skillKey, out List<SkillIndicator> group))
+            group.Remove(indicator);
+
         activeIndicators.Remove(indicator);
         PushMesh(indicator.Element.indicatorType, indicator.Mesh);
         PushIndicator(indicator);

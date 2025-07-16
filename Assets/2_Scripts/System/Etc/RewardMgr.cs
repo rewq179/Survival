@@ -22,6 +22,15 @@ public class RewardMgr : MonoBehaviour
     private int POOL_SIZE = 5;
     private Dictionary<CollectibleType, Queue<CollectibleItem>> itemPools = new();
 
+    // 배치 처리를 위한 데이터 구조
+    private List<CollectibleItem> itemsInMagnetRange = new();
+    private List<CollectibleItem> itemsOutsideMagnetRange = new();
+    
+    // 배치 처리용 임시 데이터
+    private Vector3[] itemPositions;
+    private float[] itemDistances;
+    private bool[] itemInRange;
+
     public void ResetBonuses()
     {
         magnetRangeBonus = 0f;
@@ -162,4 +171,93 @@ public class RewardMgr : MonoBehaviour
 
     public float GetMagnetSpeed() => baseMagnetSpeed + magnetSpeedBonus;
     public void AddMagnetSpeedBonus(float bonus) => magnetSpeedBonus += bonus;
+
+    private void Update()
+    {
+        CheckAllItems();
+    }
+
+    private void CheckAllItems()
+    {
+        if (activeItems.Count == 0 || playerUnit == null)
+            return;
+
+        Vector3 playerPos = playerUnit.transform.position;
+        float magnetRange = GetMagnetRange();
+        float magnetSpeed = GetMagnetSpeed();
+        float magnetRangeSqr = magnetRange * magnetRange;
+        float collectRangeSqr = CollectibleItem.BASE_COLLECT_RANGE * CollectibleItem.BASE_COLLECT_RANGE;
+
+        EnsureArrayCapacity(activeItems.Count);
+        // 1단계: 모든 아이템의 거리 계산
+        CalculateItemDistances(playerPos);
+        // 2단계: 자석 범위 내 아이템 이동
+        MoveItemsInMagnetRange(playerPos, magnetSpeed, magnetRangeSqr, collectRangeSqr);
+        // 3단계: 수집 범위 내 아이템 처리
+        CollectItemsInRange(collectRangeSqr);
+    }
+
+    private void CalculateItemDistances(Vector3 playerPos)
+    {
+        for (int i = 0; i < activeItems.Count; i++)
+        {
+            CollectibleItem item = activeItems[i];
+            if (item == null || item.IsCollected)
+                continue;
+
+            Vector3 itemPos = item.transform.position;
+            itemPositions[i] = itemPos;
+            
+            Vector3 direction = playerPos - itemPos;
+            itemDistances[i] = direction.sqrMagnitude;
+        }
+    }
+
+    private void MoveItemsInMagnetRange(Vector3 playerPos, float magnetSpeed, float magnetRangeSqr, float collectRangeSqr)
+    {
+        for (int i = 0; i < activeItems.Count; i++)
+        {
+            CollectibleItem item = activeItems[i];
+            if (item == null || item.IsCollected)
+                continue;
+
+            float distance = itemDistances[i];
+            bool shouldMove = item.IsGolbalMagentEffect || distance <= magnetRangeSqr;
+            if (!shouldMove)
+                continue;;
+
+            Vector3 direction = (playerPos - itemPositions[i]).normalized;
+            float curSpeed = item.IsGolbalMagentEffect ? magnetSpeed * CollectibleItem.MAGNET_EFFECT_SPEED_MULTIPLIER : magnetSpeed;
+            
+            Vector3 newPos = itemPositions[i] + direction * curSpeed * Time.deltaTime;
+            item.transform.position = newPos;
+            itemPositions[i] = newPos;
+        }
+    }
+
+    private void CollectItemsInRange(float collectRangeSqr)
+    {
+        for (int i = activeItems.Count - 1; i >= 0; i--)
+        {
+            CollectibleItem item = activeItems[i];
+            if (item == null || item.IsCollected)
+                continue;
+
+            float distance = itemDistances[i];
+            if (distance <= collectRangeSqr)
+            {
+                item.Collect();
+            }
+        }
+    }
+
+    private void EnsureArrayCapacity(int count)
+    {
+        if (itemPositions == null || itemPositions.Length < count)
+        {
+            itemPositions = new Vector3[count];
+            itemDistances = new float[count];
+            itemInRange = new bool[count];
+        }
+    }
 }

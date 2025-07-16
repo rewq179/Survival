@@ -25,12 +25,15 @@ public class CollectibleItem : MonoBehaviour
     private bool isGolbalMagentEffect;
 
     // 상수
-    private const float BASE_COLLECT_RANGE = 0.5f;
-    private const float MAGNET_EFFECT_SPEED_MULTIPLIER = 3f;
-    private const float ITEM_SPAWN_RADIUS = 2f; // 아이템 생성 반지름
+    public const float BASE_COLLECT_RANGE = 0.5f;
+    public const float MAGNET_EFFECT_SPEED_MULTIPLIER = 3f;
+    public const float ITEM_SPAWN_RADIUS = 2f; // 아이템 생성 반지름
 
     public CollectibleType Type => type;
     public float Value => value;
+    public bool IsCollected => isCollected;
+    public bool IsInMagnetRange => isInMagnetRange;
+    public bool IsGolbalMagentEffect => isGolbalMagentEffect;
 
     public void Reset()
     {
@@ -68,46 +71,19 @@ public class CollectibleItem : MonoBehaviour
         isInMagnetRange = true;
     }
 
-    private void Update()
+    public void UpdatePosition(Vector3 pos)
     {
-        if (!isCollected)
-        {
-            UpdateMagnetEffect();
-        }
+        transform.position = pos;
     }
-
-    private void UpdateMagnetEffect()
+    
+    public bool IsInCollectRange(float distanceSqr)
     {
-        Unit playerUnit = GameMgr.Instance.PlayerUnit;
-        if (playerUnit == null)
-            return;
-
-        Vector3 direction = playerUnit.transform.position - transform.position;
-        float dist = direction.sqrMagnitude;
-        float currMagnetSpeed = GameMgr.Instance.rewardMgr.GetMagnetSpeed();
-        float curMagnetRange = GameMgr.Instance.rewardMgr.GetMagnetRange();
-
-        if (isGolbalMagentEffect)
-            currMagnetSpeed *= MAGNET_EFFECT_SPEED_MULTIPLIER;
-
-        if (isGolbalMagentEffect || dist <= curMagnetRange * curMagnetRange)
-        {
-            if (!isInMagnetRange)
-                isInMagnetRange = true;
-
-            // 자석 효과로 플레이어 방향으로 이동
-            direction.Normalize();
-            transform.position += direction * currMagnetSpeed * Time.deltaTime;
-
-            // 수집 범위에 들어왔는지 체크
-            if (dist <= BASE_COLLECT_RANGE * BASE_COLLECT_RANGE)
-                Collect();
-        }
-
-        else if (!isGolbalMagentEffect)
-        {
-            isInMagnetRange = false;
-        }
+        return distanceSqr <= BASE_COLLECT_RANGE * BASE_COLLECT_RANGE;
+    }
+    
+    public void SetGlobalMagnetEffect(bool isGlobal)
+    {
+        isGolbalMagentEffect = isGlobal;
     }
 
     public void Collect()
