@@ -300,9 +300,8 @@ public class SkillMgr : MonoBehaviour
 
     public void ExecuteItemSkill(Unit player, CollectibleType type)
     {
-        Vector3 position = player.transform.position;
         SkillLauncher launcher = PopSkillLauncher();
-        launcher.Init(player, position, Vector3.zero);
+        launcher.Init(player, player.transform.position, Vector3.zero);
 
         SkillComponent component = type switch
         {
