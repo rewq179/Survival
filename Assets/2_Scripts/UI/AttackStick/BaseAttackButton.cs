@@ -27,6 +27,11 @@ public class BaseAttackButton : MonoBehaviour
         skillData = null;
     }
 
+    public void SetInteractable(bool isInteractable)
+    {
+        attackButton.interactable = isInteractable;
+    }
+
     public virtual void Init(Unit unit, SkillKey skillKey)
     {
         playerUnit = unit;

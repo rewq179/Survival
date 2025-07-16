@@ -21,6 +21,7 @@ public class SkillModule : MonoBehaviour
     private Dictionary<SkillKey, List<SkillKey>> subSkills = new();
 
     // 개별 쿨타임 관리
+    private bool isAutoAttack;
     private Dictionary<SkillKey, float> cooldowns = new();
     private Dictionary<SkillKey, float> cooldownTimes = new();
     private List<SkillKey> activatedSkills = new();
@@ -419,4 +420,67 @@ public class SkillModule : MonoBehaviour
     }
 
     #endregion
+
+    public void SetAutoAttack(bool isAutoAttack)
+    {
+        this.isAutoAttack = isAutoAttack;
+        if (isAutoAttack)
+        {
+            OnSkillCooldownEnded += OnAutoAttack;
+            OnSkillAdded += OnAutoAttackByAdded;
+
+            foreach (SkillKey key in activeSkills)
+            {
+                if (CanUseSkill(key))
+                    OnAutoAttack(key);
+            }
+        }
+
+        else
+        {
+            OnSkillCooldownEnded -= OnAutoAttack;
+            OnSkillAdded -= OnAutoAttackByAdded;
+        }
+    }
+
+    private void OnAutoAttackByAdded(SkillKey skillKey)
+    {
+        if (!isAutoAttack || !DataMgr.IsActiveSkill(skillKey))
+            return;
+
+        OnAutoAttack(skillKey);
+    }
+
+    private void OnAutoAttack(SkillKey skillKey)
+    {
+        if (!isAutoAttack)
+            return;
+
+        Unit target = FindNearestMonster();
+        if (target != null)
+        {
+            GameMgr.Instance.skillMgr.ActivateSkill(skillKey, owner, target);
+        }
+    }
+
+    private Unit FindNearestMonster()
+    {
+        const float searchRange = 6f;
+        const float searchRangeSqr = searchRange * searchRange;
+
+        Vector3 ownerPos = owner.transform.position;
+        List<Unit> units = GameMgr.Instance.spawnMgr.AliveEnemies.FindAll(x => (ownerPos - x.transform.position).sqrMagnitude <= searchRangeSqr);
+
+        units.Sort((a, b) =>
+        {
+            float distA = Vector3.SqrMagnitude(ownerPos - a.transform.position);
+            float distB = Vector3.SqrMagnitude(ownerPos - b.transform.position);
+            return distA.CompareTo(distB);
+        });
+
+        if (units.Count == 0)
+            return null;
+
+        return units[0];
+    }
 }

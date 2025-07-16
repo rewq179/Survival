@@ -13,6 +13,7 @@ public class UIMgr : MonoBehaviour
     public StageUI stageUI;
     public WarningUI warningUI;
     public GameOverUI gameOverUI;
+    public AutoAttackUI autoAttackUI;
 
     private void Awake()
     {
@@ -36,6 +37,7 @@ public class UIMgr : MonoBehaviour
         selectionPanel.Init(playerUnit);
         stageUI.Init(1);
         gameOverUI.Init();
+        autoAttackUI.Init(playerUnit);
     }
 
     public void UpdateUI()

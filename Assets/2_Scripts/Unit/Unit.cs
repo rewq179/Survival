@@ -170,6 +170,8 @@ public class Unit : MonoBehaviour
     public int AddExp(float amount) => playerSaveData.AddExp(amount);
 
     // SkillModule
+    public void SetAutoAttack(bool isAutoAttack) => skillModule.SetAutoAttack(isAutoAttack);
+
     public void LearnSkill(SkillKey skillKey) => skillModule.LearnSkill(skillKey);
     public bool CanUseSkill(SkillKey skillKey) => skillModule.CanUseSkill(skillKey);
     public void StartCooldown(SkillKey skillKey) => skillModule.StartCooldown(skillKey);

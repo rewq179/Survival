@@ -17,7 +17,6 @@ public class AttackJoystick : MonoBehaviour
     [SerializeField] private GameObject panel;
     [SerializeField] private BaseAttackButton[] attackButtons;
     private Unit playerUnit;
-    private SkillMgr skillManager;
 
     public void Init(Unit unit)
     {
@@ -27,7 +26,6 @@ public class AttackJoystick : MonoBehaviour
         }
 
         playerUnit = unit;
-        skillManager = GameMgr.Instance.skillMgr;
 
         UnsubscribeFromEvents();
         SubscribeToEvents();
@@ -57,6 +55,14 @@ public class AttackJoystick : MonoBehaviour
                 button.Init(playerUnit, skillKey);
                 break;
             }
+        }
+    }
+
+    public void SetButtonInteractable(bool isInteractable)
+    {
+        foreach (BaseAttackButton button in attackButtons)
+        {
+            button.SetInteractable(isInteractable);
         }
     }
 }

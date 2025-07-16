@@ -53767,7 +53767,6 @@ GameObject:
   - component: {fileID: 120269725676574324}
   - component: {fileID: 6577801179061552619}
   - component: {fileID: 2049253249179165312}
-  - component: {fileID: 1183299877165985759}
   m_Layer: 0
   m_Name: BreathAttack
   m_TagString: Untagged
@@ -53937,26 +53936,6 @@ MonoBehaviour:
   hitEffect: {fileID: 1221893910213332}
   hitOffset: 0.1
   useBeamRotation: 0
-  maxLength: 15
   mainTextureLength: 0.5
   noiseTextureLength: 0.5
   beamRenderer: {fileID: 120269725676574324}
---- !u!114 &1183299877165985759
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1955173974842222}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ea4308861e24ac4caa06d26e151d595, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  damageOverTime: 30
-  HitEffect: {fileID: 1221893910213332}
-  HitOffset: 0.1
-  useLaserRotation: 0
-  MaxLength: 15
-  MainTextureLength: 0.5
-  NoiseTextureLength: 0.5
