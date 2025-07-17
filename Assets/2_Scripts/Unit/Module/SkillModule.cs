@@ -11,17 +11,18 @@ public class SkillModule : MonoBehaviour
     private Unit owner;
 
     // 스킬 관련
+    private int activeSkillCount;
+    private int passiveSkillCount;
     private Dictionary<SkillKey, SkillInstance> skillInstances = new();
     private Dictionary<SkillKey, int> skillLevels = new();
-    private List<SkillKey> activeSkills = new();
-    private List<SkillKey> rangedAttackSkills = new();
-    private List<SkillKey> meleeAttackSkills = new();
-    private List<SkillKey> passiveSkills = new();
+    private List<SkillKey> skills = new();
     // Key: 부모 스킬, Value: 서브 스킬 리스트
     private Dictionary<SkillKey, List<SkillKey>> subSkills = new();
 
     // 개별 쿨타임 관리
     private bool isAutoAttack;
+    private float autoAttackTime;
+    private const float AUTO_ATTACK_DURATION = 0.1f;
     private Dictionary<SkillKey, float> cooldowns = new();
     private Dictionary<SkillKey, float> cooldownTimes = new();
     private List<SkillKey> activatedSkills = new();
@@ -53,10 +54,11 @@ public class SkillModule : MonoBehaviour
         cooldownTimes.Clear();
         activatedSkills.Clear();
         skillInstances.Clear();
-        rangedAttackSkills.Clear();
-        meleeAttackSkills.Clear();
-        passiveSkills.Clear();
+        skillLevels.Clear();
+        skills.Clear();
         subSkills.Clear();
+        activeSkillCount = 0;
+        passiveSkillCount = 0;
 
         foreach (SkillKey skillKey in data.skills)
         {
@@ -87,6 +89,25 @@ public class SkillModule : MonoBehaviour
         }
     }
 
+    public void UpdateAutoAttack()
+    {
+        if (!isAutoAttack)
+            return;
+
+        autoAttackTime += Time.deltaTime;
+        if (autoAttackTime < AUTO_ATTACK_DURATION)
+            return;
+
+        autoAttackTime -= AUTO_ATTACK_DURATION;
+        foreach (SkillKey key in skills)
+        {
+            if (CanUseSkill(key))
+            {
+                OnAutoAttack(key);
+            }
+        }
+    }
+
     public void LearnSkill(SkillKey skillKey)
     {
         if (skillKey == SkillKey.None)
@@ -101,31 +122,30 @@ public class SkillModule : MonoBehaviour
     private void AddSkill(SkillKey skillKey)
     {
         if (skillLevels.ContainsKey(skillKey))
+        {
             skillLevels[skillKey] += 1;
+        }
+
         else
+        {
+            skills.Add(skillKey);
             skillLevels[skillKey] = 1;
+        }
 
         SkillType type = DataMgr.GetSkillType(skillKey);
         switch (type)
         {
             case SkillType.Active:
                 CreateSkillInstance(skillKey);
-                activeSkills.Add(skillKey);
                 cooldownTimes[skillKey] = GetSkillInstance(skillKey).cooldownFinal;
                 cooldowns[skillKey] = 0f;
-
-                SkillInstance inst = GetSkillInstance(skillKey);
-                if (inst.Values[0].launcherType == SkillLauncherType.InstantAttack)
-                    meleeAttackSkills.Add(skillKey);
-                else
-                    rangedAttackSkills.Add(skillKey);
-
+                activeSkillCount++;
                 OnSkillAdded?.Invoke(skillKey);
                 break;
 
             case SkillType.Passive:
-                passiveSkills.Add(skillKey);
                 ApplyPassiveSkillEffect(skillKey);
+                passiveSkillCount++;
                 OnSkillAdded?.Invoke(skillKey);
                 break;
 
@@ -170,25 +190,23 @@ public class SkillModule : MonoBehaviour
     {
         return skillInstances.ContainsKey(skillKey) ? skillInstances[skillKey] : null;
     }
-    public bool CanUseRangedSkill() => CaseUseTypedSkill(rangedAttackSkills);
-    public bool CanUseMeleeSkill() => CaseUseTypedSkill(meleeAttackSkills);
-    private bool CaseUseTypedSkill(List<SkillKey> skills)
-    {
-        if (skills.Count == 0)
-            return false;
 
-        foreach (SkillKey key in skills)
-        {
-            if (CanUseSkill(key))
-                return true;
-        }
-
-        return false;
-    }
+    public bool IsMeleeSkill(SkillKey skillKey) => GetSkillInstance(skillKey).Values[0].launcherType == SkillLauncherType.InstantAttack;
 
     public bool CanUseSkill(SkillKey skillKey)
     {
         return cooldowns.ContainsKey(skillKey) && cooldowns[skillKey] <= 0f;
+    }
+
+    public bool CanUseSkillType(bool isMelee)
+    {
+        foreach (SkillKey key in skills)
+        {
+            if (DataMgr.IsActiveSkill(key) && CanUseSkill(key) && IsMeleeSkill(key) == isMelee)
+                return true;
+        }
+
+        return false;
     }
 
     public void StartCooldown(SkillKey skillKey)
@@ -213,7 +231,7 @@ public class SkillModule : MonoBehaviour
 
     public bool HasSkill(SkillKey skillKey)
     {
-        return activeSkills.Contains(skillKey) || passiveSkills.Contains(skillKey) || subSkills.ContainsKey(skillKey);
+        return skills.Contains(skillKey) || subSkills.ContainsKey(skillKey);
     }
 
     public bool IsSkillLearnable(SkillKey key)
@@ -222,12 +240,12 @@ public class SkillModule : MonoBehaviour
         switch (type)
         {
             case SkillType.Active: // 액티브 : 보유하지 않았거나 액티브 계열이 N개 미만일 경우
-                if (HasSkill(key) || activeSkills.Count >= GameValue.MAX_ACTIVE_SKILL_LEVEL)
+                if (HasSkill(key) || activeSkillCount >= GameValue.MAX_ACTIVE_SKILL_LEVEL)
                     return false;
                 return true;
 
             case SkillType.Passive: // 패시브 : 보유하지 않았거나 패시브 계열이 N개 미만일 경우
-                if (HasSkill(key) || passiveSkills.Count >= GameValue.MAX_PASSIVE_SKILL_LEVEL)
+                if (HasSkill(key) || passiveSkillCount >= GameValue.MAX_PASSIVE_SKILL_LEVEL)
                     return false;
                 return true;
 
@@ -264,22 +282,27 @@ public class SkillModule : MonoBehaviour
 
         return cnt;
     }
+
     public void UseRandomSkill(Unit target, AIState state)
     {
-        if (activeSkills.Count == 0)
+        if (skills.Count == 0)
             return;
 
-        List<SkillKey> skills = state switch
+        List<SkillKey> availableSkills = new();
+        foreach (SkillKey key in skills)
         {
-            AIState.MeleeAttack => meleeAttackSkills.FindAll(x => CanUseSkill(x)),
-            AIState.RangedAttack => rangedAttackSkills.FindAll(x => CanUseSkill(x)),
-            _ => null
-        };
+            if (!CanUseSkill(key))
+                continue;
 
-        if (skills == null || skills.Count == 0)
+            bool isMelee = IsMeleeSkill(key);
+            if ((state == AIState.MeleeAttack && isMelee) || (state == AIState.RangedAttack && !isMelee))
+                availableSkills.Add(key);
+        }
+
+        if (availableSkills.Count == 0)
             return;
 
-        SkillKey skillKey = skills[UnityEngine.Random.Range(0, skills.Count)];
+        SkillKey skillKey = availableSkills[UnityEngine.Random.Range(0, availableSkills.Count)];
         owner.PlayAnimation(skillKey.ToString());
         GameMgr.Instance.skillMgr.ActivateSkill(skillKey, owner, target);
     }
@@ -413,9 +436,12 @@ public class SkillModule : MonoBehaviour
         if (!applyAllSkill.Contains(skillKey))
             return;
 
-        foreach (SkillKey key in activeSkills)
+        foreach (SkillKey key in skills)
         {
-            GetSkillInstance(key).Refresh(owner);
+            if (DataMgr.IsActiveSkill(key))
+            {
+                GetSkillInstance(key).Refresh(owner);
+            }
         }
     }
 
@@ -424,31 +450,16 @@ public class SkillModule : MonoBehaviour
     public void SetAutoAttack(bool isAutoAttack)
     {
         this.isAutoAttack = isAutoAttack;
-        if (isAutoAttack)
-        {
-            OnSkillCooldownEnded += OnAutoAttack;
-            OnSkillAdded += OnAutoAttackByAdded;
-
-            foreach (SkillKey key in activeSkills)
-            {
-                if (CanUseSkill(key))
-                    OnAutoAttack(key);
-            }
-        }
-
-        else
-        {
-            OnSkillCooldownEnded -= OnAutoAttack;
-            OnSkillAdded -= OnAutoAttackByAdded;
-        }
-    }
-
-    private void OnAutoAttackByAdded(SkillKey skillKey)
-    {
-        if (!isAutoAttack || !DataMgr.IsActiveSkill(skillKey))
+        if (!isAutoAttack)
             return;
 
-        OnAutoAttack(skillKey);
+        foreach (SkillKey key in skills)
+        {
+            if (DataMgr.IsActiveSkill(key) && CanUseSkill(key))
+            {
+                OnAutoAttack(key);
+            }
+        }
     }
 
     private void OnAutoAttack(SkillKey skillKey)

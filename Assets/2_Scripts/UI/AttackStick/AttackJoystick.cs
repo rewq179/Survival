@@ -17,6 +17,7 @@ public class AttackJoystick : MonoBehaviour
     [SerializeField] private GameObject panel;
     [SerializeField] private BaseAttackButton[] attackButtons;
     private Unit playerUnit;
+    private bool isAutoAttack;
 
     public void Init(Unit unit)
     {
@@ -25,6 +26,7 @@ public class AttackJoystick : MonoBehaviour
             button.Reset();
         }
 
+        isAutoAttack = false;
         playerUnit = unit;
 
         UnsubscribeFromEvents();
@@ -45,7 +47,7 @@ public class AttackJoystick : MonoBehaviour
 
     private void RefreshSkill(SkillKey skillKey)
     {
-        if (DataMgr.IsPassiveSkill(skillKey))
+        if (isAutoAttack || DataMgr.IsPassiveSkill(skillKey))
             return;
 
         foreach (BaseAttackButton button in attackButtons)
@@ -58,11 +60,13 @@ public class AttackJoystick : MonoBehaviour
         }
     }
 
-    public void SetButtonInteractable(bool isInteractable)
+    public void SetAutoAttack(bool isAutoAttack)
     {
+        this.isAutoAttack = isAutoAttack;
+
         foreach (BaseAttackButton button in attackButtons)
         {
-            button.SetInteractable(isInteractable);
+            button.gameObject.SetActive(!isAutoAttack);
         }
     }
 }

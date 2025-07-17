@@ -57,9 +57,9 @@ public class BehaviourMonsterModule : BehaviourModule
     private void UpdateState()
     {
         float distanceSqr = (owner.transform.position - lastPlayerPosition).sqrMagnitude;
-        if (distanceSqr <= MELEE_ATTACK_RANGE_SQR && skillModule.CanUseMeleeSkill())
+        if (distanceSqr <= MELEE_ATTACK_RANGE_SQR && skillModule.CanUseSkillType(true))
             ChangeState(AIState.MeleeAttack);
-        else if (distanceSqr <= RANGED_ATTACK_RANGE_SQR && skillModule.CanUseRangedSkill())
+        else if (distanceSqr <= RANGED_ATTACK_RANGE_SQR && skillModule.CanUseSkillType(false))
             ChangeState(AIState.RangedAttack);
         else
             ChangeState(AIState.Chasing);

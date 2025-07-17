@@ -99,6 +99,7 @@ public class Unit : MonoBehaviour
     {
         behaviourModule?.Update();
         skillModule.UpdateCooldowns();
+        skillModule.UpdateAutoAttack();
     }
 
     private void LateUpdate()

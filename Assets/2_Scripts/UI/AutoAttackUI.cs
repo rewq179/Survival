@@ -26,7 +26,7 @@ public class AutoAttackUI : MonoBehaviour
     private void SetAutoAttack(bool isAutoAttack)
     {
         playerUnit.SetAutoAttack(isAutoAttack);
-        UIMgr.Instance.attackJoystick.SetButtonInteractable(!isAutoAttack);
+        UIMgr.Instance.attackJoystick.SetAutoAttack(isAutoAttack);
 
         onObject.SetActive(isAutoAttack);
         offObject.SetActive(!isAutoAttack);
