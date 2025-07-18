@@ -1,12 +1,5 @@
 fileFormatVersion: 2
-guid: a2563f2b8dbc4044b9a50537d3a29962
-AssetOrigin:
-  serializedVersion: 1
-  productId: 210622
-  packageName: 2D SKILLS ICON SET - HAND-PAINTED GUI PACK
-  packageVersion: 1.0
-  assetPath: Assets/Homeless/UI Assets/Ability_Skill_Icons/UI_Skill_Icon_Buff.png
-  uploadId: 473697
+guid: a570fbf2bdef0064da418af841acaddc
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -46,7 +39,7 @@ TextureImporter:
     mipBias: 0
     wrapU: 1
     wrapV: 1
-    wrapW: 0
+    wrapW: 1
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
