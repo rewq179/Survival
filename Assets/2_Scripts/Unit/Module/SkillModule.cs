@@ -481,6 +481,8 @@ public class SkillModule : MonoBehaviour
 
         Vector3 ownerPos = owner.transform.position;
         List<Unit> units = GameMgr.Instance.spawnMgr.AliveEnemies.FindAll(x => (ownerPos - x.transform.position).sqrMagnitude <= searchRangeSqr);
+        if (units.Count == 0)
+            return null;
 
         units.Sort((a, b) =>
         {
@@ -489,8 +491,6 @@ public class SkillModule : MonoBehaviour
             return distA.CompareTo(distB);
         });
 
-        if (units.Count == 0)
-            return null;
 
         return units[0];
     }
