@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rigidBody;
     private float moveSpeed;
     private float rotationSpeed = 10f;
+    private Vector3 cameraOffset;
 
     // 스킬 관련
     private Unit owner;
@@ -24,6 +25,7 @@ public class PlayerController : MonoBehaviour
         rigidBody = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
         mainCamera = Camera.main;
+        cameraOffset = GameMgr.Instance.cameraMgr.Offset;
     }
 
     public void Init(Unit owner)
@@ -86,7 +88,7 @@ public class PlayerController : MonoBehaviour
     public Vector3 GetMouseWorldPosition()
     {
         Vector3 mousePos = Input.mousePosition;
-        mousePos.z = 10f; // 카메라에서의 거리
+        mousePos.z = cameraOffset.y;
         Vector3 worldPos = mainCamera.ScreenToWorldPoint(mousePos);
         worldPos.y = 0f;
         return worldPos;
