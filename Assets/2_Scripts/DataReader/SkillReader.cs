@@ -2,127 +2,25 @@ using UnityEngine;
 using GoogleSheetsToUnity;
 using System.Collections.Generic;
 using System;
-using UnityEngine.Events;
 using System.Globalization;
+using System.Linq;
 
 #if UNITY_EDITOR
+using UnityEngine.Events;
 using UnityEditor;
 #endif
 
-public enum SkillKey
-{
-    None = -1,
-
-    // 액티브
-    Arrow,
-    Arrow_Cooldown,
-    Arrow_ProjectileCount,
-    Arrow_DamageInc,
-    Arrow_Ricochet,
-
-    Dagger,
-    Dagger_Cooldown,
-    Dagger_ProjectileCount,
-    Dagger_DamageInc,
-    Dagger_Piercing,
-
-    FrontSpike,
-    FrontSpike_Cooldown,
-    FrontSpike_DamageInc,
-
-    EnergyExplosion,
-    EnergyExplosion_Cooldown,
-    EnergyExplosion_DamageInc,
-    EnergyExplosion_Radius,
-
-    Meteor,
-    Meteor_Cooldown,
-    Meteor_DamageInc,
-    Meteor_Radius,
-    Meteor_Duration,
-    Meteor_DamageTick,
-
-    // 패시브
-    Health,
-    Health_Inc,
-    MoveSpeed,
-    MoveSpeed_Inc,
-    Defense,
-    Defense_Inc,
-    MagnetRange,
-    MagnetRange_Inc,
-    ExpGain,
-    ExpGain_Inc,
-    GoldGain,
-    GoldGain_Inc,
-    CriticalChance,
-    CriticalChance_Inc,
-    CriticalDamage,
-    CriticalDamage_Inc,
-    AllSkillRange,
-    AllSkillRange_Inc,
-    AllSkillCooldown,
-    AllSkillCooldown_Dec,
-    AllSkillDamage,
-    AllSkillDamage_Inc,
-    AllSkillDuration,
-    AllSkillDuration_Inc,
-
-    // 몬스터
-    StingAttack,
-    FireProjectile,
-    MeleeAttack,
-    BiteAttack,
-    SpitPoisonAttack,
-    PunchAttack,
-    HitGroundAttack,
-    DragonBiteAttack,
-    BreathAttack,
-
-    Max,
-}
-
-public enum SkillType
-{
-    Active,
-    Passive,
-    Sub,
-    Max,
-}
-
-[Serializable]
-public class SkillData
-{
-    public SkillKey skillKey;
-    public SkillType skillType;
-    public string name;
-    public string desc;
-    public float cooldown;
-    public float baseValue;
-    public List<SkillElement> skillElements;
-
-    public SkillData(SkillKey skillKey, SkillType skillType, string name, string description, float cooldown, float baseValue,
-        List<SkillElement> elements)
-    {
-        this.skillKey = skillKey;
-        this.skillType = skillType;
-        this.name = name;
-        this.desc = description;
-        this.cooldown = cooldown;
-        this.baseValue = baseValue;
-        skillElements = elements;
-    }
-}
-
 [CreateAssetMenu(fileName = "SkillReader", menuName = "Scriptable Object/SkillDataReader", order = int.MaxValue)]
-public class SkillDataReader : BaseReader
+public class SkillDataReader : ScriptableObject
 {
-    public override string sheetName => "Skill";
+    public string sheetName = "Skill";
+    public int startRow = 2;
+    public int endRow = -1;
 
     [SerializeField]
     public List<SkillData> skillDatas = new List<SkillData>();
 
-    internal void SetData(List<GSTU_Cell> cells)
+    public void SetData(List<GSTU_Cell> cells)
     {
         SkillKey skillKey = SkillKey.Max;
         SkillType skillType = SkillType.Active;
@@ -177,14 +75,17 @@ public class SkillDataReader : BaseReader
 
         skillDatas.Add(new SkillData(skillKey, skillType, name, description, cooldown,
             baseValue, elements));
+
+        // 마지막에 추가된 SkillData의 elements 정렬
+        SortSkillElements(skillDatas[skillDatas.Count - 1]);
     }
 
     private List<SkillElement> DecodeSkillElement(string skillString, SkillKey skillKey)
     {
         List<SkillElement> elements = new();
 
-        // DMG : 12 / Int : 0.5
-        string[] splits = skillString.Split(',');
+        // Projectile : Speed = 15, Dmg = 12, Ricochet=2, Piercing=1, Shot=3.2, InstantAOE : Angle = 360, Radius = 4, Dmg = 10
+        string[] splits = skillString.Split('/');
         foreach (string str in splits)
         {
             SkillElement element = DecodeSingleSkillElement(str.Trim(), skillKey, elements.Count);
@@ -196,133 +97,154 @@ public class SkillDataReader : BaseReader
 
     private SkillElement DecodeSingleSkillElement(string str, SkillKey skillKey, int index)
     {
-        float damage = 0f;
-        float duration = 0f;
-        float interval = 0f;
-        float height = 0f;
-        float width = 0f;
-        float angle = 0f;
-        float radius = 0f;
-        float moveSpeed = 0f;
-        float ricochet = 0f;
-        float piercing = 0f;
-        float projectileCount = 0f;
-        SkillLauncherType type = SkillLauncherType.Projectile;
+        ElementType ParsedElementType(string key)
+        {
+            return key switch
+            {
+                "speed" => ElementType.Speed,
+                "dmg" => ElementType.Damage,
+                "height" => ElementType.Height,
+                "width" => ElementType.Width,
+                "angle" => ElementType.Angle,
+                "radius" => ElementType.Radius,
+                "duration" => ElementType.Duration,
+                "tick" => ElementType.Tick,
+                "ricochet" => ElementType.Ricochet,
+                "piercing" => ElementType.Piercing,
+                "shot" => ElementType.Shot,
+                "power" => ElementType.Power,
+                _ => ElementType.Max,
+            };
+        }
 
-        // Dmg : 12 / Int : 0.5
-        string[] splits = str.Split('/');
+
+        // Projectile : Speed = 15, Dmg = 12, Ricochet=2, Piercing=1, Shot=3.2 
+        string[] splits = str.Split(':');
+        if (splits.Length <= 1)
+            return null;
+
+        SkillElement element = new();
+
+        SkillComponentType type = SkillComponentType.Projectile;
+        if (Enum.TryParse(splits[0].Trim(), true, out SkillComponentType parsedComType))
+            type = parsedComType;
+
+        splits = splits[1].Split(',');
         foreach (string part in splits)
         {
             string trimmedPart = part.Trim();
-            string[] keyValue = trimmedPart.Split(':');
+            string[] keyValue = trimmedPart.Split('=');
+
             string key = keyValue[0].Trim().ToLowerInvariant();
+            if (keyValue.Length != 2)
+                continue;
 
-            if (keyValue.Length == 1)
+            string value = keyValue[1].Trim();
+            switch (key)
             {
-                if (Enum.TryParse(key, true, out SkillLauncherType parsedType))
-                    type = parsedType;
-            }
+                case "order":
+                    element.SetOrder(int.Parse(value));
+                    break;
 
-            else if (keyValue.Length == 2)
-            {
-                string value = keyValue[1].Trim();
+                case "timing":
+                    element.SetTiming(Enum.Parse<ExecutionTiming>(value));
+                    break;
 
-                if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedValue))
-                {
-                    switch (key)
-                    {
-                        case "dmg":
-                            damage = parsedValue;
-                            break;
+                case "firepoint":
+                    element.SetFirePoint(Enum.Parse<FirePoint>(value));
+                    break;
 
-                        case "duration":
-                            duration = parsedValue;
-                            break;
-
-                        case "interval":
-                            interval = parsedValue;
-                            break;
-
-                        case "height":
-                            height = parsedValue;
-                            break;
-
-                        case "width":
-                            width = parsedValue;
-                            break;
-
-                        case "angle":
-                            angle = parsedValue;
-                            break;
-
-                        case "radius":
-                            radius = parsedValue;
-                            break;
-
-                        case "movespeed":
-                            moveSpeed = parsedValue;
-                            break;
-
-                        case "ricochet":
-                            ricochet = parsedValue;
-                            break;
-
-                        case "piercing":
-                            piercing = parsedValue;
-                            break;
-
-                        case "projectilecount":
-                            projectileCount = parsedValue;
-                            break;
-                    }
-                }
+                default:
+                    if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedValue))
+                        element.SetFloatParameter(ParsedElementType(key), parsedValue);
+                    break;
             }
         }
 
-        SkillElement element = new();
-        element.Init(skillKey, index, moveSpeed, height, width, angle, radius, damage, duration,
-            interval, ricochet, piercing, projectileCount, type);
+        element.Init(skillKey, index, type);
         return element;
     }
 
-#if UNITY_EDITOR
-    [CustomEditor(typeof(SkillDataReader))]
-    public class SkillDataReaderEditor : Editor
+    private void SortSkillElements(SkillData skillData)
     {
-        SkillDataReader dataReader;
+        List<SkillElement> elements = skillData.skillElements;
+        if (elements == null || elements.Count <= 1)
+            return;
 
-        private void OnEnable()
+        // 1. Order별로 그룹화
+        var orderGroups = elements
+            .GroupBy(e => e.order)
+            .OrderBy(g => g.Key)
+            .ToList();
+
+        // 2. 정렬된 리스트 생성
+        List<SkillElement> sortedElements = new();
+        foreach (var group in orderGroups)
         {
-            dataReader = (SkillDataReader)target;
+            var orderElements = group.ToList();
+
+            // 같은 Order 내에서 Timing에 따라 정렬
+            var immediateElements = orderElements
+                .Where(e => e.timing == ExecutionTiming.Immediate)
+                .ToList();
+
+            var sequentialElements = orderElements
+                .Where(e => e.timing == ExecutionTiming.Sequential)
+                .ToList();
+
+            // Immediate 먼저, Sequential 나중에
+            sortedElements.AddRange(immediateElements);
+            sortedElements.AddRange(sequentialElements);
         }
 
-        public override void OnInspectorGUI()
+        // 3. 정렬된 리스트로 교체
+        skillData.skillElements = sortedElements;
+
+        // 4. index 재설정 (선택사항)
+        for (int i = 0; i < sortedElements.Count; i++)
         {
-            base.OnInspectorGUI();
+            sortedElements[i].index = i;
+        }
+    }
+}
 
-            GUILayout.Label("\n\n스프레드 시트 읽어오기");
+#if UNITY_EDITOR
+[CustomEditor(typeof(SkillDataReader))]
+public class SkillDataReaderEditor : Editor
+{
+    SkillDataReader dataReader;
 
-            if (GUILayout.Button("데이터 읽기(API 호출)"))
-            {
-                UpdateStats(UpdateMethodOne);
-                dataReader.skillDatas.Clear();
-            }
+    private void OnEnable()
+    {
+        dataReader = (SkillDataReader)target;
+    }
+
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
+
+        GUILayout.Label("\n\n스프레드 시트 읽어오기");
+
+        if (GUILayout.Button("데이터 읽기(API 호출)"))
+        {
+            dataReader.skillDatas.Clear();
+            UpdateStats(UpdateMethodOne);
+        }
+    }
+
+    void UpdateStats(UnityAction<GstuSpreadSheet> callback, bool mergedCells = false)
+    {
+        SpreadsheetManager.Read(new GSTU_Search(GameValue.SHEET_ADDRESS, dataReader.sheetName), callback, mergedCells);
+    }
+
+    void UpdateMethodOne(GstuSpreadSheet ss)
+    {
+        for (int i = dataReader.startRow; i <= dataReader.endRow; ++i)
+        {
+            dataReader.SetData(ss.rows[i]);
         }
 
-        void UpdateStats(UnityAction<GstuSpreadSheet> callback, bool mergedCells = false)
-        {
-            SpreadsheetManager.Read(new GSTU_Search(dataReader.sheetAddress, dataReader.sheetName), callback, mergedCells);
-        }
-
-        void UpdateMethodOne(GstuSpreadSheet ss)
-        {
-            for (int i = dataReader.startRow; i <= dataReader.endRow; ++i)
-            {
-                dataReader.SetData(ss.rows[i]);
-            }
-
-            EditorUtility.SetDirty(target);
-        }
+        EditorUtility.SetDirty(target);
     }
 }
 #endif

@@ -33,9 +33,11 @@ public class WaveData
 }
 
 [CreateAssetMenu(fileName = "WaveReader", menuName = "Scriptable Object/WaveDataReader", order = int.MaxValue)]
-public class WaveDataReader : BaseReader
+public class WaveDataReader : ScriptableObject
 {
-    public override string sheetName => "Wave";
+    public string sheetName = "Wave";
+    public int startRow = 2;
+    public int endRow = -1;
 
     [SerializeField]
     public List<WaveData> waveDatas = new();
@@ -107,7 +109,7 @@ public class WaveDataReaderEditor : Editor
 
     void UpdateStats(UnityAction<GstuSpreadSheet> callback, bool mergedCells = false)
     {
-        SpreadsheetManager.Read(new GSTU_Search(dataReader.sheetAddress, dataReader.sheetName), callback, mergedCells);
+        SpreadsheetManager.Read(new GSTU_Search(GameValue.SHEET_ADDRESS, dataReader.sheetName), callback, mergedCells);
     }
 
     void UpdateMethodOne(GstuSpreadSheet ss)

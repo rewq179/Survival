@@ -33,9 +33,11 @@ public class SpawnGroupData
 }
 
 [CreateAssetMenu(fileName = "SpawnGroupReader", menuName = "Scriptable Object/SpawnGroupDataReader", order = int.MaxValue)]
-public class SpawnGroupDataReader : BaseReader
+public class SpawnGroupDataReader : ScriptableObject
 {
-    public override string sheetName => "SpawnGroup";
+    public string sheetName = "SpawnGroup";
+    public int startRow = 2;
+    public int endRow = -1;
 
     [SerializeField]
     public List<SpawnGroupData> spawnGroupDatas = new List<SpawnGroupData>();
@@ -153,7 +155,7 @@ public class SpawnGroupDataReaderEditor : Editor
 
     void UpdateStats(UnityAction<GstuSpreadSheet> callback, bool mergedCells = false)
     {
-        SpreadsheetManager.Read(new GSTU_Search(dataReader.sheetAddress, dataReader.sheetName), callback, mergedCells);
+        SpreadsheetManager.Read(new GSTU_Search(GameValue.SHEET_ADDRESS, dataReader.sheetName), callback, mergedCells);
     }
 
     void UpdateMethodOne(GstuSpreadSheet ss)

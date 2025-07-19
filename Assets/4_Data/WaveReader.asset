@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: WaveReader
   m_EditorClassIdentifier: Assembly-CSharp::WaveDataReader
-  sheetAddress: 15RA8mCckMbGIXxx5Ukfmtih0TxDTEGkXiAVyrHf8Blw
+  sheetName: Wave
   startRow: 2
   endRow: 6
   waveDatas:

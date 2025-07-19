@@ -3,7 +3,9 @@ using UnityEngine;
 
 public class InstanceValue
 {
-    public SkillLauncherType launcherType;
+    public int order;
+    public ExecutionTiming timing;
+    public SkillComponentType type;
 
     // 데미지
     private float damageFix;
@@ -30,9 +32,9 @@ public class InstanceValue
     public float damageTickFinal;
 
     // 투사체
-    private float projectileCountFix;
-    private float projectileCountAdditive;
-    public float projectileCountFinal;
+    private float ShotFix;
+    private float ShotAdditive;
+    public float ShotFinal;
 
     // 도탄
     private float ricochetFix;
@@ -53,20 +55,21 @@ public class InstanceValue
 
     public void SetFix(SkillElement skillElement)
     {
-        if (skillElement != null)
-        {
-            damageFix = skillElement.damage;
-            durationFix = skillElement.duration;
-            damageTickFix = skillElement.interval;
-            radiusFix = skillElement.radius;
-            moveSpeedFix = skillElement.moveSpeed;
-            ricochetFix = skillElement.ricochet;
-            piercingFix = skillElement.piercing;
-            projectileCountFix = Mathf.Max(1, skillElement.projectileCount);
-        }
+        if (skillElement == null)
+            return;
 
-        angle = skillElement.angle;
-        launcherType = skillElement.launcherType;
+        damageFix = skillElement.Damage;
+        durationFix = skillElement.Duration;
+        damageTickFix = skillElement.Tick;
+        radiusFix = skillElement.Radius;
+        moveSpeedFix = skillElement.Speed;
+        ricochetFix = skillElement.Ricochet;
+        piercingFix = skillElement.Piercing;
+        ShotFix = Mathf.Max(1, skillElement.Shot);
+        angle = skillElement.Angle;
+        type = skillElement.componentType;
+        order = skillElement.order;
+        timing = skillElement.timing;
     }
 
     public void Reset()
@@ -95,8 +98,8 @@ public class InstanceValue
                 damageTickAdditive += value;
                 break;
 
-            case SubSkillType.ProjectileCount:
-                projectileCountAdditive += value;
+            case SubSkillType.Shot:
+                ShotAdditive += value;
                 break;
 
             case SubSkillType.Ricochet:
@@ -145,7 +148,7 @@ public class InstanceValue
         radiusFinal = (radiusFix + radiusAdditive) * (1 + radiusMultiplier + caster.GetFinalStat(StatType.AllSkillRange));
         durationFinal = (durationFix + durationAdditive) * (1 + durationMultiplier + caster.GetFinalStat(StatType.AllSkillDuration));
         damageTickFinal = (damageTickFix + damageTickAdditive) * (1 + damageTickMultiplier);
-        projectileCountFinal = projectileCountFix + projectileCountAdditive;
+        ShotFinal = ShotFix + ShotAdditive;
         ricochetFinal = ricochetFix + ricochetAdditive;
         piercingFinal = piercingFix + piercingAdditive;
         moveSpeedFinal = (moveSpeedFix + moveSpeedAdditive) * (1 + moveSpeedMultiplier);
@@ -237,7 +240,7 @@ public class SkillInstance
                     values[0].AddMultiplierValue(data.type, value);
                     break;
 
-                case SubSkillType.ProjectileCount:
+                case SubSkillType.Shot:
                 case SubSkillType.Ricochet:
                 case SubSkillType.Piercing:
                     values[0].AddAdditiveValue(data.type, value);
@@ -259,7 +262,7 @@ public class SkillInstance
     {
         foreach (InstanceValue value in values)
         {
-            if (value.launcherType == SkillLauncherType.Projectile && value.projectileCountFinal > 1)
+            if (value.type == SkillComponentType.Projectile && value.ShotFinal > 1)
                 return true;
         }
 
@@ -272,7 +275,7 @@ public class SkillInstance
         for (int i = 0; i < values.Count; i++)
         {
             InstanceValue value = values[i];
-            debug += $"\n[스킬 {i}] 데미지: {value.damageFinal:F1}, 범위: {value.radiusFinal:F1}, 지속시간: {value.durationFinal:F1}초, 피해주기: {value.damageTickFinal:F1}초, 투사체: {value.projectileCountFinal:F0}개, 도탄: {value.ricochetFinal:F0}회, 관통: {value.piercingFinal:F0}회";
+            debug += $"\n[스킬 {i}] 데미지: {value.damageFinal:F1}, 범위: {value.radiusFinal:F1}, 지속시간: {value.durationFinal:F1}초, 피해주기: {value.damageTickFinal:F1}초, 투사체: {value.ShotFinal:F0}개, 도탄: {value.ricochetFinal:F0}회, 관통: {value.piercingFinal:F0}회";
         }
     }
 }

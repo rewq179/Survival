@@ -9,608 +9,503 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 63b91de1c9cd81d4684f43a56af0bac9, type: 3}
   m_Name: SkillReader
-  m_EditorClassIdentifier: Assembly-CSharp::SkillDataReader
-  sheetAddress: 15RA8mCckMbGIXxx5Ukfmtih0TxDTEGkXiAVyrHf8Blw
+  m_EditorClassIdentifier: 
+  sheetName: Skill
   startRow: 2
-  endRow: 27
+  endRow: 29
   skillDatas:
   - skillKey: 0
     skillType: 0
     name: Arrow
-    desc: "\uD654\uC0B4\uC744 \uB0A0\uB9BD\uB2C8\uB2E4."
+    desc: 
     cooldown: 0.7
     baseValue: 0
     skillElements:
     - skillKey: 0
       index: 0
-      launcherType: 0
-      indicatorType: 0
-      moveSpeed: 15
-      height: 0
-      width: 0
-      angle: 0
-      radius: 0
+      componentType: 3
+      indicatorType: 4
+      order: 0
+      timing: 0
+      firePoint: 1
+      isTarget: 0
       maxDistance: 0
-      damage: 12
-      duration: 0
-      interval: 0
-      ricochet: 2
-      piercing: 1
-      projectileCount: 3.2
+    - skillKey: 0
+      index: 1
+      componentType: 3
+      indicatorType: 4
+      order: 0
+      timing: 0
+      firePoint: 1
+      isTarget: 0
+      maxDistance: 0
+    - skillKey: 0
+      index: 2
+      componentType: 3
+      indicatorType: 4
+      order: 0
+      timing: 1
+      firePoint: 1
+      isTarget: 0
+      maxDistance: 0
+    - skillKey: 0
+      index: 3
+      componentType: 3
+      indicatorType: 4
+      order: 1
+      timing: 0
+      firePoint: 1
+      isTarget: 0
+      maxDistance: 0
+    - skillKey: 0
+      index: 4
+      componentType: 3
+      indicatorType: 4
+      order: 1
+      timing: 1
+      firePoint: 1
+      isTarget: 0
+      maxDistance: 0
   - skillKey: 5
     skillType: 0
     name: Dagger
-    desc: "\uD68C\uC218\uB418\uB294 \uCE7C\uC744 \uB358\uC9D1\uB2C8\uB2E4."
+    desc: 
     cooldown: 0.8
     baseValue: 0
     skillElements:
     - skillKey: 5
       index: 0
-      launcherType: 0
+      componentType: 0
       indicatorType: 0
-      moveSpeed: 18
-      height: 0
-      width: 0
-      angle: 0
-      radius: 0
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 0
-      damage: 10
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 3.2
   - skillKey: 10
     skillType: 0
     name: FrontSpike
-    desc: "\uBD80\uCC44\uAF34 \uD615\uD0DC\uC758 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
+    desc: 
     cooldown: 3
     baseValue: 0
     skillElements:
     - skillKey: 10
       index: 0
-      launcherType: 1
+      componentType: 1
       indicatorType: 2
-      moveSpeed: 0
-      height: 0
-      width: 0
-      angle: 60
-      radius: 8.2
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 16.4
-      damage: 22
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0
   - skillKey: 13
     skillType: 0
     name: EnergyExplosion
-    desc: "\uB2E8\uBC1C\uC131 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
+    desc: 
     cooldown: 4.2
     baseValue: 0
     skillElements:
     - skillKey: 13
       index: 0
-      launcherType: 1
+      componentType: 1
       indicatorType: 3
-      moveSpeed: 0
-      height: 0
-      width: 0
-      angle: 360
-      radius: 3.5
+      order: 0
+      timing: 0
+      firePoint: 1
+      isTarget: 0
       maxDistance: 7
-      damage: 45
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0
   - skillKey: 17
     skillType: 0
     name: Meteor
-    desc: "\uC9C0\uC18D\uC801\uC778 \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
+    desc: 
     cooldown: 6
     baseValue: 0
     skillElements:
     - skillKey: 17
       index: 0
-      launcherType: 2
+      componentType: 2
       indicatorType: 3
-      moveSpeed: 0
-      height: 0
-      width: 0
-      angle: 360
-      radius: 3.1
+      order: 0
+      timing: 0
+      firePoint: 1
+      isTarget: 0
       maxDistance: 6.2
-      damage: 20
-      duration: 2
-      interval: 0.5
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0
   - skillKey: 23
+    skillType: 0
+    name: Blackhole
+    desc: 
+    cooldown: 10
+    baseValue: 0
+    skillElements:
+    - skillKey: 23
+      index: 0
+      componentType: 2
+      indicatorType: 3
+      order: 0
+      timing: 0
+      firePoint: 1
+      isTarget: 0
+      maxDistance: 5.2
+  - skillKey: 29
+    skillType: 0
+    name: IceAttack
+    desc: 
+    cooldown: 8
+    baseValue: 0
+    skillElements:
+    - skillKey: 29
+      index: 0
+      componentType: 1
+      indicatorType: 3
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
+      maxDistance: 8
+  - skillKey: 33
     skillType: 1
     name: "\uCCB4\uB825 \uC99D\uAC00"
     desc: "\uCD5C\uB300 \uCCB4\uB825 +{P0}"
     cooldown: 0
     baseValue: 0.15
     skillElements:
-    - skillKey: 23
+    - skillKey: 0
       index: 0
-      launcherType: 0
+      componentType: 0
       indicatorType: 0
-      moveSpeed: 0
-      height: 0
-      width: 0
-      angle: 0
-      radius: 0
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 0
-      damage: 0
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0
-  - skillKey: 25
+  - skillKey: 35
     skillType: 1
     name: "\uC774\uB3D9 \uC18D\uB3C4 \uC99D\uAC00"
     desc: "\uC774\uB3D9 \uC18D\uB3C4 +{P0}"
     cooldown: 0
     baseValue: 0.1
     skillElements:
-    - skillKey: 25
+    - skillKey: 0
       index: 0
-      launcherType: 0
+      componentType: 0
       indicatorType: 0
-      moveSpeed: 0
-      height: 0
-      width: 0
-      angle: 0
-      radius: 0
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 0
-      damage: 0
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0
-  - skillKey: 27
+  - skillKey: 37
     skillType: 1
     name: "\uBC29\uC5B4\uB825 \uC99D\uAC00"
     desc: "\uBC1B\uB294 \uD53C\uD574 -{P0}"
     cooldown: 0
     baseValue: 0.1
     skillElements:
-    - skillKey: 27
+    - skillKey: 0
       index: 0
-      launcherType: 0
+      componentType: 0
       indicatorType: 0
-      moveSpeed: 0
-      height: 0
-      width: 0
-      angle: 0
-      radius: 0
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 0
-      damage: 0
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0
-  - skillKey: 29
+  - skillKey: 39
     skillType: 1
     name: "\uC790\uC11D \uBC94\uC704 \uC99D\uAC00"
     desc: "\uC544\uC774\uD15C \uC790\uC11D \uBC94\uC704 +{P0}"
     cooldown: 0
     baseValue: 0.2
     skillElements:
-    - skillKey: 29
+    - skillKey: 0
       index: 0
-      launcherType: 0
+      componentType: 0
       indicatorType: 0
-      moveSpeed: 0
-      height: 0
-      width: 0
-      angle: 0
-      radius: 0
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 0
-      damage: 0
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0
-  - skillKey: 31
+  - skillKey: 41
     skillType: 1
     name: "\uACBD\uD5D8\uCE58 \uD68D\uB4DD \uC99D\uAC00"
     desc: "\uACBD\uD5D8\uCE58 \uD68D\uB4DD\uB7C9 +{P0}"
     cooldown: 0
     baseValue: 0.15
     skillElements:
-    - skillKey: 31
+    - skillKey: 0
       index: 0
-      launcherType: 0
+      componentType: 0
       indicatorType: 0
-      moveSpeed: 0
-      height: 0
-      width: 0
-      angle: 0
-      radius: 0
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 0
-      damage: 0
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0
-  - skillKey: 33
+  - skillKey: 43
     skillType: 1
     name: "\uACE8\uB4DC \uD68D\uB4DD \uC99D\uAC00"
     desc: "\uACE8\uB4DC \uD68D\uB4DD\uB7C9 +{P0}"
     cooldown: 0
     baseValue: 0.2
     skillElements:
-    - skillKey: 33
+    - skillKey: 0
       index: 0
-      launcherType: 0
+      componentType: 0
       indicatorType: 0
-      moveSpeed: 0
-      height: 0
-      width: 0
-      angle: 0
-      radius: 0
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 0
-      damage: 0
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0
-  - skillKey: 35
+  - skillKey: 45
     skillType: 1
     name: "\uCE58\uBA85\uD0C0 \uD655\uB960 \uC99D\uAC00"
     desc: "\uCE58\uBA85\uD0C0 \uD655\uB960 +{P0}"
     cooldown: 0
     baseValue: 0.05
     skillElements:
-    - skillKey: 35
+    - skillKey: 0
       index: 0
-      launcherType: 0
+      componentType: 0
       indicatorType: 0
-      moveSpeed: 0
-      height: 0
-      width: 0
-      angle: 0
-      radius: 0
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 0
-      damage: 0
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0
-  - skillKey: 37
+  - skillKey: 47
     skillType: 1
     name: "\uCE58\uBA85\uD0C0 \uD53C\uD574 \uC99D\uAC00"
     desc: "\uCE58\uBA85\uD0C0 \uD53C\uD574 +{P0}"
     cooldown: 0
     baseValue: 0.2
     skillElements:
-    - skillKey: 37
+    - skillKey: 0
       index: 0
-      launcherType: 0
+      componentType: 0
       indicatorType: 0
-      moveSpeed: 0
-      height: 0
-      width: 0
-      angle: 0
-      radius: 0
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 0
-      damage: 0
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0
-  - skillKey: 39
+  - skillKey: 49
     skillType: 1
     name: "\uC2A4\uD0AC \uBC94\uC704 \uC99D\uAC00"
     desc: "\uBAA8\uB4E0 \uC2A4\uD0AC \uBC94\uC704 +{P0}"
     cooldown: 0
     baseValue: 0.1
     skillElements:
-    - skillKey: 39
+    - skillKey: 0
       index: 0
-      launcherType: 0
+      componentType: 0
       indicatorType: 0
-      moveSpeed: 0
-      height: 0
-      width: 0
-      angle: 0
-      radius: 0
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 0
-      damage: 0
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0
-  - skillKey: 41
+  - skillKey: 51
     skillType: 1
     name: "\uC2A4\uD0AC \uCFE8\uB2E4\uC6B4 \uAC10\uC18C"
     desc: "\uBAA8\uB4E0 \uC2A4\uD0AC \uCFE8\uB2E4\uC6B4 -{P0}"
     cooldown: 0
     baseValue: 0.05
     skillElements:
-    - skillKey: 41
+    - skillKey: 0
       index: 0
-      launcherType: 0
+      componentType: 0
       indicatorType: 0
-      moveSpeed: 0
-      height: 0
-      width: 0
-      angle: 0
-      radius: 0
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 0
-      damage: 0
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0
-  - skillKey: 43
+  - skillKey: 53
     skillType: 1
     name: "\uC2A4\uD0AC \uB370\uBBF8\uC9C0 \uC99D\uAC00"
     desc: "\uBAA8\uB4E0 \uC2A4\uD0AC \uB370\uBBF8\uC9C0 +{P0}"
     cooldown: 0
     baseValue: 0.1
     skillElements:
-    - skillKey: 43
+    - skillKey: 0
       index: 0
-      launcherType: 0
+      componentType: 0
       indicatorType: 0
-      moveSpeed: 0
-      height: 0
-      width: 0
-      angle: 0
-      radius: 0
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 0
-      damage: 0
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0
-  - skillKey: 45
+  - skillKey: 55
     skillType: 1
     name: "\uC2A4\uD0AC \uC9C0\uC18D\uC2DC\uAC04 \uC99D\uAC00"
     desc: "\uBAA8\uB4E0 \uC2A4\uD0AC \uC9C0\uC18D\uC2DC\uAC04 +{P0}"
     cooldown: 0
     baseValue: 0.2
     skillElements:
-    - skillKey: 45
+    - skillKey: 0
       index: 0
-      launcherType: 0
+      componentType: 0
       indicatorType: 0
-      moveSpeed: 0
-      height: 0
-      width: 0
-      angle: 0
-      radius: 0
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 0
-      damage: 0
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0
-  - skillKey: 47
+  - skillKey: 57
     skillType: 0
     name: "\uB3C5\uCE68"
-    desc: "\uC989\uC2DC \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
+    desc: 
     cooldown: 0.5
     baseValue: 0
     skillElements:
-    - skillKey: 47
+    - skillKey: 57
       index: 0
-      launcherType: 3
+      componentType: 3
       indicatorType: 4
-      moveSpeed: 0
-      height: 0
-      width: 0
-      angle: 0
-      radius: 0
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 0
-      damage: 3
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0
-  - skillKey: 48
+  - skillKey: 58
     skillType: 0
     name: "\uD654\uC5FC \uD22C\uC0AC\uCCB4"
-    desc: "\uD654\uC5FC\uC744 \uB0A0\uB9BD\uB2C8\uB2E4"
+    desc: 
     cooldown: 5
     baseValue: 0
     skillElements:
-    - skillKey: 48
+    - skillKey: 58
       index: 0
-      launcherType: 0
+      componentType: 0
       indicatorType: 0
-      moveSpeed: 10
-      height: 0
-      width: 0
-      angle: 0
-      radius: 0
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 0
-      damage: 4
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0
-  - skillKey: 49
+  - skillKey: 59
     skillType: 0
     name: "\uADFC\uC811 \uACF5\uACA9"
-    desc: "\uC989\uC2DC \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
+    desc: 
     cooldown: 0.5
     baseValue: 0
     skillElements:
-    - skillKey: 49
+    - skillKey: 59
       index: 0
-      launcherType: 3
+      componentType: 3
       indicatorType: 4
-      moveSpeed: 0
-      height: 0
-      width: 0
-      angle: 0
-      radius: 0
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 0
-      damage: 3
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0
-  - skillKey: 50
+  - skillKey: 60
     skillType: 0
     name: '-'
-    desc: '-'
+    desc: 
     cooldown: 0.5
     baseValue: 0
     skillElements:
-    - skillKey: 50
+    - skillKey: 60
       index: 0
-      launcherType: 3
+      componentType: 3
       indicatorType: 4
-      moveSpeed: 0
-      height: 0
-      width: 0
-      angle: 0
-      radius: 0
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 0
-      damage: 5
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0
-  - skillKey: 51
+  - skillKey: 61
     skillType: 0
     name: '-'
-    desc: '-'
+    desc: 
     cooldown: 1.5
     baseValue: 0
     skillElements:
-    - skillKey: 51
+    - skillKey: 61
       index: 0
-      launcherType: 0
+      componentType: 0
       indicatorType: 0
-      moveSpeed: 15
-      height: 0
-      width: 0
-      angle: 0
-      radius: 0
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 0
-      damage: 5
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 2.1
-  - skillKey: 52
+  - skillKey: 62
     skillType: 0
     name: '-'
-    desc: '-'
+    desc: 
     cooldown: 0.6
     baseValue: 0
     skillElements:
-    - skillKey: 52
+    - skillKey: 62
       index: 0
-      launcherType: 3
+      componentType: 3
       indicatorType: 4
-      moveSpeed: 0
-      height: 0
-      width: 0
-      angle: 0
-      radius: 0
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 0
-      damage: 7
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0
-  - skillKey: 53
+  - skillKey: 63
     skillType: 0
     name: '-'
-    desc: '-'
+    desc: 
     cooldown: 2.5
     baseValue: 0
     skillElements:
-    - skillKey: 53
+    - skillKey: 63
       index: 0
-      launcherType: 1
+      componentType: 4
       indicatorType: 3
-      moveSpeed: 0
-      height: 0
-      width: 0
-      angle: 360
-      radius: 3
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 6
-      damage: 10
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0
-  - skillKey: 54
+    - skillKey: 63
+      index: 1
+      componentType: 1
+      indicatorType: 3
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
+      maxDistance: 6
+  - skillKey: 64
     skillType: 0
     name: '-'
-    desc: '-'
+    desc: 
     cooldown: 0.5
     baseValue: 0
     skillElements:
-    - skillKey: 54
+    - skillKey: 64
       index: 0
-      launcherType: 3
+      componentType: 3
       indicatorType: 4
-      moveSpeed: 0
-      height: 0
-      width: 0
-      angle: 0
-      radius: 0
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 0
-      damage: 10
-      duration: 0
-      interval: 0
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0
-  - skillKey: 55
+  - skillKey: 65
     skillType: 0
     name: '-'
-    desc: '-'
+    desc: 
     cooldown: 8
     baseValue: 0
     skillElements:
-    - skillKey: 55
+    - skillKey: 65
       index: 0
-      launcherType: 4
+      componentType: 5
       indicatorType: 1
-      moveSpeed: 0
-      height: 0
-      width: 0
-      angle: 0
-      radius: 0
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
       maxDistance: 0
-      damage: 15
-      duration: 0.9
-      interval: 0.1
-      ricochet: 0
-      piercing: 0
-      projectileCount: 0

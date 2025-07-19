@@ -12,22 +12,22 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: SpawnGroupReader
   m_EditorClassIdentifier: Assembly-CSharp::SpawnGroupDataReader
-  sheetAddress: 15RA8mCckMbGIXxx5Ukfmtih0TxDTEGkXiAVyrHf8Blw
+  sheetName: SpawnGroup
   startRow: 2
   endRow: 15
   spawnGroupDatas:
   - groupID: 0
     unitID: 1001
-    count: 5
-    repeat: 3
-    repeatInterval: 0.8
+    count: 2
+    repeat: 1
+    repeatInterval: 100
     pattern: 0
     startDelay: 0
   - groupID: 1
     unitID: 1001
-    count: 3
-    repeat: 3
-    repeatInterval: 0.5
+    count: 2
+    repeat: 1
+    repeatInterval: 100
     pattern: 0
     startDelay: 2.5
   - groupID: 2

@@ -191,7 +191,10 @@ public class SkillModule : MonoBehaviour
         return skillInstances.ContainsKey(skillKey) ? skillInstances[skillKey] : null;
     }
 
-    public bool IsMeleeSkill(SkillKey skillKey) => GetSkillInstance(skillKey).Values[0].launcherType == SkillLauncherType.InstantAttack;
+    public bool IsMeleeSkill(SkillKey skillKey)
+    {
+        return GetSkillInstance(skillKey).Values[0].type == SkillComponentType.InstantAttack;
+    }
 
     public bool CanUseSkill(SkillKey skillKey)
     {

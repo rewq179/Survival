@@ -33,6 +33,12 @@ public class DataMgr : MonoBehaviour
         for (int i = 0; i < skillDataReader.skillDatas.Count; i++)
         {
             SkillData data = skillDataReader.skillDatas[i];
+            if (skillDatas.ContainsKey(data.skillKey))
+            {
+                Debug.LogError($"SkillDataReader: {data.skillKey} is already exists");
+                continue;
+            }
+
             skillDatas.Add(data.skillKey, data);
 
             if (data.skillType == SkillType.Active)
@@ -47,6 +53,12 @@ public class DataMgr : MonoBehaviour
         {
             SubSkillData data = subSkillDataReader.subSkillDatas[i];
             data.SetName(GetSkillData(data.parentSkillKey).name);
+            if (subSkillDatas.ContainsKey(data.skillKey))
+            {
+                Debug.LogError($"SubSkil: {data.skillKey} is already exists");
+                continue;
+            }
+
             subSkillDatas.Add(data.skillKey, data);
 
             if (subSkillDatasByMain.TryGetValue(data.parentSkillKey, out List<SkillKey> keys))

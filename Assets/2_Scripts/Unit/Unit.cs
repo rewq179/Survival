@@ -146,7 +146,7 @@ public class Unit : MonoBehaviour
     // PlayerSaveData
     public int Level => playerSaveData.level;
     public float CurExp => playerSaveData.exp;
-    public float MaxExp => playerSaveData.GetRequiredExp(playerSaveData.level);
+    public float MaxExp => GameValue.GetRequiredExp(playerSaveData.level);
     public int Gold => playerSaveData.gold;
 
     public event Action<int> OnLevelChanged

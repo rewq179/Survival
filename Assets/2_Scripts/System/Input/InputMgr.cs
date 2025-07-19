@@ -20,15 +20,13 @@ public class InputMgr : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            PlayerInputAction = new PlayerInputAction();
         }
+        
         else
         {
             Destroy(gameObject);
-            return;
         }
-
-        PlayerInputAction = new PlayerInputAction();
     }
 
     public void EnablePlayerInput()

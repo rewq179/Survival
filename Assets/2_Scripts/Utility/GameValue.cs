@@ -2,7 +2,13 @@ using UnityEngine;
 
 public class GameValue
 {
+    public const string SHEET_ADDRESS = "15RA8mCckMbGIXxx5Ukfmtih0TxDTEGkXiAVyrHf8Blw";
     public static readonly LayerMask UNIT_LAYERS = LayerMask.GetMask("Unit");
+
+    public static float GetRequiredExp(int level)
+    {
+        return 3 + 10 * (level + 1) * 1.5f;
+    }
 
     // 스킬
     public const float PROJECTILE_MAX_LENGTH = 15f;

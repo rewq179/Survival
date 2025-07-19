@@ -12,7 +12,7 @@ using UnityEditor;
 public enum SubSkillType
 {
     Cooldown,               // 쿨다운 감소
-    ProjectileCount,        // 투사체 개수 증가
+    Shot,        // 투사체 개수 증가
     Piercing,               // 관통
     Ricochet,               // 도탄
     Damage,                 // 데미지 증가
@@ -69,9 +69,11 @@ public class SubSkillData
 
 
 [CreateAssetMenu(fileName = "SubSkillReader", menuName = "Scriptable Object/SubSkillDataReader", order = int.MaxValue)]
-public class SubSkillDataReader : BaseReader
+public class SubSkillDataReader : ScriptableObject
 {
-    public override string sheetName => "SubSkill";
+    public string sheetName = "SubSkill";
+    public int startRow = 2;
+    public int endRow = -1;
 
     [SerializeField]
     public List<SubSkillData> subSkillDatas = new List<SubSkillData>();
@@ -160,7 +162,7 @@ public class SubSkillDataReaderEditor : Editor
 
     void UpdateStats(UnityAction<GstuSpreadSheet> callback, bool mergedCells = false)
     {
-        SpreadsheetManager.Read(new GSTU_Search(dataReader.sheetAddress, dataReader.sheetName), callback, mergedCells);
+        SpreadsheetManager.Read(new GSTU_Search(GameValue.SHEET_ADDRESS, dataReader.sheetName), callback, mergedCells);
     }
 
     void UpdateMethodOne(GstuSpreadSheet ss)

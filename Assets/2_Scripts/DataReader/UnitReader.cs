@@ -33,9 +33,11 @@ public class UnitData
 }
 
 [CreateAssetMenu(fileName = "UnitReader", menuName = "Scriptable Object/UnitDataReader", order = int.MaxValue)]
-public class UnitDataReader : BaseReader
+public class UnitDataReader : ScriptableObject
 {
-    public override string sheetName => "Unit";
+    public string sheetName = "Unit";
+    public int startRow = 2;
+    public int endRow = -1;
 
     [SerializeField]
     public List<UnitData> unitDatas = new List<UnitData>();
@@ -150,7 +152,7 @@ public class UnitDataReaderEditor : Editor
 
     void UpdateStats(UnityAction<GstuSpreadSheet> callback, bool mergedCells = false)
     {
-        SpreadsheetManager.Read(new GSTU_Search(dataReader.sheetAddress, dataReader.sheetName), callback, mergedCells);
+        SpreadsheetManager.Read(new GSTU_Search(GameValue.SHEET_ADDRESS, dataReader.sheetName), callback, mergedCells);
     }
 
     void UpdateMethodOne(GstuSpreadSheet ss)

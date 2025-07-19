@@ -1,63 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-[System.Serializable]
-public class SkillElement
-{
-    public SkillKey skillKey;
-    public int index;
-
-    public SkillLauncherType launcherType;
-    public SkillIndicatorType indicatorType;
-    public float moveSpeed;
-    public float height;
-    public float width;
-    public float angle;
-    public float radius;
-    public float maxDistance;
-    public float damage;
-    public float duration;
-    public float interval;
-    public float ricochet;
-    public float piercing;
-    public float projectileCount;
-
-    public bool IsMainIndicator => index == 0;
-
-    public void Init(SkillKey skillKey, int index, float speed, float height, float width, float angle,
-        float radius, float damage, float duration, float interval, float ricochet, float piercing,
-        float projectileCount, SkillLauncherType launcherType)
-    {
-        this.skillKey = skillKey;
-        this.index = index;
-        this.moveSpeed = speed;
-        this.height = height;
-        this.width = width;
-        this.angle = angle;
-        this.radius = radius;
-        this.damage = damage;
-        this.duration = duration;
-        this.interval = interval;
-        this.ricochet = ricochet;
-        this.piercing = piercing;
-        this.projectileCount = projectileCount;
-        this.launcherType = launcherType;
-
-        if (launcherType == SkillLauncherType.Projectile)
-            indicatorType = SkillIndicatorType.Line;
-        else if (launcherType == SkillLauncherType.Beam)
-            indicatorType = SkillIndicatorType.Rectangle;
-        else if (angle == 0)
-            indicatorType = SkillIndicatorType.InstantAttack;
-        else if (angle < 360)
-            indicatorType = SkillIndicatorType.Sector;
-        else
-            indicatorType = SkillIndicatorType.Circle;
-
-        maxDistance = radius > 0 ? radius * 2f : width * 1.6f;
-    }
-}
-
 public enum SkillIndicatorType
 {
     Line,
@@ -266,8 +209,8 @@ public class SkillIndicator : MonoBehaviour
                 return startPoint + direction * GameValue.PROJECTILE_MAX_LENGTH;
 
             case SkillIndicatorType.Sector:
-                float halfAngleRad = element.angle * 0.5f * Mathf.Deg2Rad;
-                return startPoint + direction * (element.radius * Mathf.Cos(halfAngleRad) * 2f);
+                float halfAngleRad = element.Angle * 0.5f * Mathf.Deg2Rad;
+                return startPoint + direction * (element.Radius * Mathf.Cos(halfAngleRad) * 2f);
 
             case SkillIndicatorType.Circle:
                 if ((mouse - startPoint).magnitude > element.maxDistance)

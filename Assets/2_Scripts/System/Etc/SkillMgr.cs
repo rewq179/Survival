@@ -295,13 +295,13 @@ public class SkillMgr : MonoBehaviour
 
     private SkillLauncher CreateMultipleLauncher(SkillInstance inst, Vector3 startPos, Vector3 direction, Unit caster, Unit target)
     {
-        int projectileCount = inst.Values[0].projectileCountFinal.GetInt();
+        int shot = inst.Values[0].ShotFinal.GetInt();
         float spreadAngle = GameValue.PROJECTILE_SPREAD_ANGLE;
         
-        float angleStep = spreadAngle / (projectileCount - 1);
+        float angleStep = spreadAngle / (shot - 1);
         float startAngle = -spreadAngle * 0.5f;
 
-        for (int i = 0; i < projectileCount; i++)
+        for (int i = 0; i < shot; i++)
         {
             float curAngle = startAngle + (angleStep * i);
             Vector3 rotatedDirection = Quaternion.Euler(0, curAngle, 0) * direction;
@@ -333,15 +333,7 @@ public class SkillMgr : MonoBehaviour
     {
         SkillLauncher launcher = PopSkillLauncher();
         launcher.Init(player, player.transform.position, Vector3.zero);
-
-        SkillComponent component = type switch
-        {
-            CollectibleType.Freeze => new FreezeItemEffect(),
-            CollectibleType.Explosion => new ExplosionItemEffect(),
-            _ => null,
-        };
-
-        launcher.AddSkillComponent(component);
+        launcher.CreateComponent(type);
     }
 
     #endregion
@@ -375,8 +367,8 @@ public class SkillMgr : MonoBehaviour
         return element.indicatorType switch
         {
             SkillIndicatorType.Line => SkillIndicator.CreateLineMesh(GameValue.PROJECTILE_MAX_LENGTH, GameValue.PROJECTILE_MAX_WIDTH),
-            SkillIndicatorType.Sector => SkillIndicator.CreateSectorMesh(element.angle, element.radius),
-            SkillIndicatorType.Circle => SkillIndicator.CreateCircleMesh(element.radius),
+            SkillIndicatorType.Sector => SkillIndicator.CreateSectorMesh(element.Angle, element.Radius),
+            SkillIndicatorType.Circle => SkillIndicator.CreateCircleMesh(element.Radius),
             SkillIndicatorType.Rectangle => SkillIndicator.CreateLineMesh(GameValue.PROJECTILE_MAX_LENGTH, GameValue.PROJECTILE_MAX_WIDTH),
             _ => null,
         };

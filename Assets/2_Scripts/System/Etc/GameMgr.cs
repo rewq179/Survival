@@ -22,7 +22,6 @@ public class GameMgr : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
 
         else
@@ -71,6 +70,10 @@ public class GameMgr : MonoBehaviour
         UIMgr.Instance.UpdateUI();
 
         spawnMgr.Init();
+#if UNITY_EDITOR
+        // playerUnit.LearnSkill(SkillKey.Blackhole);
+        // playerUnit.LearnSkill(SkillKey.IseAttack);
+#endif
         OnGameResume();
     }
 

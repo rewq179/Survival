@@ -2,28 +2,75 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
+public enum SkillComponentType
+{
+    Projectile,
+    InstantAOE,
+    PeriodicAOE,
+    InstantAttack,
+    Leap,
+    Beam,
+    Freeze,
+    Explosion,
+    Max,
+}
+
+public enum ComponentState
+{
+    NotStarted,
+    Running,
+    Completed
+}
+
 public abstract class SkillComponent
 {
+    public abstract SkillComponentType Type { get; }
+    public ExecutionTiming timing;
+    protected ComponentState state = ComponentState.NotStarted;
+    public int order;
+
     protected SkillLauncher launcher;
     protected SkillParticleController particleController;
     protected UnitType enemyType;
     protected float damage;
 
-    public virtual void OnInitialize(SkillLauncher launcher, SkillParticleController particle)
+    public ComponentState State => state;
+    public bool IsCompleted => state == ComponentState.Completed;
+
+    public virtual void Init(InstanceValue inst, Unit fixedTarget)
     {
-        this.launcher = launcher;
-        enemyType = launcher.Caster.UnitType == UnitType.Player ? UnitType.Monster : UnitType.Player;
-
-        if (particle == null)
-            return;
-
-        particleController = particle;
-        particleController.OnParticleFinished += launcher.Deactivate;
-
-        if (!IsWaitAction)
-            particleController.Play();
+        order = inst.order;
+        timing = inst.timing;
     }
 
+    public virtual void OnStart(SkillLauncher launcher, SkillParticleController particle)
+    {
+        if (state != ComponentState.NotStarted)
+            return;
+
+        this.launcher = launcher;
+        state = ComponentState.Running;
+        enemyType = launcher.Caster.UnitType == UnitType.Player ? UnitType.Monster : UnitType.Player;
+
+        if (particle != null)
+        {
+            particleController = particle;
+            particleController.OnParticleFinished += launcher.CheckDeactivate;
+            particleController.Play();
+        }
+    }
+
+    public abstract void OnUpdate(float deltaTime);
+    protected void OnEnd()
+    {
+        if (state == ComponentState.Completed)
+            return;
+
+        state = ComponentState.Completed;
+        launcher.CheckDeactivate();
+    }
+
+    public abstract void OnHit(Unit target);
     protected void ApplyDamage(Unit target)
     {
         DamageInfo damageInfo = CombatMgr.PopDamageInfo();
@@ -31,11 +78,7 @@ public abstract class SkillComponent
         CombatMgr.ProcessDamage(damageInfo);
     }
 
-    public virtual bool IsWaitAction => false;
-    public abstract void OnUpdate(float deltaTime);
-    public abstract void OnHit(Unit target);
     public bool IsHittable(Unit target) => target != null && !target.IsDead && target.UnitType == enemyType;
-    public virtual void OnDestroy() { }
 
     #region 타겟 Getter
 
@@ -71,8 +114,11 @@ public class ProjectileComponent : SkillComponent
     private bool isHit;
     private HashSet<int> hittedUnitIDs = new();
 
-    public ProjectileComponent(InstanceValue inst)
+    public override SkillComponentType Type => SkillComponentType.Projectile;
+
+    public override void Init(InstanceValue inst, Unit fixedTarget)
     {
+        base.Init(inst, fixedTarget);
         damage = inst.damageFinal;
         moveSpeed = inst.moveSpeedFinal;
         richocet = inst.ricochetFinal.GetInt();
@@ -81,9 +127,9 @@ public class ProjectileComponent : SkillComponent
         hittedUnitIDs.Clear();
     }
 
-    public override void OnInitialize(SkillLauncher launcher, SkillParticleController particle)
+    public override void OnStart(SkillLauncher launcher, SkillParticleController particle)
     {
-        base.OnInitialize(launcher, particle);
+        base.OnStart(launcher, particle);
         startPos = launcher.Position;
         direction = launcher.transform.forward;
         hittedUnitIDs.Add(launcher.Caster.UniqueID);
@@ -101,7 +147,7 @@ public class ProjectileComponent : SkillComponent
         float currentDistance = (launcher.Position - startPos).sqrMagnitude;
         if (currentDistance >= maxLength)
         {
-            launcher.Deactivate();
+            OnEnd();
             return;
         }
 
@@ -151,7 +197,7 @@ public class ProjectileComponent : SkillComponent
             return;
         }
 
-        launcher.Deactivate();
+        OnEnd();
     }
 
     /// <summary>
@@ -190,43 +236,32 @@ public class ProjectileComponent : SkillComponent
 /// </summary>
 public class AOEComponent : SkillComponent
 {
+    public override SkillComponentType Type => SkillComponentType.InstantAOE;
     protected SkillIndicatorType type;
     protected float angle;
     protected float radius;
     protected float maxDistance;
-    protected bool isWaitAction;
-    protected bool canAction;
 
-    public override bool IsWaitAction => isWaitAction;
-
-    public AOEComponent(InstanceValue inst, bool isWait)
+    public override void Init(InstanceValue inst, Unit fixedTarget)
     {
+        base.Init(inst, fixedTarget);
         damage = inst.damageFinal;
         radius = inst.radiusFinal;
         angle = inst.angle;
         maxDistance = radius * radius;
-        this.isWaitAction = isWait;
-        canAction = false;
         type = angle == 360f ? SkillIndicatorType.Circle : SkillIndicatorType.Sector;
     }
 
-    public override void OnInitialize(SkillLauncher launcher, SkillParticleController particle)
+    public override void OnStart(SkillLauncher launcher, SkillParticleController particle)
     {
-        base.OnInitialize(launcher, particle);
-
-        if (!IsWaitAction)
-            ExecuteAttack();
+        base.OnStart(launcher, particle);
+        ExecuteAttack();
     }
 
-    public void SetCanAction(bool canAction) => this.canAction = canAction;
     public override void OnUpdate(float deltaTime)
     {
-        if (isWaitAction && canAction)
-        {
-            particleController.Play();
-            isWaitAction = false;
-            ExecuteAttack();
-        }
+        particleController.Play();
+        ExecuteAttack();
     }
 
     public void ExecuteAttack()
@@ -276,7 +311,6 @@ public class AOEComponent : SkillComponent
     }
 
     public override void OnHit(Unit target) => ApplyDamage(target);
-    public override void OnDestroy() { }
 }
 
 /// <summary>
@@ -284,11 +318,13 @@ public class AOEComponent : SkillComponent
 /// </summary>
 public class PeriodicAOEComponent : AOEComponent
 {
+    public override SkillComponentType Type => SkillComponentType.PeriodicAOE;
     private float interval;
     private float lastDamageTime;
 
-    public PeriodicAOEComponent(InstanceValue inst) : base(inst, false)
+    public override void Init(InstanceValue inst, Unit fixedTarget)
     {
+        base.Init(inst, fixedTarget);
         interval = inst.damageTickFinal;
         lastDamageTime = Time.time;
     }
@@ -308,17 +344,18 @@ public class PeriodicAOEComponent : AOEComponent
 /// </summary>
 public class InstantComponent : SkillComponent
 {
+    public override SkillComponentType Type => SkillComponentType.InstantAttack;
     private Unit target;
 
-    public InstantComponent(InstanceValue inst, Unit target)
+    public override void Init(InstanceValue inst, Unit fixedTarget)
     {
+        base.Init(inst, fixedTarget);
         damage = inst.damageFinal;
-        this.target = target;
     }
 
-    public override void OnInitialize(SkillLauncher launcher, SkillParticleController particle)
+    public override void OnStart(SkillLauncher launcher, SkillParticleController particle)
     {
-        base.OnInitialize(launcher, particle);
+        base.OnStart(launcher, particle);
         OnHit(target);
     }
 
@@ -326,7 +363,7 @@ public class InstantComponent : SkillComponent
     public override void OnHit(Unit target)
     {
         ApplyDamage(target);
-        launcher.Deactivate();
+        OnEnd();
     }
 }
 
@@ -335,6 +372,7 @@ public class InstantComponent : SkillComponent
 /// </summary>
 public class LeapComponent : SkillComponent
 {
+    public override SkillComponentType Type => SkillComponentType.Leap;
     private SkillIndicator startIndicator;
     private SkillIndicator finalIndicator;
     private Vector3 startPos;
@@ -347,16 +385,17 @@ public class LeapComponent : SkillComponent
     private const float LEAP_DURATION = 0.6f;
     private const float LEAP_INV_DURATION = 1f / LEAP_DURATION;
 
-    public LeapComponent(Vector3 targetPos)
+    public override void Init(InstanceValue inst, Unit fixedTarget)
     {
-        this.targetPos = targetPos;
+        base.Init(inst, fixedTarget);
+        this.targetPos = fixedTarget.transform.position;
         isLeapCompleted = false;
         time = 0f;
     }
 
-    public override void OnInitialize(SkillLauncher launcher, SkillParticleController particle)
+    public override void OnStart(SkillLauncher launcher, SkillParticleController particle)
     {
-        base.OnInitialize(launcher, particle);
+        base.OnStart(launcher, particle);
 
         // 위치
         startPos = launcher.Position;
@@ -400,11 +439,7 @@ public class LeapComponent : SkillComponent
 
     private void ActivateAOEComponents()
     {
-        foreach (SkillComponent component in launcher.Components)
-        {
-            if (component is AOEComponent aoeComponent)
-                aoeComponent.SetCanAction(true);
-        }
+
     }
 
     public override void OnHit(Unit target) { }
@@ -412,6 +447,7 @@ public class LeapComponent : SkillComponent
 
 public class BeamComponent : SkillComponent
 {
+    public override SkillComponentType Type => SkillComponentType.Beam;
     private float length;
     private float damageTick;
     private float skillDuration;
@@ -428,26 +464,26 @@ public class BeamComponent : SkillComponent
     private float tickTime;
     private float indicatorDuration;
     private float invIndicatorDuration;
-    public override bool IsWaitAction => true;
 
-    public BeamComponent(InstanceValue inst, Vector3 targetPos)
+    public override void Init(InstanceValue inst, Unit fixedTarget)
     {
+        base.Init(inst, fixedTarget);
         damage = inst.damageFinal;
         damageTick = inst.damageTickFinal;
         length = GameValue.PROJECTILE_MAX_LENGTH;
         skillDuration = inst.durationFinal;
 
         isIndicatorTime = true;
-        this.targetPos = targetPos;
+        targetPos = fixedTarget.transform.position;
         indicatorDuration = 0.4f;
         invIndicatorDuration = 1f / indicatorDuration;
         tickTime = 0f;
         time = 0f;
     }
 
-    public override void OnInitialize(SkillLauncher launcher, SkillParticleController particle)
+    public override void OnStart(SkillLauncher launcher, SkillParticleController particle)
     {
-        base.OnInitialize(launcher, particle);
+        base.OnStart(launcher, particle);
         startPos = launcher.Position;
         direction = (targetPos - startPos).normalized;
 
@@ -535,15 +571,16 @@ public class BeamComponent : SkillComponent
 
 public class FreezeItemEffect : SkillComponent
 {
+    public override SkillComponentType Type => SkillComponentType.Freeze;
     private float time;
     private List<Unit> monsters = new();
 
     private const float SLOW_PERCENT = -0.5f;
     private const float DURATION = 5f;
 
-    public override void OnInitialize(SkillLauncher launcher, SkillParticleController particle)
+    public override void OnStart(SkillLauncher launcher, SkillParticleController particle)
     {
-        base.OnInitialize(launcher, particle);
+        base.OnStart(launcher, particle);
         time = 0f;
 
         monsters = new List<Unit>(GameMgr.Instance.spawnMgr.AliveEnemies);
@@ -565,37 +602,34 @@ public class FreezeItemEffect : SkillComponent
             monster.AddStatModifier(StatType.MoveSpeed, SLOW_PERCENT);
         }
 
-        launcher.Deactivate();
+        OnEnd();
     }
 
     public override void OnHit(Unit target) { }
-    public override void OnDestroy() { }
 }
 
 public class ExplosionItemEffect : SkillComponent
 {
+    public override SkillComponentType Type => SkillComponentType.Explosion;
     private const float EXPLOSION_RADIUS = 20f;
     private const float EXPLOSION_DAMAGE = 100f;
 
-    public ExplosionItemEffect()
+    public void Init()
     {
         damage = EXPLOSION_DAMAGE;
     }
 
-    public override void OnInitialize(SkillLauncher launcher, SkillParticleController particle)
+    public override void OnStart(SkillLauncher launcher, SkillParticleController particle)
     {
-        base.OnInitialize(launcher, particle);
+        base.OnStart(launcher, particle);
 
         List<Unit> targets = GetHitTargetsBySphere(launcher.Position, EXPLOSION_RADIUS);
         foreach (Unit target in targets)
         {
             OnHit(target);
         }
-
-        launcher.Deactivate();
     }
 
     public override void OnUpdate(float deltaTime) { }
     public override void OnHit(Unit target) => ApplyDamage(target);
-    public override void OnDestroy() { }
 }

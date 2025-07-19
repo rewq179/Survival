@@ -19,11 +19,6 @@ public class PlayerSaveData
         this.unit = unit;
     }
 
-    public float GetRequiredExp(int level)
-    {
-        return 10 * (level + 1) * 1.5f;
-    }
-
     public int AddExp(float amount)
     {
         int levelUpCount = 0;
@@ -31,7 +26,7 @@ public class PlayerSaveData
 
         while (true)
         {
-            float requiredExp = GetRequiredExp(level);
+            float requiredExp = GameValue.GetRequiredExp(level);
             if (exp < requiredExp)
                 break;
 

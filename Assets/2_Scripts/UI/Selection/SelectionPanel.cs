@@ -82,7 +82,7 @@ public class SelectionPanel : MonoBehaviour
     {
         SkillData skillData = DataMgr.GetSkillData(key);
         SelectionData data = PopSelectionData();
-        data.Init(key, skillData.skillType, skillData.name, skillData.desc, GameMgr.Instance.resourceMgr.GetSkillIcon(key));
+        data.Init(key, skillData.skillType, skillData.name, skillData.desc, GetSkillIcon(key));
         return data;
     }
 
@@ -90,8 +90,13 @@ public class SelectionPanel : MonoBehaviour
     {
         SubSkillData skillData = DataMgr.GetSubSkillData(key);
         SelectionData data = PopSelectionData();
-        data.Init(key, SkillType.Sub, skillData.name, skillData.description, GameMgr.Instance.resourceMgr.GetSkillIcon(key));
+        data.Init(key, SkillType.Sub, skillData.name, skillData.description, GetSkillIcon(skillData.parentSkillKey));
         return data;
+    }
+
+    private Sprite GetSkillIcon(SkillKey key)
+    {
+        return GameMgr.Instance.resourceMgr.GetSkillIcon(key);
     }
 
     private void GetRandomSkills(int count)
