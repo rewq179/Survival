@@ -32,6 +32,7 @@ public class UnitData
     }
 }
 
+[System.Serializable]
 [CreateAssetMenu(fileName = "UnitReader", menuName = "Scriptable Object/UnitDataReader", order = int.MaxValue)]
 public class UnitDataReader : ScriptableObject
 {
@@ -55,7 +56,7 @@ public class UnitDataReader : ScriptableObject
         for (int i = 0; i < cells.Count; i++)
         {
             string columnId = cells[i].columnId.ToLowerInvariant();
-            
+
             switch (columnId)
             {
                 case "id":

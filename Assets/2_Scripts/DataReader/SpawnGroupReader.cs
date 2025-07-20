@@ -32,6 +32,7 @@ public class SpawnGroupData
     }
 }
 
+ [System.Serializable]
 [CreateAssetMenu(fileName = "SpawnGroupReader", menuName = "Scriptable Object/SpawnGroupDataReader", order = int.MaxValue)]
 public class SpawnGroupDataReader : ScriptableObject
 {

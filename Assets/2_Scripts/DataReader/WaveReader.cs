@@ -32,6 +32,7 @@ public class WaveData
     }
 }
 
+[System.Serializable]
 [CreateAssetMenu(fileName = "WaveReader", menuName = "Scriptable Object/WaveDataReader", order = int.MaxValue)]
 public class WaveDataReader : ScriptableObject
 {
