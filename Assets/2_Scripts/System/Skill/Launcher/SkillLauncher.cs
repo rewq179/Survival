@@ -9,8 +9,6 @@ public class SkillLauncher : MonoBehaviour
     private Vector3 direction;
     private Unit caster;
     private bool isActive;
-    private float duration;
-    private float time;
     private bool isParticleFinished;
 
     // 컴포넌트 관리
@@ -21,8 +19,8 @@ public class SkillLauncher : MonoBehaviour
 
     // 현재 Order 내 컴포넌트 실행 관리
     private int currentSequentialIndex;  // 현재 순차 실행 중인 컴포넌트 인덱스
-    private bool isSequentialExecutionComplete;  // 순차 실행 완료 여부
-    private List<SkillComponent> immediateComponents = new();  // 현재 Order의 즉시 실행 컴포넌트들
+    private bool isSequentialComplete;  // 순차 실행 완료 여부
+    private List<SkillComponent> instantComponents = new();  // 현재 Order의 즉시 실행 컴포넌트들
     private List<SkillComponent> sequentialComponents = new();  // 현재 Order의 순차 실행 컴포넌트들
 
     public SkillKey SkillKey => skillKey;
@@ -34,15 +32,14 @@ public class SkillLauncher : MonoBehaviour
     public void Reset()
     {
         isActive = false;
-        time = 0f;
         orderGroups.Clear();
         orderSequence.Clear();
         currentOrderIndex = 0;
         isCurrentOrderCompleted = false;
-        immediateComponents.Clear();
+        instantComponents.Clear();
         sequentialComponents.Clear();
         currentSequentialIndex = 0;
-        isSequentialExecutionComplete = false;
+        isSequentialComplete = false;
         transform.position = Vector3.zero;
         transform.rotation = Quaternion.identity;
         gameObject.SetActive(false);
@@ -53,7 +50,6 @@ public class SkillLauncher : MonoBehaviour
         if (!isActive)
             return;
 
-        time += Time.deltaTime;
         UpdateComponentsByOrder();
     }
 
@@ -75,8 +71,10 @@ public class SkillLauncher : MonoBehaviour
         this.direction = direction.normalized;
         SetTransform(position, direction);
         isActive = true;
-        time = 0f;
 
+#if UNITY_EDITOR
+        gameObject.name = $"Launcher_{skillKey}";
+#endif
         gameObject.SetActive(true);
     }
 
@@ -147,14 +145,14 @@ public class SkillLauncher : MonoBehaviour
         List<SkillComponent> components = orderGroups[order];
 
         // 현재 Order의 컴포넌트들을 즉시/순차로 분류만 수행
-        immediateComponents.Clear();
+        instantComponents.Clear();
         sequentialComponents.Clear();
 
         foreach (SkillComponent component in components)
         {
-            if (component.timing == ExecutionTiming.Immediate)
+            if (component.timing == ExecutionTiming.Instant)
             {
-                immediateComponents.Add(component);
+                instantComponents.Add(component);
             }
 
             else if (component.timing == ExecutionTiming.Sequential)
@@ -165,7 +163,7 @@ public class SkillLauncher : MonoBehaviour
 
         // 순차 실행 초기화
         currentSequentialIndex = 0;
-        isSequentialExecutionComplete = sequentialComponents.Count == 0;
+        isSequentialComplete = sequentialComponents.Count == 0;
     }
 
     private void UpdateComponentsByOrder()
@@ -175,11 +173,11 @@ public class SkillLauncher : MonoBehaviour
 
         // 현재 Order의 즉시 실행 컴포넌트들 시작 및 업데이트
         bool allImmediateCompleted = true;
-        foreach (SkillComponent component in immediateComponents)
+        foreach (SkillComponent component in instantComponents)
         {
             if (component.State == ComponentState.NotStarted)
             {
-                component.OnStart(this);
+                component.OnStart();
             }
 
             if (component.State == ComponentState.Running)
@@ -192,7 +190,7 @@ public class SkillLauncher : MonoBehaviour
         }
 
         // 즉시 실행 컴포넌트들이 모두 완료되었고, 순차 실행이 아직 완료되지 않았다면
-        if (allImmediateCompleted && !isSequentialExecutionComplete)
+        if (allImmediateCompleted && !isSequentialComplete)
         {
             UpdateSequentialComponents();
         }
@@ -225,7 +223,7 @@ public class SkillLauncher : MonoBehaviour
         // 모든 순차 컴포넌트가 완료되었는지 체크
         if (currentSequentialIndex >= sequentialComponents.Count)
         {
-            isSequentialExecutionComplete = true;
+            isSequentialComplete = true;
             return;
         }
 
@@ -234,7 +232,7 @@ public class SkillLauncher : MonoBehaviour
         switch (currentComponent.State)
         {
             case ComponentState.NotStarted:
-                currentComponent.OnStart(this);
+                currentComponent.OnStart();
                 break;
             case ComponentState.Running:
                 currentComponent.OnUpdate(Time.deltaTime);
@@ -269,6 +267,9 @@ public class SkillLauncher : MonoBehaviour
             List<SkillComponent> components = group.Value;
             foreach (SkillComponent component in components)
             {
+                if (component.EffectController != null)
+                    skillMgr.PushSkillObject(skillKey, component.EffectController);
+
                 skillMgr.PushComponent(component);
             }
         }

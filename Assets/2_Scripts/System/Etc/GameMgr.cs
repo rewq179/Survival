@@ -71,8 +71,8 @@ public class GameMgr : MonoBehaviour
 
         spawnMgr.Init();
 #if UNITY_EDITOR
-        // playerUnit.LearnSkill(SkillKey.Blackhole);
-        // playerUnit.LearnSkill(SkillKey.IseAttack);
+        playerUnit.LearnSkill(SkillKey.Blackhole);
+        playerUnit.LearnSkill(SkillKey.IseAttack);
 #endif
         OnGameResume();
     }

@@ -111,13 +111,13 @@ public enum ElementType
     Ricochet,
     Piercing,
     Shot,
-    Power,
+    Gravity,
     Max,
 }
 
 public enum ExecutionTiming
 {
-    Immediate,      // 즉시 실행
+    Instant,        // 즉시 실행
     Sequential,     // 순차 실행 (이전 엘리먼트 완료 후)
     Max,
 }
@@ -155,7 +155,7 @@ public class SkillElement
     public float Ricochet => GetParameter(ElementType.Ricochet);
     public float Piercing => GetParameter(ElementType.Piercing);
     public float Shot => GetParameter(ElementType.Shot);
-    public float Power => GetParameter(ElementType.Power);
+    public float Gravity => GetParameter(ElementType.Gravity);
 
     public void Init(SkillKey skillKey, int index, SkillComponentType componentType)
     {

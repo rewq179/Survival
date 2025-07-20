@@ -10,12 +10,16 @@ public class SkillEffectController : MonoBehaviour
     {
         collision?.Reset();
         particle.Reset();
+        transform.position = Vector3.zero;
+        transform.rotation = Quaternion.identity;
+        gameObject.SetActive(false);
     }
 
     public void Init()
     {
         collision?.Init();
         particle.Init();
+        gameObject.SetActive(true);
     }
 
     public void Play() => particle.Play();

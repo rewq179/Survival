@@ -27,11 +27,7 @@ public class SkillParticle : MonoBehaviour
             particleCheckCoroutine = null;
         }
 
-        transform.position = Vector3.zero;
-        transform.rotation = Quaternion.identity;
-
         StopAllParticles();
-        gameObject.SetActive(false);
     }
 
     public void Init()

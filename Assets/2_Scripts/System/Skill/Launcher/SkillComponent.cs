@@ -11,6 +11,7 @@ public enum SkillComponentType
     Beam,
     Linear,
     Leap,
+    Gravity,
     Freeze,
     Explosion,
     Max,
@@ -35,22 +36,37 @@ public abstract class SkillComponent
     protected float damage;
 
     public ComponentState State => state;
+    public virtual SkillEffectController EffectController => null;
     public bool IsCompleted => state == ComponentState.Completed;
+
+    public virtual void Reset()
+    {
+        state = ComponentState.NotStarted;
+        launcher = null;
+        order = 0;
+        timing = ExecutionTiming.Instant;
+        damage = 0f;
+        enemyType = UnitType.Monster;
+    }
 
     public virtual void Init(SkillLauncher launcher, InstanceValue inst, Unit fixedTarget)
     {
         this.launcher = launcher;
-        order = inst.order;
-        timing = inst.timing;
+        enemyType = launcher.Caster.UnitType == UnitType.Player ? UnitType.Monster : UnitType.Player;
+
+        if (inst != null)
+        {
+            order = inst.order;
+            timing = inst.timing;
+        }
     }
 
-    public virtual void OnStart(SkillLauncher launcher)
+    public virtual void OnStart()
     {
         if (state != ComponentState.NotStarted)
             return;
 
         state = ComponentState.Running;
-        enemyType = launcher.Caster.UnitType == UnitType.Player ? UnitType.Monster : UnitType.Player;
     }
 
     public virtual void OnUpdate(float deltaTime) { }
@@ -115,22 +131,23 @@ public abstract class Attack_Component : SkillComponent
         effectController.SubscribeHitTarget(OnHit);
     }
 
+    public override SkillEffectController EffectController => effectController;
     private void OnParticleFinished()
     {
         launcher.SetParticleFinished(true);
         launcher.CheckDeactivate();
     }
 
-    public override void OnStart(SkillLauncher launcher)
+    public override void OnStart()
     {
-        base.OnStart(launcher);
-        effectController.Play();
+        base.OnStart();
+        effectController?.Play();
     }
 
     protected override void OnEnd()
     {
         base.OnEnd();
-        effectController.StopMain();
+        effectController?.StopMain();
     }
 }
 
@@ -148,6 +165,13 @@ public class Attack_ProjectileComponent : Attack_Component
 
     public override SkillComponentType Type => SkillComponentType.Projectile;
 
+    public override void Reset()
+    {
+        base.Reset();
+        isHit = false;
+        hittedUnitIDs.Clear();
+    }
+
     public override void Init(SkillLauncher launcher, InstanceValue inst, Unit fixedTarget)
     {
         base.Init(launcher, inst, fixedTarget);
@@ -156,12 +180,6 @@ public class Attack_ProjectileComponent : Attack_Component
         richocet = inst.ricochetFinal.GetInt();
         piercing = inst.piercingFinal.GetInt();
         maxLength = GameValue.PROJECTILE_MAX_LENGTH_POW;
-        hittedUnitIDs.Clear();
-    }
-
-    public override void OnStart(SkillLauncher launcher)
-    {
-        base.OnStart(launcher);
         startPos = launcher.Position;
         direction = launcher.transform.forward;
         hittedUnitIDs.Add(launcher.Caster.UniqueID);
@@ -267,6 +285,7 @@ public class Attack_AOEComponent : Attack_Component
     protected float radius;
     protected float maxDistance;
 
+    protected virtual bool IsInstantComplete => true;
     public override void Init(SkillLauncher launcher, InstanceValue inst, Unit fixedTarget)
     {
         base.Init(launcher, inst, fixedTarget);
@@ -277,11 +296,14 @@ public class Attack_AOEComponent : Attack_Component
         type = angle == 360f ? SkillIndicatorType.Circle : SkillIndicatorType.Sector;
     }
 
-    public override void OnStart(SkillLauncher launcher)
+    public override void OnStart()
     {
-        base.OnStart(launcher);
+        base.OnStart();
         ExecuteAttack();
-        OnEnd();
+        if (IsInstantComplete)
+        {
+            OnEnd();
+        }
     }
 
     protected void ExecuteAttack()
@@ -344,27 +366,34 @@ public class Attack_PeriodicAOEComponent : Attack_AOEComponent
 {
     public override SkillComponentType Type => SkillComponentType.PeriodicAOE;
     private float duration;
-    private float interval;
     private float time;
-    private float lastDamageTime;
+    private float tick;
+    private float lastTickTime;
+
+    protected override bool IsInstantComplete => false;
+    public override void Reset()
+    {
+        base.Reset();
+        time = 0f;
+        lastTickTime = 0f;
+    }
 
     public override void Init(SkillLauncher launcher, InstanceValue inst, Unit fixedTarget)
     {
         base.Init(launcher, inst, fixedTarget);
-        interval = inst.damageTickFinal;
+        tick = inst.damageTickFinal;
         duration = inst.durationFinal;
-        time = 0f;
-        lastDamageTime = Time.time;
+        lastTickTime = Time.time;
     }
 
     public override void OnUpdate(float deltaTime)
     {
         time += deltaTime;
         float currentTime = Time.time;
-        if (currentTime - lastDamageTime >= interval)
+        if (currentTime - lastTickTime >= tick)
         {
             ExecuteAttack();
-            lastDamageTime = currentTime;
+            lastTickTime = currentTime;
         }
 
         if (time >= duration)
@@ -375,7 +404,7 @@ public class Attack_PeriodicAOEComponent : Attack_AOEComponent
 }
 
 /// <summary> 즉시 공격 컴포넌트 </summary>
-public class Attack_ImmediateComponent : Attack_Component
+public class Attack_InstantComponent : Attack_Component
 {
     public override SkillComponentType Type => SkillComponentType.InstantAttack;
     private Unit target;
@@ -387,9 +416,9 @@ public class Attack_ImmediateComponent : Attack_Component
         damage = inst.damageFinal;
     }
 
-    public override void OnStart(SkillLauncher launcher)
+    public override void OnStart()
     {
-        base.OnStart(launcher);
+        base.OnStart();
         OnHit(target);
         OnEnd();
     }
@@ -397,7 +426,6 @@ public class Attack_ImmediateComponent : Attack_Component
     public override void OnHit(Unit target)
     {
         ApplyDamage(target);
-        effectController.PlayHit();
     }
 }
 
@@ -422,6 +450,16 @@ public class Attack_BeamComponent : Attack_Component
     private float indicatorDuration;
     private float invIndicatorDuration;
 
+    public override void Reset()
+    {
+        base.Reset();
+        tickTime = 0f;
+        time = 0f;
+        beamParticle = null;
+        startIndicator = null;
+        finalIndicator = null;
+    }
+
     public override void Init(SkillLauncher launcher, InstanceValue inst, Unit fixedTarget)
     {
         base.Init(launcher, inst, fixedTarget);
@@ -434,22 +472,23 @@ public class Attack_BeamComponent : Attack_Component
         targetPos = fixedTarget.transform.position;
         indicatorDuration = 0.4f;
         invIndicatorDuration = 1f / indicatorDuration;
-        tickTime = 0f;
-        time = 0f;
-    }
 
-    public override void OnStart(SkillLauncher launcher)
-    {
-        base.OnStart(launcher);
         startPos = launcher.Position;
         direction = (targetPos - startPos).normalized;
+    }
 
-        // 스킬 인디케이터
+    public override void OnStart()
+    {
+        base.OnStart();
+
         SkillData data = DataMgr.GetSkillData(launcher.SkillKey);
         SkillElement element = data.skillElements[0];
-        startIndicator = GameMgr.Instance.skillMgr.CreateIndicator(element, false);
+        SkillMgr skillMgr = GameMgr.Instance.skillMgr;
+
+        // 스킬 인디케이터
+        startIndicator = skillMgr.CreateIndicator(element, false);
         startIndicator.DrawIndicator(startPos, targetPos);
-        finalIndicator = GameMgr.Instance.skillMgr.CreateIndicator(element, false);
+        finalIndicator = skillMgr.CreateIndicator(element, false);
         finalIndicator.DrawIndicator(startPos, targetPos);
     }
 
@@ -560,31 +599,38 @@ public class Movement_LeapComponent : SkillComponent
     private float invDuration;
     private AnimationCurve curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
+    public override void Reset()
+    {
+        base.Reset();
+        time = 0f;
+        startIndicator = null;
+        finalIndicator = null;
+    }
+
     public override void Init(SkillLauncher launcher, InstanceValue inst, Unit fixedTarget)
     {
         base.Init(launcher, inst, fixedTarget);
-        this.targetPos = fixedTarget.transform.position;
+        targetPos = fixedTarget.transform.position;
         isLeapCompleted = false;
         duration = inst.durationFinal;
         invDuration = 1f / duration;
-        time = 0f;
-    }
-
-    public override void OnStart(SkillLauncher launcher)
-    {
-        base.OnStart(launcher);
-
-        // 위치
         startPos = launcher.Position;
         Vector3 dir = (launcher.Position - targetPos).normalized;
         casterAdjustedPos = dir * 2f;
+    }
+
+    public override void OnStart()
+    {
+        base.OnStart();
 
         // 스킬 인디케이터
         SkillData data = DataMgr.GetSkillData(launcher.SkillKey);
         SkillElement element = data.skillElements[0];
-        startIndicator = GameMgr.Instance.skillMgr.CreateIndicator(element, false);
+        SkillMgr skillMgr = GameMgr.Instance.skillMgr;
+
+        startIndicator = skillMgr.CreateIndicator(element, false);
         startIndicator.DrawIndicator(targetPos, targetPos);
-        finalIndicator = GameMgr.Instance.skillMgr.CreateIndicator(element, false);
+        finalIndicator = skillMgr.CreateIndicator(element, false);
         finalIndicator.DrawIndicator(targetPos, targetPos);
     }
 
@@ -616,19 +662,127 @@ public class Movement_LeapComponent : SkillComponent
 
 #endregion
 
+#region 효과 컴포넌트
+
+public class Effect_GravityComponent : SkillComponent
+{
+    public override SkillComponentType Type => SkillComponentType.Gravity;
+
+    private float gravityForce;        // 중력 강도
+    private float duration;            // 지속 시간
+    private float radius;              // 중력 범위
+    private float radiusSqr;
+    private float invRadiusSqr;
+    private float rotationSpeed;       // 회전 속도
+
+    private Vector3 gravityCenter;     // 중력 중심점
+    private float time;
+    private List<Unit> units = new();
+    private Dictionary<Unit, float> startTimes = new();
+
+    public override void Reset()
+    {
+        base.Reset();
+        time = 0f;
+        units.Clear();
+        startTimes.Clear();
+    }
+
+    public override void Init(SkillLauncher launcher, InstanceValue inst, Unit fixedTarget)
+    {
+        base.Init(launcher, inst, fixedTarget);
+        gravityForce = inst.gravityFinal;
+        duration = inst.durationFinal;
+        radius = inst.radiusFinal;
+        radiusSqr = radius * radius;
+        rotationSpeed = 15f;
+        gravityCenter = launcher.Position;
+        invRadiusSqr = 1f / radiusSqr;
+    }
+
+    public override void OnStart()
+    {
+        base.OnStart();
+
+        List<Unit> targets = GetHitTargetsBySphere(gravityCenter, radius);
+        foreach (Unit target in targets)
+        {
+            if (IsHittable(target))
+            {
+                units.Add(target);
+                startTimes[target] = time;
+            }
+        }
+    }
+
+    public override void OnUpdate(float deltaTime)
+    {
+        time += deltaTime;
+
+        foreach (Unit unit in units)
+        {
+            if (unit == null || unit.IsDead)
+                continue;
+
+            ApplyGravityEffect(unit, deltaTime);
+        }
+
+        if (time >= duration)
+        {
+            OnEnd();
+        }
+    }
+
+    private void ApplyGravityEffect(Unit unit, float deltaTime)
+    {
+        Vector3 pos = unit.transform.position;
+        float unitTime = time - startTimes[unit];
+
+        float distanceToCenterSqr = (pos - gravityCenter).sqrMagnitude;
+        if (distanceToCenterSqr <= 0.1f)
+            return;
+
+        // 나선형 이동
+        Vector3 directionToCenter = (gravityCenter - pos).normalized;
+        Vector3 rotatedDirection = Quaternion.AngleAxis(rotationSpeed * unitTime, Vector3.up) * directionToCenter;
+
+        // 가까울수록 강해짐
+        float distanceRatio = 1f - (distanceToCenterSqr * invRadiusSqr);
+        float gravityPower = gravityForce * distanceRatio;
+
+        Vector3 finalPos = pos + rotatedDirection * gravityPower * deltaTime;
+        unit.transform.position = Vector3.Lerp(pos, finalPos, 0.1f);
+    }
+}
+
 public class Effect_FreezeComponent : SkillComponent
 {
     public override SkillComponentType Type => SkillComponentType.Freeze;
     private float time;
+    private float duration;
     private List<Unit> monsters = new();
 
     private const float SLOW_PERCENT = -0.5f;
-    private const float DURATION = 5f;
 
-    public override void OnStart(SkillLauncher launcher)
+    public override void Reset()
     {
-        base.OnStart(launcher);
+        base.Reset();
         time = 0f;
+        monsters.Clear();
+    }
+
+    public override void Init(SkillLauncher launcher, InstanceValue inst, Unit fixedTarget)
+    {
+        base.Init(launcher, inst, fixedTarget);
+        if (inst != null)
+            duration = inst.durationFinal;
+        else
+            duration = 5f; // 아이템에 의한 지속 시간
+    }
+
+    public override void OnStart()
+    {
+        base.OnStart();
 
         monsters = new List<Unit>(GameMgr.Instance.spawnMgr.AliveEnemies);
         foreach (Unit monster in monsters)
@@ -641,12 +795,13 @@ public class Effect_FreezeComponent : SkillComponent
     public override void OnUpdate(float deltaTime)
     {
         time += deltaTime;
-        if (time < DURATION)
+        if (time < duration)
             return;
 
         foreach (Unit monster in monsters)
         {
-            monster.AddStatModifier(StatType.MoveSpeed, SLOW_PERCENT);
+            monster.AddStatModifier(StatType.MoveSpeed, -SLOW_PERCENT);
+            monster.UpdateMoveSpeed();
         }
 
         OnEnd();
@@ -664,9 +819,9 @@ public class Effect_ExplosionComponent : SkillComponent
         damage = EXPLOSION_DAMAGE;
     }
 
-    public override void OnStart(SkillLauncher launcher)
+    public override void OnStart()
     {
-        base.OnStart(launcher);
+        base.OnStart();
 
         List<Unit> targets = GetHitTargetsBySphere(launcher.Position, EXPLOSION_RADIUS);
         foreach (Unit target in targets)
@@ -677,3 +832,5 @@ public class Effect_ExplosionComponent : SkillComponent
 
     public override void OnHit(Unit target) => ApplyDamage(target);
 }
+
+#endregion

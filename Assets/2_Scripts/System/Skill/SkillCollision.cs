@@ -7,7 +7,7 @@ public class SkillCollision : MonoBehaviour
     [SerializeField] private Collider skillCollider;
     public event Action<Unit> OnHitTarget;
 
-    private bool canUseCollision => skillCollider != null && skillCollider.enabled;
+    private bool canUseCollision => skillCollider != null;
 
     public void Reset()
     {

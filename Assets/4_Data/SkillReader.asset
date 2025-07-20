@@ -105,13 +105,22 @@ MonoBehaviour:
     skillElements:
     - skillKey: 23
       index: 0
-      componentType: 2
+      componentType: 7
       indicatorType: 3
       order: 0
       timing: 0
       firePoint: 1
       isTarget: 0
-      maxDistance: 5.2
+      maxDistance: 6
+    - skillKey: 23
+      index: 1
+      componentType: 1
+      indicatorType: 3
+      order: 0
+      timing: 1
+      firePoint: 1
+      isTarget: 0
+      maxDistance: 6
   - skillKey: 29
     skillType: 0
     name: IceAttack
@@ -121,7 +130,16 @@ MonoBehaviour:
     skillElements:
     - skillKey: 29
       index: 0
-      componentType: 1
+      componentType: 2
+      indicatorType: 3
+      order: 0
+      timing: 0
+      firePoint: 0
+      isTarget: 0
+      maxDistance: 8
+    - skillKey: 29
+      index: 1
+      componentType: 8
       indicatorType: 3
       order: 0
       timing: 0

@@ -201,25 +201,33 @@ public class SkillIndicator : MonoBehaviour
     /// </summary>
     public static Vector3 GetElementEndPoint(Vector3 startPoint, Vector3 mouse, SkillElement element)
     {
+        if (element == null)
+            return startPoint;
+
         Vector3 direction = (mouse - startPoint).normalized;
+        Vector3 basePosition = element.firePoint == FirePoint.Self ? startPoint : mouse;
 
         switch (element.indicatorType)
         {
             case SkillIndicatorType.Line:
-                return startPoint + direction * GameValue.PROJECTILE_MAX_LENGTH;
+                return basePosition + direction * GameValue.PROJECTILE_MAX_LENGTH;
 
             case SkillIndicatorType.Sector:
                 float halfAngleRad = element.Angle * 0.5f * Mathf.Deg2Rad;
-                return startPoint + direction * (element.Radius * Mathf.Cos(halfAngleRad) * 2f);
+                float sectorDistance = element.Radius * Mathf.Cos(halfAngleRad) * 2f;
+                return basePosition + direction * sectorDistance;
 
             case SkillIndicatorType.Circle:
-                if ((mouse - startPoint).magnitude > element.maxDistance)
-                    return startPoint + direction.normalized * element.maxDistance;
-                else
-                    return mouse;
-
-            default:
-                return startPoint;
+                if (element.firePoint == FirePoint.Self)
+                    return startPoint;
+                
+                float distanceToMouse = (mouse - startPoint).magnitude;
+                if (distanceToMouse > element.maxDistance)
+                    return startPoint + direction * element.maxDistance;
+                
+                return mouse;
         }
+
+        return basePosition;
     }
 }

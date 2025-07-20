@@ -115,7 +115,7 @@ public class SkillDataReader : ScriptableObject
                 "ricochet" => ElementType.Ricochet,
                 "piercing" => ElementType.Piercing,
                 "shot" => ElementType.Shot,
-                "power" => ElementType.Power,
+                "gravity" => ElementType.Gravity,
                 _ => ElementType.Max,
             };
         }
@@ -196,7 +196,7 @@ public class SkillDataReader : ScriptableObject
 
             // 같은 Order 내에서 Timing에 따라 정렬
             var immediateElements = orderElements
-                .Where(e => e.timing == ExecutionTiming.Immediate)
+                .Where(e => e.timing == ExecutionTiming.Instant)
                 .ToList();
 
             var sequentialElements = orderElements

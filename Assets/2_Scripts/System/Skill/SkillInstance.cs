@@ -46,10 +46,15 @@ public class InstanceValue
     private float piercingAdditive;
     public float piercingFinal;
 
+    // 속도
     private float moveSpeedFix;
     private float moveSpeedAdditive;
     private float moveSpeedMultiplier;
     public float moveSpeedFinal;
+
+    // 중력
+    private float gravityFix;
+    public float gravityFinal;
 
     public float angle;
 
@@ -66,6 +71,7 @@ public class InstanceValue
         ricochetFix = skillElement.Ricochet;
         piercingFix = skillElement.Piercing;
         ShotFix = Mathf.Max(1, skillElement.Shot);
+        gravityFix = skillElement.Gravity;
         angle = skillElement.Angle;
         type = skillElement.componentType;
         order = skillElement.order;
@@ -152,6 +158,7 @@ public class InstanceValue
         ricochetFinal = ricochetFix + ricochetAdditive;
         piercingFinal = piercingFix + piercingAdditive;
         moveSpeedFinal = (moveSpeedFix + moveSpeedAdditive) * (1 + moveSpeedMultiplier);
+        gravityFinal = gravityFix;
     }
 }
 

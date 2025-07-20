@@ -395,29 +395,27 @@ public class SkillMgr : MonoBehaviour
         return Instantiate(skillLauncherPrefab, Vector3.zero, Quaternion.identity);
     }
 
+    public void PushSkillObject(SkillKey skillKey, SkillEffectController effect)
+    {
+        if (!effectPools.ContainsKey(skillKey))
+            effectPools[skillKey] = new Stack<SkillEffectController>();
+
+        effect.Reset();
+        effect.transform.SetParent(transform, false);
+        effectPools[skillKey].Push(effect);
+    }
+
     public SkillEffectController PopSkillObject(SkillKey key, Transform parent)
     {
         if (effectPools.TryGetValue(key, out Stack<SkillEffectController> pools) && pools.Count > 0)
         {
             SkillEffectController effect = pools.Pop();
-            effect.transform.SetParent(parent);
+            effect.Reset();
+            effect.transform.SetParent(parent, false);
             return effect;
         }
 
         return GameMgr.Instance.resourceMgr.GetSkillEffect(parent, key);
-    }
-
-    public void PushSkillObject(SkillKey skillKey, SkillEffectController effect)
-    {
-        if (effect == null)
-            return;
-
-        if (!effectPools.ContainsKey(skillKey))
-            effectPools[skillKey] = new Stack<SkillEffectController>();
-
-        effect.Reset();
-        effect.transform.SetParent(transform);
-        effectPools[skillKey].Push(effect);
     }
 
     public void PushComponent(SkillComponent component)
@@ -426,6 +424,7 @@ public class SkillMgr : MonoBehaviour
         if (!componentPools.ContainsKey(type))
             componentPools[type] = new Stack<SkillComponent>();
 
+        component.Reset();
         componentPools[type].Push(component);
     }
 
@@ -439,10 +438,11 @@ public class SkillMgr : MonoBehaviour
             SkillComponentType.Projectile => new Attack_ProjectileComponent(),
             SkillComponentType.InstantAOE => new Attack_AOEComponent(),
             SkillComponentType.PeriodicAOE => new Attack_PeriodicAOEComponent(),
-            SkillComponentType.InstantAttack => new Attack_ImmediateComponent(),
+            SkillComponentType.InstantAttack => new Attack_InstantComponent(),
             SkillComponentType.Beam => new Attack_BeamComponent(),
             SkillComponentType.Linear => new Movement_LinearComponent(),
             SkillComponentType.Leap => new Movement_LeapComponent(),
+            SkillComponentType.Gravity => new Effect_GravityComponent(),
             SkillComponentType.Freeze => new Effect_FreezeComponent(),
             SkillComponentType.Explosion => new Effect_ExplosionComponent(),
             _ => null,
