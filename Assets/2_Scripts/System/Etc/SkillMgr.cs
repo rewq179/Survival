@@ -21,7 +21,7 @@ public class SkillMgr : MonoBehaviour
     [SerializeField] private SkillLauncher skillLauncherPrefab;
     private List<SkillLauncher> activeLaunchers = new();
     private Stack<SkillLauncher> launcherPools = new();
-    private Dictionary<SkillKey, Stack<SkillParticleController>> particlePools = new();
+    private Dictionary<SkillKey, Stack<SkillEffectController>> effectPools = new();
     private Dictionary<SkillComponentType, Stack<SkillComponent>> componentPools = new();
 
     private void Start()
@@ -395,29 +395,29 @@ public class SkillMgr : MonoBehaviour
         return Instantiate(skillLauncherPrefab, Vector3.zero, Quaternion.identity);
     }
 
-    public SkillParticleController PopParticle(SkillKey key, Transform parent)
+    public SkillEffectController PopSkillObject(SkillKey key, Transform parent)
     {
-        if (particlePools.TryGetValue(key, out Stack<SkillParticleController> pools) && pools.Count > 0)
+        if (effectPools.TryGetValue(key, out Stack<SkillEffectController> pools) && pools.Count > 0)
         {
-            SkillParticleController particle = pools.Pop();
-            particle.transform.SetParent(parent);
-            return particle;
+            SkillEffectController effect = pools.Pop();
+            effect.transform.SetParent(parent);
+            return effect;
         }
 
         return GameMgr.Instance.resourceMgr.GetSkillEffect(parent, key);
     }
 
-    public void PushParticle(SkillKey skillKey, SkillParticleController particle)
+    public void PushSkillObject(SkillKey skillKey, SkillEffectController effect)
     {
-        if (particle == null)
+        if (effect == null)
             return;
 
-        if (!particlePools.ContainsKey(skillKey))
-            particlePools[skillKey] = new Stack<SkillParticleController>();
+        if (!effectPools.ContainsKey(skillKey))
+            effectPools[skillKey] = new Stack<SkillEffectController>();
 
-        particle.Reset();
-        particle.transform.SetParent(transform);
-        particlePools[skillKey].Push(particle);
+        effect.Reset();
+        effect.transform.SetParent(transform);
+        effectPools[skillKey].Push(effect);
     }
 
     public void PushComponent(SkillComponent component)

@@ -9,11 +9,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 657344037872189318}
+  - component: {fileID: 7333010403737789974}
   - component: {fileID: 1249450823355257420}
+  - component: {fileID: 8068501048665172774}
+  - component: {fileID: 2926645549481416479}
   - component: {fileID: 8834671199709361927}
   - component: {fileID: 9057439659945328764}
-  - component: {fileID: 2926645549481416479}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Dagger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -35,6 +37,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7333010403737789974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2839713592347348334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3994e6f8acc017e4cb797854b0d8925c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collision: {fileID: 8068501048665172774}
+  particle: {fileID: 1249450823355257420}
 --- !u!114 &1249450823355257420
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -50,6 +66,40 @@ MonoBehaviour:
   playParticles:
   - {fileID: 8834671199709361927}
   hittedParticles: []
+--- !u!114 &8068501048665172774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2839713592347348334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1a5183d35e38074ca11310a5ed56d32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skillCollider: {fileID: 2926645549481416479}
+--- !u!135 &2926645549481416479
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2839713592347348334}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.1
+  m_Center: {x: 0, y: 0, z: -0.1}
 --- !u!198 &8834671199709361927
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -4921,24 +4971,3 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!135 &2926645549481416479
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2839713592347348334}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.1
-  m_Center: {x: 0, y: 0, z: -0.1}

@@ -31,7 +31,7 @@ public class ResourceMgr : MonoBehaviour
     private Dictionary<SkillKey, Sprite> skillIcons = new();
     private Dictionary<string, Sprite> equipmentIcons = new();
     private Dictionary<string, Sprite> itemIcons = new();
-    private Dictionary<SkillKey, SkillParticleController> skillEffects = new();
+    private Dictionary<SkillKey, SkillEffectController> skillEffects = new();
     private Dictionary<int, Unit> unitPrefabs = new Dictionary<int, Unit>();
     private Dictionary<CollectibleType, CollectibleItem> collectibleItemPrefabs = new();
 
@@ -78,8 +78,8 @@ public class ResourceMgr : MonoBehaviour
 
     private void LoadSkillEffectsFromPath()
     {
-        SkillParticleController[] effects = Resources.LoadAll<SkillParticleController>(skillEffectPath);
-        foreach (SkillParticleController effect in effects)
+        SkillEffectController[] effects = Resources.LoadAll<SkillEffectController>(skillEffectPath);
+        foreach (SkillEffectController effect in effects)
         {
             if (Enum.TryParse(effect.name, out SkillKey skillKey))
                 skillEffects[skillKey] = effect;
@@ -129,9 +129,9 @@ public class ResourceMgr : MonoBehaviour
         return null;
     }
 
-    public SkillParticleController GetSkillEffect(Transform parent, SkillKey skillKey)
+    public SkillEffectController GetSkillEffect(Transform parent, SkillKey skillKey)
     {
-        if (skillEffects.TryGetValue(skillKey, out SkillParticleController effect))
+        if (skillEffects.TryGetValue(skillKey, out SkillEffectController effect))
             return Instantiate(effect, parent, false);
 
         return null;

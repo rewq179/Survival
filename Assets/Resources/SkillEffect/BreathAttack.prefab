@@ -53765,9 +53765,10 @@ GameObject:
   m_Component:
   - component: {fileID: 4377817723901784}
   - component: {fileID: 120269725676574324}
+  - component: {fileID: 7618617680568419384}
   - component: {fileID: 6577801179061552619}
   - component: {fileID: 2049253249179165312}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: BreathAttack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -53907,6 +53908,20 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 0
+--- !u!114 &7618617680568419384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1955173974842222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3994e6f8acc017e4cb797854b0d8925c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collision: {fileID: 0}
+  particle: {fileID: 6577801179061552619}
 --- !u!114 &6577801179061552619
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -53923,7 +53938,6 @@ MonoBehaviour:
   - {fileID: 198080461927093774}
   - {fileID: 198589701467457858}
   - {fileID: 198808525585659474}
-  hitObject: {fileID: 1221893910213332}
   hittedParticles:
   - {fileID: 198201873886598266}
   - {fileID: 198050301318838036}

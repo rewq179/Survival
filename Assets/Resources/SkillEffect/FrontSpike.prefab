@@ -49705,10 +49705,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4693226928840970}
+  - component: {fileID: 2238431659589534463}
   - component: {fileID: 7410811637614523039}
   - component: {fileID: 198949203646741092}
   - component: {fileID: 199460688499430816}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: FrontSpike
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -49747,6 +49748,20 @@ Transform:
   - {fileID: 4117720601246906}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2238431659589534463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1481932562201786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3994e6f8acc017e4cb797854b0d8925c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collision: {fileID: 0}
+  particle: {fileID: 7410811637614523039}
 --- !u!114 &7410811637614523039
 MonoBehaviour:
   m_ObjectHideFlags: 0

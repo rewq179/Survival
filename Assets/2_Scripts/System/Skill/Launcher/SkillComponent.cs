@@ -98,19 +98,21 @@ public abstract class SkillComponent
 /// <summary> 공격 컴포넌트들의 기본 클래스 </summary>
 public abstract class Attack_Component : SkillComponent
 {
-    protected SkillParticleController particle;
+    protected SkillEffectController effectController;
 
     public override void Init(SkillLauncher launcher, InstanceValue inst, Unit fixedTarget)
     {
         base.Init(launcher, inst, fixedTarget);
 
         // 공격 컴포넌트에만 파티클 할당
-        particle = GameMgr.Instance.skillMgr.PopParticle(launcher.SkillKey, launcher.transform);
-        if (particle == null)
+        effectController = GameMgr.Instance.skillMgr.PopSkillObject(launcher.SkillKey, launcher.transform);
+        if (effectController == null)
             return;
 
+        effectController.Init();
         launcher.SetParticleFinished(false);
-        particle.OnParticleFinished += OnParticleFinished;
+        effectController.SubscribeParticleFinished(OnParticleFinished);
+        effectController.SubscribeHitTarget(OnHit);
     }
 
     private void OnParticleFinished()
@@ -122,13 +124,13 @@ public abstract class Attack_Component : SkillComponent
     public override void OnStart(SkillLauncher launcher)
     {
         base.OnStart(launcher);
-        particle?.Play();
+        effectController.Play();
     }
 
     protected override void OnEnd()
     {
         base.OnEnd();
-        particle?.StopMain();
+        effectController.StopMain();
     }
 }
 
@@ -180,12 +182,6 @@ public class Attack_ProjectileComponent : Attack_Component
             OnEnd();
             return;
         }
-
-        // 충돌 체크
-        if (Physics.Raycast(launcher.Position, direction, out RaycastHit hit, moveDistance, GameValue.UNIT_LAYERS))
-        {
-            OnHit(hit.collider.GetComponent<Unit>());
-        }
     }
 
     public override void OnHit(Unit target)
@@ -200,7 +196,7 @@ public class Attack_ProjectileComponent : Attack_Component
         hittedUnitIDs.Add(target.UniqueID);
         ApplyDamage(target);
         isHit = true;
-        particle?.PlayHit();
+        effectController.PlayHit();
 
         // 도탄
         if (richocet > 0)
@@ -339,7 +335,7 @@ public class Attack_AOEComponent : Attack_Component
     public override void OnHit(Unit target)
     {
         ApplyDamage(target);
-        particle?.PlayHit();
+        effectController.PlayHit();
     }
 }
 
@@ -401,7 +397,7 @@ public class Attack_ImmediateComponent : Attack_Component
     public override void OnHit(Unit target)
     {
         ApplyDamage(target);
-        particle?.PlayHit();
+        effectController.PlayHit();
     }
 }
 
@@ -490,7 +486,7 @@ public class Attack_BeamComponent : Attack_Component
             direction = (targetPos - startPos).normalized;
             launcher.SetTransform(startPos, direction);
 
-            beamParticle = particle.GetComponent<BeamParticle>();
+            beamParticle = effectController.GetComponent<BeamParticle>();
             beamParticle.Init(direction, length);
         }
     }

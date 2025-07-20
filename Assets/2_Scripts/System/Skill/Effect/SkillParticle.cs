@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class SkillParticleController : MonoBehaviour
+public class SkillParticle : MonoBehaviour
 {
     [Header("Main")]
     [SerializeField] private List<ParticleSystem> playParticles = new();
@@ -12,7 +12,6 @@ public class SkillParticleController : MonoBehaviour
     [SerializeField] private List<ParticleSystem> hittedParticles = new();
     private List<float> hittedInvDurations = new();
 
-    // 파티클
     private bool isPlaying = false;
     private Coroutine particleCheckCoroutine;
     public event Action OnParticleFinished;
@@ -35,6 +34,14 @@ public class SkillParticleController : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    public void Init()
+    {
+        foreach (ParticleSystem particle in hittedParticles)
+        {
+            hittedInvDurations.Add(1f / particle.main.duration);
+        }
+    }
+
     public void Play()
     {
         if (isPlaying)
@@ -52,14 +59,9 @@ public class SkillParticleController : MonoBehaviour
 
     public void PlayHit()
     {
-        bool addInvDuration = hittedInvDurations.Count == 0;
-
         foreach (ParticleSystem particle in hittedParticles)
         {
             particle.Play();
-
-            if (addInvDuration)
-                hittedInvDurations.Add(1f / particle.main.duration);
         }
     }
 

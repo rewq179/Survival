@@ -9,13 +9,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4753020624446900}
+  - component: {fileID: 820792839270890751}
   - component: {fileID: 3871860642576291494}
   - component: {fileID: 198736250677286802}
   - component: {fileID: 114188026125287036}
   - component: {fileID: 199258168809205748}
   - component: {fileID: 108106897617494064}
   - component: {fileID: -4558389114168429226}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Meteor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,6 +41,20 @@ Transform:
   - {fileID: 4905270703906250}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &820792839270890751
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1090634406790140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3994e6f8acc017e4cb797854b0d8925c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collision: {fileID: 0}
+  particle: {fileID: 3871860642576291494}
 --- !u!114 &3871860642576291494
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5030,7 +5045,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 9.1897e-41, z: 2.5166e-41, w: 1}
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0

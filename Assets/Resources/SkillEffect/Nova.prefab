@@ -19747,10 +19747,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7720770243439060584}
+  - component: {fileID: 3762133235396193689}
   - component: {fileID: 7367405210392648666}
+  - component: {fileID: 2444469842276608223}
+  - component: {fileID: 5863478397849877822}
   - component: {fileID: 5221510488998455123}
   - component: {fileID: 7317962171405296175}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Nova
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19776,6 +19779,20 @@ Transform:
   - {fileID: 3967830474777299018}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3762133235396193689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7644508785917436000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3994e6f8acc017e4cb797854b0d8925c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collision: {fileID: 2444469842276608223}
+  particle: {fileID: 7367405210392648666}
 --- !u!114 &7367405210392648666
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19788,12 +19805,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52bc9e8b256968047afcfa4eb40a1c28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainParticle: {fileID: 5221510488998455123}
-  subParticles:
-  - {fileID: 3873449436362689468}
-  - {fileID: 3873446021988181914}
-  - {fileID: 3872670500647524056}
-  - {fileID: 3872582076245682232}
+  playParticles: []
+  hittedParticles: []
+--- !u!114 &2444469842276608223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7644508785917436000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1a5183d35e38074ca11310a5ed56d32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skillCollider: {fileID: 5863478397849877822}
+--- !u!135 &5863478397849877822
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7644508785917436000}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.852
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!198 &5221510488998455123
 ParticleSystem:
   m_ObjectHideFlags: 0
