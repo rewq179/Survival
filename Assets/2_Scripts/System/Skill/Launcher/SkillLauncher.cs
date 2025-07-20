@@ -4,27 +4,26 @@ using System.Linq;
 
 public class SkillLauncher : MonoBehaviour
 {
-    protected SkillKey skillKey;
-    protected Vector3 startPosition;
-    protected Vector3 direction;
-    protected Unit caster;
-    protected bool isActive;
-    protected float duration;
-    protected float time;
+    private SkillKey skillKey;
+    private Vector3 startPosition;
+    private Vector3 direction;
+    private Unit caster;
+    private bool isActive;
+    private float duration;
+    private float time;
+    private bool isParticleFinished;
 
     // 컴포넌트 관리
     private bool isCurrentOrderCompleted;  // 현재 Order 완료 여부
     private int currentOrderIndex;  // 현재 실행 중인 Order
     private List<int> orderSequence = new();  // Order 실행 순서
     private Dictionary<int, List<SkillComponent>> orderGroups = new();  // Order별 그룹
-    
+
     // 현재 Order 내 컴포넌트 실행 관리
     private int currentSequentialIndex;  // 현재 순차 실행 중인 컴포넌트 인덱스
     private bool isSequentialExecutionComplete;  // 순차 실행 완료 여부
     private List<SkillComponent> immediateComponents = new();  // 현재 Order의 즉시 실행 컴포넌트들
     private List<SkillComponent> sequentialComponents = new();  // 현재 Order의 순차 실행 컴포넌트들
-
-    protected SkillParticleController particleController;
 
     public SkillKey SkillKey => skillKey;
     public bool IsActive => isActive;
@@ -44,37 +43,28 @@ public class SkillLauncher : MonoBehaviour
         sequentialComponents.Clear();
         currentSequentialIndex = 0;
         isSequentialExecutionComplete = false;
-        particleController = null;
         transform.position = Vector3.zero;
         transform.rotation = Quaternion.identity;
         gameObject.SetActive(false);
     }
 
-    protected virtual void Update()
+    private void Update()
     {
         if (!isActive)
             return;
 
         time += Time.deltaTime;
-
-        // Order별로 순차 실행
         UpdateComponentsByOrder();
-
-        if (particleController == null && duration > 0f && time >= duration)
-        {
-            Deactivate();
-        }
     }
 
-    public void Init(SkillInstance inst, Vector3 startPos, Vector3 dir, SkillParticleController particleController,
-        Unit caster, Unit fixedTarget = null)
+    public void Init(SkillInstance inst, Vector3 startPos, Vector3 dir, Unit caster, Unit fixedTarget = null)
     {
         skillKey = inst.skillKey;
+        isParticleFinished = true;
         Init(caster, startPos, dir);
-        this.particleController = particleController;
 
         // 스킬 데이터 기반으로 효과들 자동 추가
-        CreateComponents(inst, fixedTarget);
+        CreateComponentBySkill(inst, fixedTarget);
         StartOrderComponents();
     }
 
@@ -96,28 +86,28 @@ public class SkillLauncher : MonoBehaviour
         transform.rotation = Quaternion.LookRotation(dir);
     }
 
-    private void CreateComponents(SkillInstance inst, Unit fixedTarget)
+    public void SetParticleFinished(bool isFinished)
+    {
+        isParticleFinished = isFinished;
+    }
+
+    private void CreateComponentBySkill(SkillInstance inst, Unit fixedTarget)
     {
         // 컴포넌트 생성 및 Order별 그룹화
         List<InstanceValue> values = inst.Values;
         foreach (InstanceValue instValue in values)
         {
-            SkillComponent component = CreateComponent(instValue.type);
+            SkillComponent component = CreateComponent(instValue.type, instValue.order);
             if (component == null)
                 continue;
 
-            int order = instValue.order;
-            if (!orderGroups.ContainsKey(order))
-                orderGroups[order] = new List<SkillComponent>();
-
-            orderGroups[order].Add(component);
-            component.Init(instValue, fixedTarget);
+            component.Init(this, instValue, fixedTarget);
         }
 
         orderSequence = orderGroups.Keys.OrderBy(x => x).ToList();
     }
 
-    public void CreateComponent(CollectibleType type)
+    public void CreateComponentByCollectible(CollectibleType type)
     {
         SkillComponentType componentType = type switch
         {
@@ -129,25 +119,20 @@ public class SkillLauncher : MonoBehaviour
         if (componentType == SkillComponentType.Max)
             return;
 
-        SkillComponent component = CreateComponent(componentType);
-        orderGroups[0] = new List<SkillComponent> { component };
-        component.Init(null, null);
+        CreateComponent(componentType, 0).Init(this, null, null);
     }
 
-    private SkillComponent CreateComponent(SkillComponentType type)
+    private SkillComponent CreateComponent(SkillComponentType type, int order)
     {
-        return type switch
-        {
-            SkillComponentType.Projectile => new ProjectileComponent(),
-            SkillComponentType.InstantAOE => new AOEComponent(),
-            SkillComponentType.PeriodicAOE => new PeriodicAOEComponent(),
-            SkillComponentType.InstantAttack => new InstantComponent(),
-            SkillComponentType.Leap => new LeapComponent(),
-            SkillComponentType.Beam => new BeamComponent(),
-            SkillComponentType.Freeze => new FreezeItemEffect(),
-            SkillComponentType.Explosion => new ExplosionItemEffect(),
-            _ => null,
-        };
+        SkillComponent component = GameMgr.Instance.skillMgr.PopComponent(type);
+        if (component == null)
+            return null;
+
+        if (!orderGroups.ContainsKey(order))
+            orderGroups[order] = new List<SkillComponent>();
+
+        orderGroups[order].Add(component);
+        return component;
     }
 
     /// <summary>
@@ -160,11 +145,11 @@ public class SkillLauncher : MonoBehaviour
 
         int order = orderSequence[currentOrderIndex];
         List<SkillComponent> components = orderGroups[order];
-        
+
         // 현재 Order의 컴포넌트들을 즉시/순차로 분류만 수행
         immediateComponents.Clear();
         sequentialComponents.Clear();
-        
+
         foreach (SkillComponent component in components)
         {
             if (component.timing == ExecutionTiming.Immediate)
@@ -177,7 +162,7 @@ public class SkillLauncher : MonoBehaviour
                 sequentialComponents.Add(component);
             }
         }
-        
+
         // 순차 실행 초기화
         currentSequentialIndex = 0;
         isSequentialExecutionComplete = sequentialComponents.Count == 0;
@@ -194,13 +179,15 @@ public class SkillLauncher : MonoBehaviour
         {
             if (component.State == ComponentState.NotStarted)
             {
-                component.OnStart(this, particleController);
+                component.OnStart(this);
             }
-            
+
             if (component.State == ComponentState.Running)
             {
                 component.OnUpdate(Time.deltaTime);
-                allImmediateCompleted = false;
+
+                if (!component.IsCompleted) // 진행중에 종료된 경우
+                    allImmediateCompleted = false;
             }
         }
 
@@ -225,7 +212,7 @@ public class SkillLauncher : MonoBehaviour
         if (allImmediateCompleted && allSequentialCompleted && !isCurrentOrderCompleted)
         {
             isCurrentOrderCompleted = true;
-            if (++currentOrderIndex >= orderSequence.Count)
+            if (++currentOrderIndex < orderSequence.Count)
                 return;
 
             // 다음 Order의 컴포넌트들 시작
@@ -247,7 +234,7 @@ public class SkillLauncher : MonoBehaviour
         switch (currentComponent.State)
         {
             case ComponentState.NotStarted:
-                currentComponent.OnStart(this, particleController);
+                currentComponent.OnStart(this);
                 break;
             case ComponentState.Running:
                 currentComponent.OnUpdate(Time.deltaTime);
@@ -260,9 +247,9 @@ public class SkillLauncher : MonoBehaviour
 
     public void CheckDeactivate()
     {
-        if (!isActive)
+        if (!isActive || !isParticleFinished)
             return;
-        
+
         if (currentOrderIndex >= orderSequence.Count)
         {
             Deactivate();
@@ -276,11 +263,16 @@ public class SkillLauncher : MonoBehaviour
 
         isActive = false;
 
-        if (particleController != null)
+        SkillMgr skillMgr = GameMgr.Instance.skillMgr;
+        foreach (var group in orderGroups)
         {
-            GameMgr.Instance.skillMgr.PushParticle(skillKey, particleController);
+            List<SkillComponent> components = group.Value;
+            foreach (SkillComponent component in components)
+            {
+                skillMgr.PushComponent(component);
+            }
         }
-        
-        GameMgr.Instance.skillMgr.RemoveLauncher(this);
+
+        skillMgr.RemoveLauncher(this);
     }
 }

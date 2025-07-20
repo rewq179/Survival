@@ -22,6 +22,7 @@ public class SkillMgr : MonoBehaviour
     private List<SkillLauncher> activeLaunchers = new();
     private Stack<SkillLauncher> launcherPools = new();
     private Dictionary<SkillKey, Stack<SkillParticleController>> particlePools = new();
+    private Dictionary<SkillComponentType, Stack<SkillComponent>> componentPools = new();
 
     private void Start()
     {
@@ -234,14 +235,7 @@ public class SkillMgr : MonoBehaviour
     {
         SkillIndicator indicator = PopIndicator();
         indicator.Init(element, indicatorMaterial, PopMesh(element), isPlayerIndicator);
-
-        activeIndicators.Add(indicator);
-        SkillKey skillKey = indicator.Element.skillKey;
-        if (indicatorGroups.TryGetValue(skillKey, out List<SkillIndicator> group))
-            group.Add(indicator);
-        else
-            indicatorGroups.Add(skillKey, new List<SkillIndicator> { indicator });
-
+        RegisterActiveIndicator(indicator);
         return indicator;
     }
 
@@ -259,13 +253,28 @@ public class SkillMgr : MonoBehaviour
 
     public void RemoveIndicator(SkillIndicator indicator)
     {
-        SkillKey skillKey = indicator.Element.skillKey;
-        if (indicatorGroups.TryGetValue(skillKey, out List<SkillIndicator> group))
-            group.Remove(indicator);
-
-        activeIndicators.Remove(indicator);
+        UnregisterActiveIndicator(indicator);
         PushMesh(indicator.Element.indicatorType, indicator.Mesh);
         PushIndicator(indicator);
+    }
+
+    private void RegisterActiveIndicator(SkillIndicator indicator)
+    {
+        SkillKey key = indicator.Element.skillKey;
+        if (!indicatorGroups.ContainsKey(key))
+            indicatorGroups.Add(key, new List<SkillIndicator>());
+
+        indicatorGroups[key].Add(indicator);
+        activeIndicators.Add(indicator);
+    }
+
+    private void UnregisterActiveIndicator(SkillIndicator indicator)
+    {
+        SkillKey key = indicator.Element.skillKey;
+        if (indicatorGroups.ContainsKey(key))
+            indicatorGroups[key].Remove(indicator);
+
+        activeIndicators.Remove(indicator);
     }
 
     #endregion
@@ -297,7 +306,7 @@ public class SkillMgr : MonoBehaviour
     {
         int shot = inst.Values[0].ShotFinal.GetInt();
         float spreadAngle = GameValue.PROJECTILE_SPREAD_ANGLE;
-        
+
         float angleStep = spreadAngle / (shot - 1);
         float startAngle = -spreadAngle * 0.5f;
 
@@ -315,8 +324,7 @@ public class SkillMgr : MonoBehaviour
     private SkillLauncher CreateSingleLauncher(SkillInstance inst, Vector3 startPos, Vector3 direction, Unit caster, Unit target)
     {
         SkillLauncher launcher = PopSkillLauncher();
-        SkillParticleController particle = PopParticle(inst.skillKey, launcher.transform);
-        launcher.Init(inst, startPos, direction, particle, caster, target);
+        launcher.Init(inst, startPos, direction, caster, target);
         caster.StartCooldown(inst.skillKey);
         activeLaunchers.Add(launcher);
         return launcher;
@@ -333,7 +341,7 @@ public class SkillMgr : MonoBehaviour
     {
         SkillLauncher launcher = PopSkillLauncher();
         launcher.Init(player, player.transform.position, Vector3.zero);
-        launcher.CreateComponent(type);
+        launcher.CreateComponentByCollectible(type);
     }
 
     #endregion
@@ -387,16 +395,16 @@ public class SkillMgr : MonoBehaviour
         return Instantiate(skillLauncherPrefab, Vector3.zero, Quaternion.identity);
     }
 
-    private SkillParticleController PopParticle(SkillKey skillKey, Transform parent)
+    public SkillParticleController PopParticle(SkillKey key, Transform parent)
     {
-        if (particlePools.TryGetValue(skillKey, out Stack<SkillParticleController> particles) && particles.Count > 0)
+        if (particlePools.TryGetValue(key, out Stack<SkillParticleController> pools) && pools.Count > 0)
         {
-            SkillParticleController particle = particles.Pop();
+            SkillParticleController particle = pools.Pop();
             particle.transform.SetParent(parent);
             return particle;
         }
 
-        return GameMgr.Instance.resourceMgr.GetSkillEffect(parent, skillKey);
+        return GameMgr.Instance.resourceMgr.GetSkillEffect(parent, key);
     }
 
     public void PushParticle(SkillKey skillKey, SkillParticleController particle)
@@ -410,6 +418,35 @@ public class SkillMgr : MonoBehaviour
         particle.Reset();
         particle.transform.SetParent(transform);
         particlePools[skillKey].Push(particle);
+    }
+
+    public void PushComponent(SkillComponent component)
+    {
+        SkillComponentType type = component.Type;
+        if (!componentPools.ContainsKey(type))
+            componentPools[type] = new Stack<SkillComponent>();
+
+        componentPools[type].Push(component);
+    }
+
+    public SkillComponent PopComponent(SkillComponentType type)
+    {
+        if (componentPools.TryGetValue(type, out Stack<SkillComponent> pools) && pools.Count > 0)
+            return pools.Pop();
+
+        return type switch
+        {
+            SkillComponentType.Projectile => new Attack_ProjectileComponent(),
+            SkillComponentType.InstantAOE => new Attack_AOEComponent(),
+            SkillComponentType.PeriodicAOE => new Attack_PeriodicAOEComponent(),
+            SkillComponentType.InstantAttack => new Attack_ImmediateComponent(),
+            SkillComponentType.Beam => new Attack_BeamComponent(),
+            SkillComponentType.Linear => new Movement_LinearComponent(),
+            SkillComponentType.Leap => new Movement_LeapComponent(),
+            SkillComponentType.Freeze => new Effect_FreezeComponent(),
+            SkillComponentType.Explosion => new Effect_ExplosionComponent(),
+            _ => null,
+        };
     }
 
     #endregion

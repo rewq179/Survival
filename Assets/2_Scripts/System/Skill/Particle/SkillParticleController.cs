@@ -5,27 +5,33 @@ using System.Collections.Generic;
 
 public class SkillParticleController : MonoBehaviour
 {
-    [SerializeField] private ParticleSystem mainParticle;
-    [SerializeField] private List<ParticleSystem> subParticles = new();
+    [Header("Main")]
+    [SerializeField] private List<ParticleSystem> playParticles = new();
 
+    [Header("Hitted")]
+    [SerializeField] private List<ParticleSystem> hittedParticles = new();
+    private List<float> hittedInvDurations = new();
+
+    // 파티클
     private bool isPlaying = false;
+    private Coroutine particleCheckCoroutine;
     public event Action OnParticleFinished;
 
     public void Reset()
     {
         isPlaying = false;
         OnParticleFinished = null;
+
+        if (particleCheckCoroutine != null)
+        {
+            StopCoroutine(particleCheckCoroutine);
+            particleCheckCoroutine = null;
+        }
+
         transform.position = Vector3.zero;
         transform.rotation = Quaternion.identity;
 
-        if (mainParticle != null)
-            mainParticle.Stop();
-
-        foreach (ParticleSystem particle in subParticles)
-        {
-            particle.Stop();
-        }
-
+        StopAllParticles();
         gameObject.SetActive(false);
     }
 
@@ -36,29 +42,80 @@ public class SkillParticleController : MonoBehaviour
 
         isPlaying = true;
         gameObject.SetActive(true);
+        particleCheckCoroutine = StartCoroutine(CheckParticleFinished());
 
-        mainParticle.Play();
-        StartCoroutine(CheckParticleFinished(mainParticle));
-
-        foreach (ParticleSystem particle in subParticles)
+        foreach (ParticleSystem particle in playParticles)
+        {
             particle.Play();
+        }
     }
 
-    public void Stop()
+    public void PlayHit()
     {
-        if (!isPlaying)
-            return;
+        bool addInvDuration = hittedInvDurations.Count == 0;
 
-        isPlaying = false;
+        foreach (ParticleSystem particle in hittedParticles)
+        {
+            particle.Play();
 
-        mainParticle.Stop();
-        foreach (ParticleSystem particle in subParticles)
-            particle.Stop();
+            if (addInvDuration)
+                hittedInvDurations.Add(1f / particle.main.duration);
+        }
     }
 
-    private IEnumerator CheckParticleFinished(ParticleSystem particle)
+    private void StopAllParticles()
     {
-        while (particle.isPlaying)
+        if (particleCheckCoroutine != null)
+        {
+            StopCoroutine(particleCheckCoroutine);
+            particleCheckCoroutine = null;
+        }
+
+        StopMain();
+        StopHitted();
+    }
+
+    public void StopMain()
+    {
+        foreach (ParticleSystem particle in playParticles)
+        {
+            particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        }
+    }
+
+    public void StopHitted()
+    {
+        foreach (ParticleSystem particle in hittedParticles)
+        {
+            particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        }
+    }
+
+    private IEnumerator CheckParticleFinished()
+    {
+        bool IsMainPlaying(List<ParticleSystem> particles)
+        {
+            foreach (ParticleSystem particle in particles)
+            {
+                if (particle.isPlaying)
+                    return true;
+            }
+            return false;
+        }
+
+        bool IsHittedPlaying(List<ParticleSystem> particles)
+        {
+            for (int i = 0; i < particles.Count; i++)
+            {
+                ParticleSystem particle = particles[i];
+                if (particle.isPlaying && particle.time * hittedInvDurations[i] < 0.5f)
+                    return true;
+            }
+
+            return false;
+        }
+
+        while (IsMainPlaying(playParticles) || IsHittedPlaying(hittedParticles))
         {
             yield return null;
         }

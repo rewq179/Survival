@@ -53919,8 +53919,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52bc9e8b256968047afcfa4eb40a1c28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainParticle: {fileID: 0}
-  subParticles: []
+  playParticles:
+  - {fileID: 198080461927093774}
+  - {fileID: 198589701467457858}
+  - {fileID: 198808525585659474}
+  hitObject: {fileID: 1221893910213332}
+  hittedParticles:
+  - {fileID: 198201873886598266}
+  - {fileID: 198050301318838036}
+  - {fileID: 198114987638610014}
+  - {fileID: 198934990658033968}
+  - {fileID: 198284277412788680}
+  - {fileID: 198085508117193198}
+  - {fileID: 198512455813703994}
+  - {fileID: 198576085876932960}
 --- !u!114 &2049253249179165312
 MonoBehaviour:
   m_ObjectHideFlags: 0

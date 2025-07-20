@@ -52,11 +52,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52bc9e8b256968047afcfa4eb40a1c28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainParticle: {fileID: 198736250677286802}
-  subParticles:
-  - {fileID: 198891545406110170}
-  - {fileID: 198808812099508380}
-  - {fileID: 198444919947095206}
+  playParticles: []
+  hittedParticles: []
 --- !u!198 &198736250677286802
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -1063,8 +1060,8 @@ ParticleSystem:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-      cycleCount: 40
-      repeatInterval: 0.03
+      cycleCount: 20
+      repeatInterval: 0.12
       probability: 1
   SizeModule:
     enabled: 0
@@ -5033,7 +5030,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_BoundingSphereOverride: {x: 0, y: 9.1897e-41, z: 2.5166e-41, w: 1}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0

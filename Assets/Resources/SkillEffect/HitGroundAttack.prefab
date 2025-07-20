@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4145471958960878
 Transform:
   m_ObjectHideFlags: 0
@@ -14662,7 +14662,6 @@ GameObject:
   - component: {fileID: 4231334530682172}
   - component: {fileID: 198076815976795324}
   - component: {fileID: 199376571608345920}
-  - component: {fileID: 82000935677290146}
   - component: {fileID: 1335665066508631217}
   m_Layer: 0
   m_Name: HitGroundAttack
@@ -14670,7 +14669,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4231334530682172
 Transform:
   m_ObjectHideFlags: 0
@@ -19586,103 +19585,6 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!82 &82000935677290146
-AudioSource:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1535640691960112}
-  m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 339d6920ba96a9e44912e66d36be4f4c, type: 3}
-  m_Resource: {fileID: 8300000, guid: 339d6920ba96a9e44912e66d36be4f4c, type: 3}
-  m_PlayOnAwake: 0
-  m_Volume: 1
-  m_Pitch: 1
-  Loop: 0
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 5
-  MaxDistance: 50
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: -2.5890806
-      outSlope: -2.5890806
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.109433964
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0.041666668
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!114 &1335665066508631217
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19695,8 +19597,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52bc9e8b256968047afcfa4eb40a1c28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainParticle: {fileID: 198076815976795324}
-  subParticles:
+  playParticles:
+  - {fileID: 198076815976795324}
   - {fileID: 198241445646253894}
   - {fileID: 198331496451943482}
   - {fileID: 198512132914029492}
@@ -19704,6 +19606,7 @@ MonoBehaviour:
   - {fileID: 198236726822805752}
   - {fileID: 198433115164893152}
   - {fileID: 198389162935870964}
+  hittedParticles: []
 --- !u!1 &1598199573090778
 GameObject:
   m_ObjectHideFlags: 0
@@ -19721,7 +19624,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4689337514735700
 Transform:
   m_ObjectHideFlags: 0
@@ -24633,7 +24536,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4233693533674174
 Transform:
   m_ObjectHideFlags: 0
@@ -29478,7 +29381,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4930917516125428
 Transform:
   m_ObjectHideFlags: 0

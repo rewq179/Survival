@@ -17,8 +17,8 @@ MonoBehaviour:
   endRow: 15
   spawnGroupDatas:
   - groupID: 0
-    unitID: 1001
-    count: 2
+    unitID: 1003
+    count: 1
     repeat: 1
     repeatInterval: 100
     pattern: 0
@@ -29,7 +29,7 @@ MonoBehaviour:
     repeat: 1
     repeatInterval: 100
     pattern: 0
-    startDelay: 2.5
+    startDelay: 10010
   - groupID: 2
     unitID: 1002
     count: 4

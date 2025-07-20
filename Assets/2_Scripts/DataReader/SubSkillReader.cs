@@ -12,7 +12,7 @@ using UnityEditor;
 public enum SubSkillType
 {
     Cooldown,               // 쿨다운 감소
-    Shot,        // 투사체 개수 증가
+    Shot,                   // 투사체 개수 증가
     Piercing,               // 관통
     Ricochet,               // 도탄
     Damage,                 // 데미지 증가

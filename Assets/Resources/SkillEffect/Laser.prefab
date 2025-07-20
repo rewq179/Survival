@@ -47,9 +47,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52bc9e8b256968047afcfa4eb40a1c28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainParticle: {fileID: 3773123497845620853}
-  subParticles:
+  playParticles:
+  - {fileID: 3773123497845620853}
   - {fileID: 6627631843702503576}
+  hittedParticles: []
 --- !u!198 &3773123497845620853
 ParticleSystem:
   m_ObjectHideFlags: 0

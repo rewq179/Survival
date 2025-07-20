@@ -88,6 +88,9 @@ public class SkillDataReader : ScriptableObject
         string[] splits = skillString.Split('/');
         foreach (string str in splits)
         {
+            if (string.IsNullOrEmpty(str))
+                continue;
+
             SkillElement element = DecodeSingleSkillElement(str.Trim(), skillKey, elements.Count);
             elements.Add(element);
         }
@@ -123,6 +126,12 @@ public class SkillDataReader : ScriptableObject
         if (splits.Length <= 1)
             return null;
 
+        if (splits.Length > 2)
+        {
+            Debug.LogError($"명령문 내 '=' 대신 ':' 사용중");
+            return null;
+        }
+
         SkillElement element = new();
 
         SkillComponentType type = SkillComponentType.Projectile;
@@ -157,6 +166,8 @@ public class SkillDataReader : ScriptableObject
                 default:
                     if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedValue))
                         element.SetFloatParameter(ParsedElementType(key), parsedValue);
+                    else
+                        Debug.LogError($"명령문 내 파라미터 파싱 실패 => {value}");
                     break;
             }
         }
