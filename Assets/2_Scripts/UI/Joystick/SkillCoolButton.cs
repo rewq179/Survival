@@ -16,9 +16,9 @@ public class SkillCoolButton : BaseAttackButton
         cooldownText.text = string.Empty;
     }
 
-    public override void Init(Unit unit, SkillKey skillKey)
+    public override void Init(Unit unit, SkillKey skillKey, bool isActive)
     {
-        base.Init(unit, skillKey);
+        base.Init(unit, skillKey, isActive);
 
         maxCooldown = skillData.cooldown;
         cooldownSlider.maxValue = maxCooldown;

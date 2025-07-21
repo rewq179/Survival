@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Pool;
 using UnityEngine.UI;
 
 public class BaseAttackButton : MonoBehaviour
@@ -33,12 +34,12 @@ public class BaseAttackButton : MonoBehaviour
         attackButton.interactable = isInteractable;
     }
 
-    public virtual void Init(Unit unit, SkillKey skillKey)
+    public virtual void Init(Unit unit, SkillKey skillKey, bool isActive)
     {
         playerUnit = unit;
         skillData = DataMgr.GetSkillData(skillKey);
         skillIcon.sprite = GameMgr.Instance.resourceMgr.GetSkillIcon(skillKey);
-        gameObject.SetActive(true);
+        gameObject.SetActive(isActive);
     }
 
     public virtual void OnClick()

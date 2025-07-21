@@ -47,14 +47,14 @@ public class AttackJoystick : MonoBehaviour
 
     private void RefreshSkill(SkillKey skillKey)
     {
-        if (isAutoAttack || DataMgr.IsPassiveSkill(skillKey))
+        if (DataMgr.IsPassiveSkill(skillKey))
             return;
 
         foreach (BaseAttackButton button in attackButtons)
         {
             if (!button.IsSetted)
             {
-                button.Init(playerUnit, skillKey);
+                button.Init(playerUnit, skillKey, !isAutoAttack);
                 break;
             }
         }
