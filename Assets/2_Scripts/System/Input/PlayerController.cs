@@ -18,6 +18,10 @@ public class PlayerController : MonoBehaviour
     private Unit owner;
     private SkillMgr skillManager;
     private Camera mainCamera;
+    
+    // 조이스틱 관련
+    private MovementJoystick movementJoystick;
+    private bool isUsingJoystick;
 
     private void Awake()
     {
@@ -33,8 +37,16 @@ public class PlayerController : MonoBehaviour
         this.owner = owner;
         skillManager = GameMgr.Instance.skillMgr;
         UpdateMoveSpeed();
+        
+        // 조이스틱 찾기 및 이벤트 연결
+        movementJoystick = UIMgr.Instance.movementJoystick;
+        if (movementJoystick != null)
+        {
+            movementJoystick.OnJoystickMove += OnJoystickMove;
+            movementJoystick.OnJoystickRelease += OnJoystickRelease;
+        }
     }
-
+    
     private void OnEnable()
     {
         // 액션 활성화
@@ -61,7 +73,22 @@ public class PlayerController : MonoBehaviour
 
     private void OnMove(InputAction.CallbackContext context)
     {
+        if (isUsingJoystick)
+            return;
+
         moveInput = context.ReadValue<Vector2>();
+    }
+    
+    private void OnJoystickMove(Vector2 joystickInput)
+    {
+        isUsingJoystick = true;
+        moveInput = joystickInput;
+    }
+    
+    private void OnJoystickRelease()
+    {
+        isUsingJoystick = false;
+        moveInput = Vector2.zero;
     }
 
     private void OnAttack(InputAction.CallbackContext context)

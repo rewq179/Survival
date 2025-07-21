@@ -15,6 +15,7 @@ public class UIMgr : MonoBehaviour
     public GameOverUI gameOverUI;
     public AutoAttackUI autoAttackUI;
     public PauseUI pauseUI;
+    public MovementJoystick movementJoystick;
 
     private void Awake()
     {
