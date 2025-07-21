@@ -9,29 +9,6 @@ using UnityEngine.Events;
 using UnityEditor;
 #endif
 
-public enum WaveType
-{
-    Normal,
-    Boss,
-}
-
-[Serializable]
-public class WaveData
-{
-    public int waveID;
-    public WaveType waveType;
-    public float difficulty;
-    public List<int> spawnGroupIDs;
-
-    public WaveData(int waveID, WaveType waveType, float difficulty, List<int> spawnGroups)
-    {
-        this.waveID = waveID;
-        this.waveType = waveType;
-        this.difficulty = difficulty;
-        this.spawnGroupIDs = spawnGroups;
-    }
-}
-
 [System.Serializable]
 [CreateAssetMenu(fileName = "WaveReader", menuName = "Scriptable Object/WaveDataReader", order = int.MaxValue)]
 public class WaveDataReader : ScriptableObject

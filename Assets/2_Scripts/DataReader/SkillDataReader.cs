@@ -10,6 +10,7 @@ using UnityEngine.Events;
 using UnityEditor;
 #endif
 
+[System.Serializable]
 [CreateAssetMenu(fileName = "SkillReader", menuName = "Scriptable Object/SkillDataReader", order = int.MaxValue)]
 public class SkillDataReader : ScriptableObject
 {

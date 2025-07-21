@@ -9,29 +9,6 @@ using UnityEngine.Events;
 using UnityEditor;
 #endif
 
-[Serializable]
-public class UnitData
-{
-    public int id;
-    public string name;
-    public float hp;
-    public float moveSpeed;
-    public List<SkillKey> skills;
-    public float exp;
-    public int gold;
-
-    public UnitData(int id, string name, float hp, float moveSpeed, List<SkillKey> skills, float exp, int gold)
-    {
-        this.id = id;
-        this.name = name;
-        this.hp = hp;
-        this.moveSpeed = moveSpeed;
-        this.skills = skills;
-        this.exp = exp;
-        this.gold = gold;
-    }
-}
-
 [System.Serializable]
 [CreateAssetMenu(fileName = "UnitReader", menuName = "Scriptable Object/UnitDataReader", order = int.MaxValue)]
 public class UnitDataReader : ScriptableObject

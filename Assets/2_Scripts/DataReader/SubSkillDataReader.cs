@@ -9,65 +9,6 @@ using System.Globalization;
 using UnityEditor;
 #endif
 
-public enum SubSkillType
-{
-    Cooldown,               // 쿨다운 감소
-    Shot,                   // 투사체 개수 증가
-    Piercing,               // 관통
-    Ricochet,               // 도탄
-    Damage,                 // 데미지 증가
-    Duration,               // 지속 시간 증가
-    Radius,                 // 범위 증가
-    DamageTick,             // 데미지 틱 증가
-    MoveSpeed,              // 이동 속도 증가
-
-    // 패시브 스킬 타입들
-    HealthInc,              // 체력 증가
-    MoveSpeedInc,           // 이동 속도 증가
-    DefenseInc,             // 방어력 증가
-    MagnetRangeInc,         // 자석 범위 증가
-    ExpGainInc,             // 경험치 획득 증가
-    GoldGainInc,            // 골드 획득 증가
-    CriticalChanceInc,      // 치명타 확률 증가
-    CriticalDamageInc,      // 치명타 피해 증가
-    AllSkillRangeInc,       // 모든 스킬 범위 증가
-    AllSkillCooldownDec,    // 모든 스킬 쿨다운 감소
-    AllSkillDamageInc,      // 모든 스킬 데미지 증가
-    AllSkillDurationInc,    // 모든 스킬 지속시간 증가
-
-    Max,
-}
-
-[Serializable]
-public class SubSkillData
-{
-    public SkillKey skillKey;
-    public SkillKey parentSkillKey;
-    public string name;
-    public string description;
-    public float baseValue;
-    public float perLevelValue;
-    public int maxLevel;
-    public SubSkillType type;
-
-    public void Init(SkillKey skillKey, SkillKey parentSkillKey, string description, float baseValue, float perLevelValue, int maxLevel, SubSkillType type)
-    {
-        this.skillKey = skillKey;
-        this.parentSkillKey = parentSkillKey;
-        this.description = description;
-        this.baseValue = baseValue;
-        this.perLevelValue = perLevelValue;
-        this.maxLevel = maxLevel;
-        this.type = type;
-    }
-
-    public void SetName(string name)
-    {
-        this.name = name;
-    }
-}
-
-
 [CreateAssetMenu(fileName = "SubSkillReader", menuName = "Scriptable Object/SubSkillDataReader", order = int.MaxValue)]
 public class SubSkillDataReader : ScriptableObject
 {

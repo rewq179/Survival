@@ -230,3 +230,131 @@ public class SkillData
         skillElements = elements;
     }
 }
+
+public enum SubSkillType
+{
+    Cooldown,               // 쿨다운 감소
+    Shot,                   // 투사체 개수 증가
+    Piercing,               // 관통
+    Ricochet,               // 도탄
+    Damage,                 // 데미지 증가
+    Duration,               // 지속 시간 증가
+    Radius,                 // 범위 증가
+    DamageTick,             // 데미지 틱 증가
+    MoveSpeed,              // 이동 속도 증가
+
+    // 패시브 스킬 타입들
+    HealthInc,              // 체력 증가
+    MoveSpeedInc,           // 이동 속도 증가
+    DefenseInc,             // 방어력 증가
+    MagnetRangeInc,         // 자석 범위 증가
+    ExpGainInc,             // 경험치 획득 증가
+    GoldGainInc,            // 골드 획득 증가
+    CriticalChanceInc,      // 치명타 확률 증가
+    CriticalDamageInc,      // 치명타 피해 증가
+    AllSkillRangeInc,       // 모든 스킬 범위 증가
+    AllSkillCooldownDec,    // 모든 스킬 쿨다운 감소
+    AllSkillDamageInc,      // 모든 스킬 데미지 증가
+    AllSkillDurationInc,    // 모든 스킬 지속시간 증가
+
+    Max,
+}
+
+[Serializable]
+public class SubSkillData
+{
+    public SkillKey skillKey;
+    public SkillKey parentSkillKey;
+    public string name;
+    public string description;
+    public float baseValue;
+    public float perLevelValue;
+    public int maxLevel;
+    public SubSkillType type;
+
+    public void Init(SkillKey skillKey, SkillKey parentSkillKey, string description, float baseValue, float perLevelValue, int maxLevel, SubSkillType type)
+    {
+        this.skillKey = skillKey;
+        this.parentSkillKey = parentSkillKey;
+        this.description = description;
+        this.baseValue = baseValue;
+        this.perLevelValue = perLevelValue;
+        this.maxLevel = maxLevel;
+        this.type = type;
+    }
+
+    public void SetName(string name)
+    {
+        this.name = name;
+    }
+}
+
+
+[Serializable]
+public class UnitData
+{
+    public int id;
+    public string name;
+    public float hp;
+    public float moveSpeed;
+    public List<SkillKey> skills;
+    public float exp;
+    public int gold;
+
+    public UnitData(int id, string name, float hp, float moveSpeed, List<SkillKey> skills, float exp, int gold)
+    {
+        this.id = id;
+        this.name = name;
+        this.hp = hp;
+        this.moveSpeed = moveSpeed;
+        this.skills = skills;
+        this.exp = exp;
+        this.gold = gold;
+    }
+}
+
+[Serializable]
+public class SpawnGroupData
+{
+    public int groupID;
+    public int unitID;
+    public int count;
+    public int repeat;
+    public float repeatInterval;
+    public SpawnMgr.SpawnPattern pattern;
+    public float startDelay;
+
+    public SpawnGroupData(int groupID, int unitID, int count, int repeat, float repeatInterval, SpawnMgr.SpawnPattern pattern, float startDelay)
+    {
+        this.groupID = groupID;
+        this.unitID = unitID;
+        this.count = count;
+        this.repeat = repeat;
+        this.repeatInterval = repeatInterval;
+        this.pattern = pattern;
+        this.startDelay = startDelay;
+    }
+}
+
+public enum WaveType
+{
+    Normal,
+    Boss,
+}
+
+[Serializable]
+public class WaveData
+{
+    public int waveID;
+    public WaveType waveType;
+    public float difficulty;
+    public List<int> spawnGroupIDs;
+
+    public WaveData(int waveID, WaveType waveType, float difficulty, List<int> spawnGroups)
+    {
+        this.waveID = waveID;
+        this.waveType = waveType;
+        this.difficulty = difficulty;
+        this.spawnGroupIDs = spawnGroups;
+    }
+}

@@ -9,29 +9,6 @@ using UnityEngine.Events;
 using UnityEditor;
 #endif
 
-[Serializable]
-public class SpawnGroupData
-{
-    public int groupID;
-    public int unitID;
-    public int count;
-    public int repeat;
-    public float repeatInterval;
-    public SpawnMgr.SpawnPattern pattern;
-    public float startDelay;
-
-    public SpawnGroupData(int groupID, int unitID, int count, int repeat, float repeatInterval, SpawnMgr.SpawnPattern pattern, float startDelay)
-    {
-        this.groupID = groupID;
-        this.unitID = unitID;
-        this.count = count;
-        this.repeat = repeat;
-        this.repeatInterval = repeatInterval;
-        this.pattern = pattern;
-        this.startDelay = startDelay;
-    }
-}
-
  [System.Serializable]
 [CreateAssetMenu(fileName = "SpawnGroupReader", menuName = "Scriptable Object/SpawnGroupDataReader", order = int.MaxValue)]
 public class SpawnGroupDataReader : ScriptableObject

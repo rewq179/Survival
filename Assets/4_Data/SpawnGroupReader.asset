@@ -14,5 +14,103 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpawnGroupDataReader
   sheetName: SpawnGroup
   startRow: 2
-  endRow: 17
-  spawnGroupDatas: []
+  endRow: 16
+  spawnGroupDatas:
+  - groupID: 0
+    unitID: 1001
+    count: 5
+    repeat: 3
+    repeatInterval: 0.8
+    pattern: 0
+    startDelay: 0
+  - groupID: 1
+    unitID: 1001
+    count: 3
+    repeat: 3
+    repeatInterval: 0.5
+    pattern: 0
+    startDelay: 2.5
+  - groupID: 2
+    unitID: 1002
+    count: 4
+    repeat: 4
+    repeatInterval: 1
+    pattern: 0
+    startDelay: 0
+  - groupID: 3
+    unitID: 1001
+    count: 2
+    repeat: 2
+    repeatInterval: 0.6
+    pattern: 0
+    startDelay: 3
+  - groupID: 4
+    unitID: 1001
+    count: 10
+    repeat: 2
+    repeatInterval: 1.5
+    pattern: 0
+    startDelay: 0
+  - groupID: 5
+    unitID: 1002
+    count: 9
+    repeat: 3
+    repeatInterval: 3
+    pattern: 0
+    startDelay: 2.2
+  - groupID: 6
+    unitID: 1003
+    count: 3
+    repeat: 2
+    repeatInterval: 2
+    pattern: 0
+    startDelay: 7.5
+  - groupID: 7
+    unitID: 1001
+    count: 5
+    repeat: 3
+    repeatInterval: 0.9
+    pattern: 0
+    startDelay: 0
+  - groupID: 8
+    unitID: 1002
+    count: 4
+    repeat: 2
+    repeatInterval: 0.6
+    pattern: 0
+    startDelay: 3
+  - groupID: 9
+    unitID: 1004
+    count: 2
+    repeat: 1
+    repeatInterval: 1.5
+    pattern: 0
+    startDelay: 5
+  - groupID: 10
+    unitID: 1002
+    count: 4
+    repeat: 4
+    repeatInterval: 1
+    pattern: 0
+    startDelay: 0
+  - groupID: 11
+    unitID: 1003
+    count: 3
+    repeat: 2
+    repeatInterval: 1
+    pattern: 0
+    startDelay: 3.5
+  - groupID: 12
+    unitID: 1004
+    count: 3
+    repeat: 1
+    repeatInterval: 1.5
+    pattern: 0
+    startDelay: 10
+  - groupID: 13
+    unitID: 1005
+    count: 1
+    repeat: 1
+    repeatInterval: 0
+    pattern: 0
+    startDelay: 10
