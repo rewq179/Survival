@@ -57,6 +57,14 @@ public class StatModule
 
     public void AddStatModifier(StatType type, float value)
     {
-        statModifiers[type] += value;
+        if (statModifiers.ContainsKey(type))
+        {
+            statModifiers[type] += value;
+        }
+        
+        else
+        {
+            statModifiers[type] = value;
+        }
     }
 }

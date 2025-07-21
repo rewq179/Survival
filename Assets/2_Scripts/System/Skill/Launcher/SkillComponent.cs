@@ -70,13 +70,13 @@ public abstract class SkillComponent
     }
 
     public virtual void OnUpdate(float deltaTime) { }
-    protected virtual void OnEnd()
+    protected virtual void OnEnd(bool forceEnd = false)
     {
         if (state == ComponentState.Completed)
             return;
 
         state = ComponentState.Completed;
-        launcher.CheckDeactivate();
+        launcher.CheckDeactivate(forceEnd);
     }
 
     public virtual void OnHit(Unit target) { }
@@ -135,7 +135,7 @@ public abstract class Attack_Component : SkillComponent
     private void OnParticleFinished()
     {
         launcher.SetParticleFinished(true);
-        launcher.CheckDeactivate();
+        launcher.CheckDeactivate(false);
     }
 
     public override void OnStart()
@@ -144,9 +144,9 @@ public abstract class Attack_Component : SkillComponent
         effectController?.Play();
     }
 
-    protected override void OnEnd()
+    protected override void OnEnd(bool forceEnd = false)
     {
-        base.OnEnd();
+        base.OnEnd(forceEnd);
         effectController?.StopMain();
     }
 }
@@ -420,7 +420,7 @@ public class Attack_InstantComponent : Attack_Component
     {
         base.OnStart();
         OnHit(target);
-        OnEnd();
+        OnEnd(true);
     }
 
     public override void OnHit(Unit target)

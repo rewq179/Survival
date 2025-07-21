@@ -173,8 +173,10 @@ public class SkillLauncher : MonoBehaviour
 
         // 현재 Order의 즉시 실행 컴포넌트들 시작 및 업데이트
         bool allImmediateCompleted = true;
-        foreach (SkillComponent component in instantComponents)
+        int count = instantComponents.Count;
+        for(int i = 0; i < count; i++)
         {
+            SkillComponent component = instantComponents[i];
             if (component.State == ComponentState.NotStarted)
             {
                 component.OnStart();
@@ -194,6 +196,9 @@ public class SkillLauncher : MonoBehaviour
         {
             UpdateSequentialComponents();
         }
+
+        if (!isActive)
+            return;
 
         // 현재 Order의 모든 컴포넌트가 완료되었는지 체크
         bool allSequentialCompleted = true;
@@ -228,22 +233,27 @@ public class SkillLauncher : MonoBehaviour
         }
 
         // 현재 순차 컴포넌트 가져오기
-        SkillComponent currentComponent = sequentialComponents[currentSequentialIndex];
-        switch (currentComponent.State)
+        float time = Time.deltaTime;
+        SkillComponent component = sequentialComponents[currentSequentialIndex];
+        switch (component.State)
         {
             case ComponentState.NotStarted:
-                currentComponent.OnStart();
+                component.OnStart();
+                if (component.State == ComponentState.Running)
+                    component.OnUpdate(time);
                 break;
+
             case ComponentState.Running:
-                currentComponent.OnUpdate(Time.deltaTime);
+                component.OnUpdate(time);
                 break;
+
             case ComponentState.Completed:
                 currentSequentialIndex++;
                 break;
         }
     }
 
-    public void CheckDeactivate(bool forceEnd = false)
+    public void CheckDeactivate(bool forceEnd)
     {
         if (!isActive || !isParticleFinished)
             return;
