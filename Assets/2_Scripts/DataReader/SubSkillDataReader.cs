@@ -9,6 +9,7 @@ using System.Globalization;
 using UnityEditor;
 #endif
 
+[DefaultExecutionOrder(100)]
 [CreateAssetMenu(fileName = "SubSkillReader", menuName = "Scriptable Object/SubSkillDataReader", order = int.MaxValue)]
 public class SubSkillDataReader : ScriptableObject
 {

@@ -9,7 +9,7 @@ using UnityEngine.Events;
 using UnityEditor;
 #endif
 
-[System.Serializable]
+[DefaultExecutionOrder(100)]
 [CreateAssetMenu(fileName = "WaveReader", menuName = "Scriptable Object/WaveDataReader", order = int.MaxValue)]
 public class WaveDataReader : ScriptableObject
 {

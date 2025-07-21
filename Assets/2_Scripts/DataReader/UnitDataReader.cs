@@ -9,7 +9,7 @@ using UnityEngine.Events;
 using UnityEditor;
 #endif
 
-[System.Serializable]
+[DefaultExecutionOrder(100)]
 [CreateAssetMenu(fileName = "UnitReader", menuName = "Scriptable Object/UnitDataReader", order = int.MaxValue)]
 public class UnitDataReader : ScriptableObject
 {

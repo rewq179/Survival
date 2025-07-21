@@ -141,7 +141,7 @@ public class SkillElement
     public FirePoint firePoint;
     public bool isTarget;
     public float maxDistance;
-    private float[] parameters = new float[(int)ElementType.Max];
+    public float[] parameters = new float[(int)ElementType.Max];
 
     public bool IsMainIndicator => index == 0;
     public float Speed => GetParameter(ElementType.Speed);

@@ -32,6 +32,22 @@ MonoBehaviour:
       firePoint: 1
       isTarget: 0
       maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 1
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 5
     skillType: 0
     name: Dagger
@@ -48,6 +64,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 10
+      - 18
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 3.2
+      - 0
   - skillKey: 10
     skillType: 0
     name: FrontSpike
@@ -64,6 +96,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 16.4
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 22
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 60
+      - 8.2
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 13
     skillType: 0
     name: EnergyExplosion
@@ -80,6 +128,22 @@ MonoBehaviour:
       firePoint: 1
       isTarget: 0
       maxDistance: 7
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 45
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 360
+      - 3.5
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 17
     skillType: 0
     name: Meteor
@@ -96,6 +160,22 @@ MonoBehaviour:
       firePoint: 1
       isTarget: 0
       maxDistance: 6.2
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 20
+      - 0
+      - 2
+      - 0.5
+      - 0
+      - 0
+      - 360
+      - 3.1
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 23
     skillType: 0
     name: Blackhole
@@ -112,6 +192,22 @@ MonoBehaviour:
       firePoint: 1
       isTarget: 0
       maxDistance: 6
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 3
+      - 0
+      - 0
+      - 0
+      - 360
+      - 3
+      - 0
+      - 0
+      - 0
+      - 30
     - skillKey: 23
       index: 1
       componentType: 1
@@ -121,6 +217,22 @@ MonoBehaviour:
       firePoint: 1
       isTarget: 0
       maxDistance: 6
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 75
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 360
+      - 3
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 29
     skillType: 0
     name: IceAttack
@@ -137,6 +249,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 8
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 6.5
+      - 0
+      - 1.5
+      - 0.3
+      - 0
+      - 0
+      - 360
+      - 4
+      - 0
+      - 0
+      - 0
+      - 0
     - skillKey: 29
       index: 1
       componentType: 8
@@ -146,6 +274,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 8
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 3
+      - 0
+      - 0
+      - 0
+      - 360
+      - 4
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 33
     skillType: 1
     name: "\uCCB4\uB825 \uC99D\uAC00"
@@ -162,6 +306,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 35
     skillType: 1
     name: "\uC774\uB3D9 \uC18D\uB3C4 \uC99D\uAC00"
@@ -178,6 +338,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 37
     skillType: 1
     name: "\uBC29\uC5B4\uB825 \uC99D\uAC00"
@@ -194,6 +370,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 39
     skillType: 1
     name: "\uC790\uC11D \uBC94\uC704 \uC99D\uAC00"
@@ -210,6 +402,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 41
     skillType: 1
     name: "\uACBD\uD5D8\uCE58 \uD68D\uB4DD \uC99D\uAC00"
@@ -226,6 +434,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 43
     skillType: 1
     name: "\uACE8\uB4DC \uD68D\uB4DD \uC99D\uAC00"
@@ -242,6 +466,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 45
     skillType: 1
     name: "\uCE58\uBA85\uD0C0 \uD655\uB960 \uC99D\uAC00"
@@ -258,6 +498,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 47
     skillType: 1
     name: "\uCE58\uBA85\uD0C0 \uD53C\uD574 \uC99D\uAC00"
@@ -274,6 +530,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 49
     skillType: 1
     name: "\uC2A4\uD0AC \uBC94\uC704 \uC99D\uAC00"
@@ -290,6 +562,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 51
     skillType: 1
     name: "\uC2A4\uD0AC \uCFE8\uB2E4\uC6B4 \uAC10\uC18C"
@@ -306,6 +594,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 53
     skillType: 1
     name: "\uC2A4\uD0AC \uB370\uBBF8\uC9C0 \uC99D\uAC00"
@@ -322,6 +626,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 55
     skillType: 1
     name: "\uC2A4\uD0AC \uC9C0\uC18D\uC2DC\uAC04 \uC99D\uAC00"
@@ -338,6 +658,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 57
     skillType: 0
     name: "\uB3C5\uCE68"
@@ -354,6 +690,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 3
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 58
     skillType: 0
     name: "\uD654\uC5FC \uD22C\uC0AC\uCCB4"
@@ -370,6 +722,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 4
+      - 10
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 59
     skillType: 0
     name: "\uADFC\uC811 \uACF5\uACA9"
@@ -386,6 +754,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 3
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 60
     skillType: 0
     name: '-'
@@ -402,6 +786,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 5
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 61
     skillType: 0
     name: '-'
@@ -418,6 +818,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 5
+      - 15
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 3.1
+      - 0
   - skillKey: 62
     skillType: 0
     name: '-'
@@ -434,6 +850,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 7
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 63
     skillType: 0
     name: '-'
@@ -450,6 +882,22 @@ MonoBehaviour:
       firePoint: 1
       isTarget: 0
       maxDistance: 6
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0.6
+      - 0
+      - 0
+      - 0
+      - 360
+      - 3
+      - 0
+      - 0
+      - 0
+      - 0
     - skillKey: 63
       index: 1
       componentType: 1
@@ -459,6 +907,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 6
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 10
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 360
+      - 3
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 64
     skillType: 0
     name: '-'
@@ -475,6 +939,22 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 10
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
   - skillKey: 65
     skillType: 0
     name: '-'
@@ -491,3 +971,19 @@ MonoBehaviour:
       firePoint: 0
       isTarget: 0
       maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 15
+      - 0
+      - 0.9
+      - 0.1
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0

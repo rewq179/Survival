@@ -9,7 +9,7 @@ using UnityEngine.Events;
 using UnityEditor;
 #endif
 
- [System.Serializable]
+[DefaultExecutionOrder(100)]
 [CreateAssetMenu(fileName = "SpawnGroupReader", menuName = "Scriptable Object/SpawnGroupDataReader", order = int.MaxValue)]
 public class SpawnGroupDataReader : ScriptableObject
 {
