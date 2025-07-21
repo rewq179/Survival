@@ -17,6 +17,7 @@ public class BaseAttackButton : MonoBehaviour
 
     protected Unit playerUnit;
     protected SkillData skillData;
+    public bool IsSetted => skillData != null;
 
     public virtual void Reset()
     {

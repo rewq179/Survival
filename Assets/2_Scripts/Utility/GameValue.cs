@@ -7,7 +7,14 @@ public class GameValue
 
     public static float GetRequiredExp(int level)
     {
-        return 3 + 10 * (level + 1) * 1.5f;
+        if (level <= 5)
+            return 3 + 5 * level;
+
+        else if (level <= 10)
+            return 8 + 10 * level;
+
+        else
+            return 20 + 12 * level;
     }
 
     // 스킬

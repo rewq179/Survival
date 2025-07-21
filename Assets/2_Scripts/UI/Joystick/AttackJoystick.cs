@@ -52,7 +52,7 @@ public class AttackJoystick : MonoBehaviour
 
         foreach (BaseAttackButton button in attackButtons)
         {
-            if (!button.gameObject.activeSelf)
+            if (!button.IsSetted)
             {
                 button.Init(playerUnit, skillKey);
                 break;
@@ -66,6 +66,9 @@ public class AttackJoystick : MonoBehaviour
 
         foreach (BaseAttackButton button in attackButtons)
         {
+            if (!button.IsSetted)
+                continue;
+
             button.gameObject.SetActive(!isAutoAttack);
         }
     }
