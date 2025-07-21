@@ -214,8 +214,12 @@ public class SkillMgr : MonoBehaviour
 
     private void ShowMultipleIndicators(SkillData skillData, Vector3 start, bool isPlayerIndicator)
     {
-        for (int i = 0; i < skillData.skillElements.Count; i++)
+        int count = skillData.skillElements.Count;
+        for (int i = 0; i < count; i++)
         {
+            if (skillData.skillElements[i].indicatorType == SkillIndicatorType.None)
+                continue;
+
             SkillIndicator indicator = CreateIndicator(skillData.skillElements[i], isPlayerIndicator);
 
             if (i == 0)

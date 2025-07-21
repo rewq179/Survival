@@ -152,6 +152,11 @@ public class SkillDataReader : ScriptableObject
             string value = keyValue[1].Trim();
             switch (key)
             {
+                case "indicator":
+                    if (Enum.TryParse(value, true, out SkillIndicatorType parsedIndicatorType))
+                        element.SetIndicatorType(parsedIndicatorType);
+                    break;
+
                 case "order":
                     element.SetOrder(int.Parse(value));
                     break;

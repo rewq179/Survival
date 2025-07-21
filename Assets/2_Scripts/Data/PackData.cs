@@ -139,7 +139,6 @@ public class SkillElement
     public int order;
     public ExecutionTiming timing;
     public FirePoint firePoint;
-    public bool isTarget;
     public float maxDistance;
     public float[] parameters = new float[(int)ElementType.Max];
 
@@ -162,28 +161,7 @@ public class SkillElement
         this.skillKey = skillKey;
         this.index = index;
         this.componentType = componentType;
-
-        SetIndicatorType();
         SetMaxDistance();
-    }
-
-    private void SetIndicatorType()
-    {
-        if (componentType == SkillComponentType.Projectile)
-            indicatorType = SkillIndicatorType.Line;
-        else if (componentType == SkillComponentType.Beam)
-            indicatorType = SkillIndicatorType.Rectangle;
-        else if (Angle == 0)
-            indicatorType = SkillIndicatorType.InstantAttack;
-        else if (Angle < 360)
-            indicatorType = SkillIndicatorType.Sector;
-        else
-            indicatorType = SkillIndicatorType.Circle;
-    }
-
-    private void SetMaxDistance()
-    {
-        maxDistance = Radius > 0 ? Radius * 2f : Width * 1.6f;
     }
 
     public float GetParameter(ElementType key)
@@ -195,6 +173,7 @@ public class SkillElement
         return 0f;
     }
 
+    public void SetIndicatorType(SkillIndicatorType type) => indicatorType = type;
     public void SetFirePoint(FirePoint value) => firePoint = value;
     public void SetOrder(int value) => order = value;
     public void SetTiming(ExecutionTiming value) => timing = value;
@@ -204,6 +183,19 @@ public class SkillElement
         int index = (int)key;
         if (index >= 0 && index < parameters.Length)
             parameters[index] = value;
+    }
+
+    public void SetMaxDistance()
+    {
+        maxDistance = indicatorType switch
+        {
+            SkillIndicatorType.Line => GameValue.PROJECTILE_MAX_LENGTH,
+            SkillIndicatorType.Rectangle => Width * 1.6f,
+            SkillIndicatorType.Sector => Radius * 2f,
+            SkillIndicatorType.Circle => Radius * 2f,
+            SkillIndicatorType.InstantAttack => 0f,
+            _ => 0f,
+        };
     }
 }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 public enum SkillIndicatorType
 {
+    None,
     Line,
     Rectangle,
     Sector,

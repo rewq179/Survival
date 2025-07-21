@@ -25,18 +25,17 @@ MonoBehaviour:
     skillElements:
     - skillKey: 0
       index: 0
-      componentType: 3
-      indicatorType: 4
+      componentType: 0
+      indicatorType: 1
       order: 0
       timing: 0
       firePoint: 1
-      isTarget: 0
-      maxDistance: 0
+      maxDistance: 15
       parameters:
       - 0
       - 0
       - 0
-      - 1
+      - 8
       - 0
       - 0
       - 0
@@ -44,9 +43,9 @@ MonoBehaviour:
       - 0
       - 0
       - 0
-      - 0
-      - 0
-      - 0
+      - 1.2
+      - 1.4
+      - 2.2
       - 0
   - skillKey: 5
     skillType: 0
@@ -58,12 +57,11 @@ MonoBehaviour:
     - skillKey: 5
       index: 0
       componentType: 0
-      indicatorType: 0
+      indicatorType: 1
       order: 0
       timing: 0
-      firePoint: 0
-      isTarget: 0
-      maxDistance: 0
+      firePoint: 1
+      maxDistance: 15
       parameters:
       - 0
       - 0
@@ -78,7 +76,7 @@ MonoBehaviour:
       - 0
       - 0
       - 0
-      - 3.2
+      - 3.4
       - 0
   - skillKey: 10
     skillType: 0
@@ -90,11 +88,10 @@ MonoBehaviour:
     - skillKey: 10
       index: 0
       componentType: 1
-      indicatorType: 2
+      indicatorType: 3
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
       maxDistance: 16.4
       parameters:
       - 0
@@ -122,11 +119,10 @@ MonoBehaviour:
     - skillKey: 13
       index: 0
       componentType: 1
-      indicatorType: 3
+      indicatorType: 4
       order: 0
       timing: 0
       firePoint: 1
-      isTarget: 0
       maxDistance: 7
       parameters:
       - 0
@@ -154,11 +150,10 @@ MonoBehaviour:
     - skillKey: 17
       index: 0
       componentType: 2
-      indicatorType: 3
+      indicatorType: 4
       order: 0
       timing: 0
       firePoint: 1
-      isTarget: 0
       maxDistance: 6.2
       parameters:
       - 0
@@ -186,11 +181,10 @@ MonoBehaviour:
     - skillKey: 23
       index: 0
       componentType: 7
-      indicatorType: 3
+      indicatorType: 4
       order: 0
       timing: 0
       firePoint: 1
-      isTarget: 0
       maxDistance: 6
       parameters:
       - 0
@@ -211,12 +205,11 @@ MonoBehaviour:
     - skillKey: 23
       index: 1
       componentType: 1
-      indicatorType: 3
+      indicatorType: 0
       order: 0
       timing: 1
       firePoint: 1
-      isTarget: 0
-      maxDistance: 6
+      maxDistance: 0
       parameters:
       - 0
       - 0
@@ -243,11 +236,10 @@ MonoBehaviour:
     - skillKey: 29
       index: 0
       componentType: 2
-      indicatorType: 3
+      indicatorType: 4
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
       maxDistance: 8
       parameters:
       - 0
@@ -268,12 +260,11 @@ MonoBehaviour:
     - skillKey: 29
       index: 1
       componentType: 8
-      indicatorType: 3
+      indicatorType: 0
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
-      maxDistance: 8
+      maxDistance: 0
       parameters:
       - 0
       - 0
@@ -304,7 +295,6 @@ MonoBehaviour:
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
       maxDistance: 0
       parameters:
       - 0
@@ -336,7 +326,6 @@ MonoBehaviour:
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
       maxDistance: 0
       parameters:
       - 0
@@ -368,7 +357,6 @@ MonoBehaviour:
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
       maxDistance: 0
       parameters:
       - 0
@@ -400,7 +388,6 @@ MonoBehaviour:
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
       maxDistance: 0
       parameters:
       - 0
@@ -432,7 +419,6 @@ MonoBehaviour:
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
       maxDistance: 0
       parameters:
       - 0
@@ -464,7 +450,6 @@ MonoBehaviour:
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
       maxDistance: 0
       parameters:
       - 0
@@ -496,7 +481,6 @@ MonoBehaviour:
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
       maxDistance: 0
       parameters:
       - 0
@@ -528,7 +512,6 @@ MonoBehaviour:
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
       maxDistance: 0
       parameters:
       - 0
@@ -560,7 +543,6 @@ MonoBehaviour:
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
       maxDistance: 0
       parameters:
       - 0
@@ -592,7 +574,6 @@ MonoBehaviour:
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
       maxDistance: 0
       parameters:
       - 0
@@ -624,7 +605,6 @@ MonoBehaviour:
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
       maxDistance: 0
       parameters:
       - 0
@@ -656,7 +636,6 @@ MonoBehaviour:
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
       maxDistance: 0
       parameters:
       - 0
@@ -684,11 +663,10 @@ MonoBehaviour:
     - skillKey: 57
       index: 0
       componentType: 3
-      indicatorType: 4
+      indicatorType: 0
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
       maxDistance: 0
       parameters:
       - 0
@@ -716,12 +694,11 @@ MonoBehaviour:
     - skillKey: 58
       index: 0
       componentType: 0
-      indicatorType: 0
+      indicatorType: 1
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
-      maxDistance: 0
+      maxDistance: 15
       parameters:
       - 0
       - 0
@@ -748,11 +725,10 @@ MonoBehaviour:
     - skillKey: 59
       index: 0
       componentType: 3
-      indicatorType: 4
+      indicatorType: 0
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
       maxDistance: 0
       parameters:
       - 0
@@ -780,11 +756,10 @@ MonoBehaviour:
     - skillKey: 60
       index: 0
       componentType: 3
-      indicatorType: 4
+      indicatorType: 0
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
       maxDistance: 0
       parameters:
       - 0
@@ -812,12 +787,11 @@ MonoBehaviour:
     - skillKey: 61
       index: 0
       componentType: 0
-      indicatorType: 0
+      indicatorType: 1
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
-      maxDistance: 0
+      maxDistance: 15
       parameters:
       - 0
       - 0
@@ -844,11 +818,10 @@ MonoBehaviour:
     - skillKey: 62
       index: 0
       componentType: 3
-      indicatorType: 4
+      indicatorType: 0
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
       maxDistance: 0
       parameters:
       - 0
@@ -876,11 +849,10 @@ MonoBehaviour:
     - skillKey: 63
       index: 0
       componentType: 6
-      indicatorType: 3
+      indicatorType: 4
       order: 0
       timing: 0
       firePoint: 1
-      isTarget: 0
       maxDistance: 6
       parameters:
       - 0
@@ -901,12 +873,11 @@ MonoBehaviour:
     - skillKey: 63
       index: 1
       componentType: 1
-      indicatorType: 3
+      indicatorType: 0
       order: 1
       timing: 1
       firePoint: 0
-      isTarget: 0
-      maxDistance: 6
+      maxDistance: 0
       parameters:
       - 0
       - 0
@@ -933,11 +904,10 @@ MonoBehaviour:
     - skillKey: 64
       index: 0
       componentType: 3
-      indicatorType: 4
+      indicatorType: 0
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
       maxDistance: 0
       parameters:
       - 0
@@ -969,8 +939,7 @@ MonoBehaviour:
       order: 0
       timing: 0
       firePoint: 0
-      isTarget: 0
-      maxDistance: 0
+      maxDistance: 15
       parameters:
       - 0
       - 0

@@ -719,8 +719,9 @@ public class Effect_GravityComponent : SkillComponent
     {
         time += deltaTime;
 
-        foreach (Unit unit in units)
+        for (int i = units.Count - 1; i >= 0; i--)
         {
+            Unit unit = units[i];
             if (unit == null || unit.IsDead)
                 continue;
 
@@ -761,6 +762,7 @@ public class Effect_FreezeComponent : SkillComponent
     private float time;
     private float duration;
     private List<Unit> monsters = new();
+    private HashSet<int> monsterUniqueIDs = new();
 
     private const float SLOW_PERCENT = -0.5f;
 
@@ -769,6 +771,7 @@ public class Effect_FreezeComponent : SkillComponent
         base.Reset();
         time = 0f;
         monsters.Clear();
+        monsterUniqueIDs.Clear();
     }
 
     public override void Init(SkillLauncher launcher, InstanceValue inst, Unit fixedTarget)
@@ -787,9 +790,10 @@ public class Effect_FreezeComponent : SkillComponent
         monsters = new List<Unit>(GameMgr.Instance.spawnMgr.AliveEnemies);
         foreach (Unit monster in monsters)
         {
-            monster.AddStatModifier(StatType.MoveSpeed, SLOW_PERCENT);
-            monster.UpdateMoveSpeed();
+            monsterUniqueIDs.Add(monster.UniqueID);
         }
+
+        ApplySlowEffect();
     }
 
     public override void OnUpdate(float deltaTime)
@@ -798,13 +802,20 @@ public class Effect_FreezeComponent : SkillComponent
         if (time < duration)
             return;
 
+        ApplySlowEffect();
+        OnEnd();
+    }
+
+    private void ApplySlowEffect()
+    {
         foreach (Unit monster in monsters)
         {
-            monster.AddStatModifier(StatType.MoveSpeed, -SLOW_PERCENT);
+            if (monster.IsDead || !monsterUniqueIDs.Contains(monster.UniqueID))
+                continue;
+
+            monster.AddStatModifier(StatType.MoveSpeed, SLOW_PERCENT);
             monster.UpdateMoveSpeed();
         }
-
-        OnEnd();
     }
 }
 
