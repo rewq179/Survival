@@ -27,6 +27,13 @@ public class StatModule
     public float MaxHP => health * (1 + statModifiers[StatType.Health]);
     public float MoveSpeed => moveSpeed * (1 + statModifiers[StatType.MoveSpeed]);
 
+    public void Reset()
+    {
+        health = 0f;
+        moveSpeed = 0f;
+        statModifiers.Clear();
+    }
+
     public void Init(UnitData unitData)
     {
         for (StatType type = 0; type < StatType.Max; type++)

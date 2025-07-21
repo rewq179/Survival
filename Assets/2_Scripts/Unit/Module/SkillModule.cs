@@ -46,10 +46,16 @@ public class SkillModule : MonoBehaviour
         SkillKey.AllSkillDuration_Inc,
     };
 
-    public void Init(Unit unit, UnitData data)
+    public void Reset()
     {
-        owner = unit;
+        OnSkillCooldownChanged = null;
+        OnSkillCooldownEnded = null;
+        OnSkillAdded = null;
+        OnSkillRemoved = null;
+        OnSkillLevelChanged = null;
 
+        isAutoAttack = false;
+        autoAttackTime = 0f;
         cooldowns.Clear();
         cooldownTimes.Clear();
         activatedSkills.Clear();
@@ -59,6 +65,11 @@ public class SkillModule : MonoBehaviour
         subSkills.Clear();
         activeSkillCount = 0;
         passiveSkillCount = 0;
+    }
+
+    public void Init(Unit unit, UnitData data)
+    {
+        owner = unit;
 
         foreach (SkillKey skillKey in data.skills)
         {

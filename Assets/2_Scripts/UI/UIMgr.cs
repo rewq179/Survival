@@ -14,6 +14,7 @@ public class UIMgr : MonoBehaviour
     public WarningUI warningUI;
     public GameOverUI gameOverUI;
     public AutoAttackUI autoAttackUI;
+    public PauseUI pauseUI;
 
     private void Awake()
     {
@@ -29,15 +30,16 @@ public class UIMgr : MonoBehaviour
         }
     }
 
-    public void Init(Unit playerUnit)
+    public void Init(Unit playerUnit, int stage)
     {
         characterInfo.Init(playerUnit);
         attackJoystick.Init(playerUnit);
         topBar.Init(playerUnit);
         selectionPanel.Init(playerUnit);
-        stageUI.Init(1);
+        stageUI.Init(stage);
         gameOverUI.Init();
         autoAttackUI.Init(playerUnit);
+        pauseUI.Init();
     }
 
     public void UpdateUI()

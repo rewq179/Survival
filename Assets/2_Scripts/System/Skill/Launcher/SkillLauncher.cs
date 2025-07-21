@@ -243,12 +243,12 @@ public class SkillLauncher : MonoBehaviour
         }
     }
 
-    public void CheckDeactivate()
+    public void CheckDeactivate(bool forceEnd = false)
     {
         if (!isActive || !isParticleFinished)
             return;
 
-        if (currentOrderIndex >= orderSequence.Count)
+        if (forceEnd || currentOrderIndex >= orderSequence.Count)
         {
             Deactivate();
         }

@@ -198,7 +198,7 @@ public class SkillElement
     public void SetFirePoint(FirePoint value) => firePoint = value;
     public void SetOrder(int value) => order = value;
     public void SetTiming(ExecutionTiming value) => timing = value;
-    
+
     public void SetFloatParameter(ElementType key, float value)
     {
         int index = (int)key;
@@ -356,5 +356,66 @@ public class WaveData
         this.waveType = waveType;
         this.difficulty = difficulty;
         this.spawnGroupIDs = spawnGroups;
+    }
+}
+
+[Serializable]
+public class ActiveWave
+{
+    public int waveID;
+    public float waveDuration;
+    public int groupCount;
+    private int groupMaxCount;
+
+    private float waveTime;
+    public bool isTimeExceeded;
+    public bool isCompleted;
+    public List<Unit> waveEnemies = new();
+
+    public void Reset()
+    {
+        waveID = -1;
+        groupCount = 0;
+        waveTime = 0f;
+        isTimeExceeded = false;
+        isCompleted = false;
+
+        SpawnMgr spawnMgr = GameMgr.Instance.spawnMgr;
+        for (int i = waveEnemies.Count - 1; i >= 0; i--)
+        {
+            spawnMgr.RemoveEnemy(waveEnemies[i]);
+        }
+
+        waveEnemies.Clear();
+    }
+
+    public void Init(int waveID, float waveDuration, int groupMaxCount)
+    {
+        this.waveID = waveID;
+        this.waveDuration = waveDuration;
+        this.groupMaxCount = groupMaxCount;
+    }
+
+    public void Update(float time)
+    {
+        if (isCompleted)
+            return;
+
+        waveTime += time;
+        if (waveTime >= waveDuration)
+            isTimeExceeded = true;
+    }
+
+    public void AddGroupCount() => groupCount++;
+
+    /// <summary>
+    /// 웨이브 완료 여부 확인
+    /// </summary>
+    public bool IsWaveClear()
+    {
+        if (waveEnemies.Count > 0)
+            return false;
+
+        return groupCount >= groupMaxCount;
     }
 }

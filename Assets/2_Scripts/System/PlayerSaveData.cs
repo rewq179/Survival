@@ -14,6 +14,18 @@ public class PlayerSaveData
     public event Action<float> OnExpChanged;
     public event Action<int> OnGoldChanged;
 
+    public void Reset()
+    {
+        level = 1;
+        exp = 0f;
+        gold = 0;
+        
+        OnLevelChanged = null;
+        OnExpChanged = null;
+        OnGoldChanged = null;
+        unit = null;
+    }
+
     public void Init(Unit unit)
     {
         this.unit = unit;

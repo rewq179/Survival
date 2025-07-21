@@ -145,7 +145,7 @@ public class DataMgr : MonoBehaviour
         return null;
     }
 
-    public static List<WaveData> GetWaveDatas() => waveDatas;
+    public static List<WaveData> GetWaveDatas() => new(waveDatas);
     public static WaveData GetWaveData(int waveID)
     {
         for (int i = 0; i < waveDatas.Count; i++)

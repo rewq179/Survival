@@ -26,63 +26,34 @@ public class SpawnMgr : MonoBehaviour
     private Transform playerTransform;
     private List<Unit> aliveEnemies = new();
     private Dictionary<int, Stack<Unit>> enemyPools = new();
+    private Stack<ActiveWave> activeWavePools = new();
 
     public List<Unit> AliveEnemies => aliveEnemies;
 
-    [Serializable]
-    public class ActiveWave
-    {
-        public int waveID;
-        public float waveDuration;
-        public int groupCount;
-        private int groupMaxCount;
-
-        private float waveTime;
-        public bool isTimeExceeded;
-        public bool isCompleted;
-        public List<Unit> waveEnemies = new();
-
-        public ActiveWave(int waveID, float waveDuration, int groupMaxCount)
-        {
-            this.waveID = waveID;
-            this.waveDuration = waveDuration;
-            this.groupCount = 0;
-            this.groupMaxCount = groupMaxCount;
-            this.waveTime = 0f;
-            this.isTimeExceeded = false;
-            this.isCompleted = false;
-        }
-
-        public void Update(float time)
-        {
-            if (isCompleted)
-                return;
-
-            waveTime += time;
-            if (waveTime >= waveDuration)
-                isTimeExceeded = true;
-        }
-
-        public void AddGroupCount() => groupCount++;
-
-        /// <summary>
-        /// 웨이브 완료 여부 확인
-        /// </summary>
-        public bool IsWaveClear()
-        {
-            if (waveEnemies.Count > 0)
-                return false;
-
-            return groupCount >= groupMaxCount;
-        }
-    }
-
     private void Update()
     {
-        CheckWaveCompletion();
+        float deltaTime = Time.deltaTime;
+        CheckWaveCompletion(deltaTime);
     }
 
-    #region 초기화
+    public void Reset()
+    {
+        StopAllCoroutines();
+
+        for (int i = aliveEnemies.Count - 1; i >= 0; i--)
+        {
+            RemoveEnemy(aliveEnemies[i]);
+        }
+
+        for (int i = activeWaves.Count - 1; i >= 0; i--)
+        {
+            RemoveActiveWave(activeWaves[i]);
+        }
+
+        activeWaves.Clear();
+        waveDatas.Clear();
+        nextWaveIndex = 0;
+    }
 
     public void SetPlayerTransform(Transform playerTransform)
     {
@@ -91,16 +62,10 @@ public class SpawnMgr : MonoBehaviour
 
     public void Init()
     {
-        nextWaveIndex = 0;
-        waveDatas.Clear();
-        activeWaves.Clear();
-
         waveDatas = DataMgr.GetWaveDatas();
         maxWaveInvIndex = 1f / waveDatas.Count;
         StartNextWave();
     }
-
-    #endregion
 
     #region 웨이브 관리
 
@@ -109,35 +74,33 @@ public class SpawnMgr : MonoBehaviour
         if (nextWaveIndex >= waveDatas.Count)
             return;
 
-        WaveData waveData = waveDatas[nextWaveIndex++];
-        List<int> spawnGroupIDs = waveData.spawnGroupIDs;
-        int groupMaxCount = spawnGroupIDs.Count;
-        UIMgr.Instance.stageUI.UpdateStageSlider(nextWaveIndex * maxWaveInvIndex);
-
         // 웨이브 생성
-        ActiveWave activeWave = new ActiveWave(waveData.waveID, GetWaveDuration(waveData), groupMaxCount);
-        activeWaves.Add(activeWave);
+        WaveData waveData = waveDatas[nextWaveIndex++];
+        ActiveWave activeWave = CreateActiveWave(waveData);
 
+        // 웨이브 연출
+        UIMgr.Instance.stageUI.UpdateStageSlider(nextWaveIndex * maxWaveInvIndex);
         if (waveData.waveType == WaveType.Boss)
+        {
             UIMgr.Instance.warningUI.ShowWarning();
+        }
 
         // 웨이브 내 스폰될 그룹 유닛들 생성
-        foreach (int groupID in spawnGroupIDs)
+        List<int> groupIDs = waveData.spawnGroupIDs;
+        foreach (int id in groupIDs)
         {
-            SpawnGroupData spawnGroup = DataMgr.GetSpawnGroupData(groupID);
-            StartCoroutine(SpawnGroupCoroutine(spawnGroup, activeWave));
+            SpawnGroupData data = DataMgr.GetSpawnGroupData(id);
+            StartCoroutine(SpawnGroupCoroutine(data, activeWave));
         }
     }
 
-    private void CheckWaveCompletion()
+    private void CheckWaveCompletion(float deltaTime)
     {
-        float time = Time.deltaTime;
-
         bool canNextWave = false;
         List<ActiveWave> completedWaves = new();
         foreach (ActiveWave wave in activeWaves)
         {
-            wave.Update(time);
+            wave.Update(deltaTime);
 
             if (wave.isCompleted)
                 completedWaves.Add(wave);
@@ -146,32 +109,48 @@ public class SpawnMgr : MonoBehaviour
         }
 
         foreach (ActiveWave wave in completedWaves)
+        {
             activeWaves.Remove(wave);
+        }
 
         if (canNextWave)
             StartNextWave();
+    }
+
+    private ActiveWave CreateActiveWave(WaveData waveData)
+    {
+        ActiveWave wave = PopActiveWave();
+        wave.Init(waveData.waveID, GetWaveDuration(waveData), waveData.spawnGroupIDs.Count);
+        return wave;
+    }
+
+    private void RemoveActiveWave(ActiveWave wave)
+    {
+        wave.Reset();
+        activeWaves.Remove(wave);
+        PushActiveWave(wave);
     }
 
     #endregion
 
     #region 스폰 그룹 관리
 
-    private IEnumerator SpawnGroupCoroutine(SpawnGroupData spawnGroup, ActiveWave activeWave)
+    private IEnumerator SpawnGroupCoroutine(SpawnGroupData data, ActiveWave activeWave)
     {
-        if (spawnGroup.startDelay > 0f)
-            yield return new WaitForSeconds(spawnGroup.startDelay);
+        if (data.startDelay > 0f)
+            yield return new WaitForSeconds(data.startDelay);
 
         // 반복 횟수만큼 추가 스폰
-        for (int i = 0; i < spawnGroup.repeat; i++)
+        for (int i = 0; i < data.repeat; i++)
         {
-            for (int j = 0; j < spawnGroup.count; j++)
+            for (int j = 0; j < data.count; j++)
             {
-                Unit enemy = CreateEnemy(spawnGroup.unitID, spawnGroup.pattern);
+                Unit enemy = CreateEnemy(data.unitID, data.pattern);
                 activeWave.waveEnemies.Add(enemy);
             }
 
-            if (spawnGroup.repeatInterval > 0f)
-                yield return new WaitForSeconds(spawnGroup.repeatInterval);
+            if (data.repeatInterval > 0f)
+                yield return new WaitForSeconds(data.repeatInterval);
         }
 
         activeWave.AddGroupCount();
@@ -187,7 +166,6 @@ public class SpawnMgr : MonoBehaviour
         aliveEnemies.Add(enemy);
         return enemy;
     }
-
 
     public void RemoveEnemy(Unit enemy)
     {
@@ -322,6 +300,20 @@ public class SpawnMgr : MonoBehaviour
             enemyPools[enemy.UnitID] = new Stack<Unit>();
             enemyPools[enemy.UnitID].Push(enemy);
         }
+    }
+
+    private void PushActiveWave(ActiveWave wave)
+    {
+        activeWavePools.Push(wave);
+    }
+
+    private ActiveWave PopActiveWave()
+    {
+        if (!activeWavePools.TryPop(out ActiveWave pooledWave))
+            pooledWave = new ActiveWave();
+
+        activeWaves.Add(pooledWave);
+        return pooledWave;
     }
 
     #endregion

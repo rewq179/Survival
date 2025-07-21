@@ -9,7 +9,7 @@ public class GameOverUI : MonoBehaviour
     public void Init()
     {
         panel.SetActive(false);
-        // retryButton.onClick.AddListener(GameMgr.Instance.OnGameStart);
+        retryButton.onClick.AddListener(GameMgr.Instance.OnGameRestart);
     }
 
     public void ShowGameOverUI()

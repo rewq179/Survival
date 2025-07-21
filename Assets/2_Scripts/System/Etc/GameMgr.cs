@@ -14,7 +14,9 @@ public class GameMgr : MonoBehaviour
     public RewardMgr rewardMgr;
 
     private Unit playerUnit;
+    private int stage = 1;
 
+    public int Stage => stage;
     public Unit PlayerUnit => playerUnit;
 
     private void Awake()
@@ -64,7 +66,7 @@ public class GameMgr : MonoBehaviour
     {
         skillMgr.Init(playerUnit);
         rewardMgr.Init(playerUnit);
-        UIMgr.Instance.Init(playerUnit);
+        UIMgr.Instance.Init(playerUnit, stage);
         playerUnit.Init(SpawnMgr.UNIT_UNIQUE_ID++, 100, Vector3.zero);
 
         UIMgr.Instance.UpdateUI();
@@ -75,6 +77,14 @@ public class GameMgr : MonoBehaviour
         playerUnit.LearnSkill(SkillKey.IseAttack);
 #endif
         OnGameResume();
+    }
+
+    public void OnGameRestart()
+    {
+        stage = 1;
+        playerUnit.Reset();
+        spawnMgr.Reset();
+        OnGameStart();
     }
 
     public void OnGameResume()

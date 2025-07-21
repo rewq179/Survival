@@ -35,7 +35,7 @@ public class Unit : MonoBehaviour
     private UnitType unitType;
 
     // 기타
-    private Camera mainCam;
+    private Camera mainCamera;
 
     public int UniqueID => uniqueID;
     public int UnitID => unitID;
@@ -45,14 +45,26 @@ public class Unit : MonoBehaviour
 
     public void Reset()
     {
-        if (healthBar != null)
-            OnHpChanged -= healthBar.UpdateHealthBar;
-
+        statModule.Reset();
         combatModule.Reset();
-        behaviourModule.Reset();
+        skillModule.Reset();
+        behaviourModule?.Reset();
+        playerSaveData.Reset();
+        
+        uniqueID = -1;
+        unitID = 0;
+        unitType = UnitType.Player;
+        mainCamera = null;
         transform.position = Vector3.zero;
+        transform.rotation = Quaternion.identity;
+        
+        if (healthBar != null)
+        {
+            OnHpChanged -= healthBar.UpdateHealthBar;
+            healthBar.ShowHealthBar(false);
+        }
+
         gameObject.SetActive(false);
-        healthBar?.ShowHealthBar(false);
     }
 
     public void Init(int uniqueID, int unitID, Vector3 position)
@@ -65,7 +77,7 @@ public class Unit : MonoBehaviour
         playerSaveData.Init(this);
         playerController?.Init(this);
         transform.position = position;
-        mainCam = Camera.main;
+        mainCamera = Camera.main;
         gameObject.SetActive(true);
 
 #if UNITY_EDITOR
@@ -105,7 +117,7 @@ public class Unit : MonoBehaviour
     private void LateUpdate()
     {
         if (healthBar != null)
-            healthBar.transform.rotation = Quaternion.LookRotation(mainCam.transform.forward);
+            healthBar.transform.rotation = Quaternion.LookRotation(mainCamera.transform.forward);
     }
 
     public void UpdateMoveSpeed()
