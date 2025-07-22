@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sheetName: Skill
   startRow: 2
-  endRow: 29
+  endRow: 30
   skillDatas:
   - skillKey: 0
     skillType: 0
@@ -252,7 +252,7 @@ MonoBehaviour:
       - 0
       - 0
       - 0
-      - 1
+      - 3
       - 0
       - 1.5
       - 0.3
@@ -957,6 +957,38 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      buffKeys: 
+  - skillKey: 66
+    skillType: 0
+    name: '-'
+    desc: 
+    cooldown: 0
+    baseValue: 0
+    skillElements:
+    - skillKey: 66
+      index: 0
+      componentType: 1
+      indicatorType: 0
+      order: 0
+      timing: 0
+      firePoint: 1
+      maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 100
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 360
+      - 12
       - 0
       - 0
       - 0

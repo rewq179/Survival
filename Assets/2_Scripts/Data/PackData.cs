@@ -84,6 +84,9 @@ public enum SkillKey
     DragonBiteAttack,
     BreathAttack,
 
+    // 아이템
+    Explosion,
+
     Max,
 }
 

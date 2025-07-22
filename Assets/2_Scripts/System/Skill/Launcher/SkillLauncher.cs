@@ -93,31 +93,21 @@ public class SkillLauncher : MonoBehaviour
     {
         // 컴포넌트 생성 및 Order별 그룹화
         List<SkillHolder> values = inst.Values;
-        foreach (SkillHolder instValue in values)
+        foreach (SkillHolder holder in values)
         {
-            SkillComponent component = CreateComponent(instValue.type, instValue.order);
+            SkillComponent component = CreateComponent(holder.type, holder.order);
             if (component == null)
                 continue;
 
-            component.Init(this, instValue, fixedTarget);
+            component.Init(this, holder, fixedTarget);
         }
 
         orderSequence = orderGroups.Keys.OrderBy(x => x).ToList();
     }
 
-    public void CreateComponentByCollectible(CollectibleType type)
+    public void CreateComponentByItem(SkillHolder holder, Unit target)
     {
-        SkillComponentType componentType = type switch
-        {
-            CollectibleType.Freeze => SkillComponentType.Freeze,
-            CollectibleType.Explosion => SkillComponentType.Explosion,
-            _ => SkillComponentType.Max,
-        };
-
-        if (componentType == SkillComponentType.Max)
-            return;
-
-        CreateComponent(componentType, 0).Init(this, null, null);
+        CreateComponent(holder.type, holder.order).Init(this, holder, target);
     }
 
     private SkillComponent CreateComponent(SkillComponentType type, int order)
@@ -136,7 +126,7 @@ public class SkillLauncher : MonoBehaviour
     /// <summary>
     /// 해당 Order의 컴포넌트들을 시작함.
     /// </summary>
-    private void StartOrderComponents()
+    public void StartOrderComponents()
     {
         if (currentOrderIndex >= orderSequence.Count)
             return;
@@ -174,7 +164,7 @@ public class SkillLauncher : MonoBehaviour
         // 현재 Order의 즉시 실행 컴포넌트들 시작 및 업데이트
         bool allImmediateCompleted = true;
         int count = instantComponents.Count;
-        for(int i = 0; i < count; i++)
+        for (int i = 0; i < count; i++)
         {
             SkillComponent component = instantComponents[i];
             if (component.State == ComponentState.NotStarted)

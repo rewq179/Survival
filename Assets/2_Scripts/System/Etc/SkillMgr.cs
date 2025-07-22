@@ -23,6 +23,7 @@ public class SkillMgr : MonoBehaviour
     private Stack<SkillLauncher> launcherPools = new();
     private Dictionary<SkillKey, Stack<SkillEffectController>> effectPools = new();
     private Dictionary<SkillComponentType, Stack<SkillComponent>> componentPools = new();
+    private Dictionary<CollectibleType, SkillHolder> itemHolders = new();
 
     private void Start()
     {
@@ -30,6 +31,8 @@ public class SkillMgr : MonoBehaviour
         {
             meshPools.Add(i, new Stack<Mesh>());
         }
+
+        itemHolders.Clear();
     }
 
     private void Update()
@@ -343,9 +346,27 @@ public class SkillMgr : MonoBehaviour
 
     public void ExecuteItemSkill(Unit player, CollectibleType type)
     {
+        if (!itemHolders.TryGetValue(type, out SkillHolder holder)) // 아이템 용 스킬 홀더 생성
+        {
+            SkillKey skillKey = type switch
+            {
+                CollectibleType.Explosion => SkillKey.Explosion,
+                _ => SkillKey.None,
+            };
+
+            if (skillKey == SkillKey.None)
+                return;
+
+            holder = new SkillHolder();
+            holder.SetFix(DataMgr.GetSkillData(skillKey).skillElements[0]);
+            itemHolders.Add(type, holder);
+        }
+
         SkillLauncher launcher = PopSkillLauncher();
         launcher.Init(player, player.transform.position, Vector3.zero);
-        launcher.CreateComponentByCollectible(type);
+        launcher.CreateComponentByItem(holder, player);
+        launcher.StartOrderComponents();
+        activeLaunchers.Add(launcher);
     }
 
     #endregion
@@ -447,8 +468,6 @@ public class SkillMgr : MonoBehaviour
             SkillComponentType.Linear => new Movement_LinearComponent(),
             SkillComponentType.Leap => new Movement_LeapComponent(),
             SkillComponentType.Gravity => new Effect_GravityComponent(),
-            SkillComponentType.Freeze => new Effect_FreezeComponent(),
-            SkillComponentType.Explosion => new Effect_ExplosionComponent(),
             _ => null,
         };
     }

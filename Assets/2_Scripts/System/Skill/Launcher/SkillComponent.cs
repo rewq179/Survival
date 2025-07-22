@@ -12,8 +12,6 @@ public enum SkillComponentType
     Linear,
     Leap,
     Gravity,
-    Freeze,
-    Explosion,
     Max,
 }
 
@@ -768,83 +766,6 @@ public class Effect_GravityComponent : SkillComponent
 
         Vector3 finalPos = pos + rotatedDirection * gravityPower * deltaTime;
         unit.transform.position = Vector3.Lerp(pos, finalPos, 0.1f);
-    }
-}
-
-public class Effect_FreezeComponent : SkillComponent
-{
-    public override SkillComponentType Type => SkillComponentType.Freeze;
-    private float time;
-    private float duration;
-    private List<Unit> monsters = new();
-    private HashSet<int> monsterUniqueIDs = new();
-
-    private const float SLOW_PERCENT = -0.5f;
-
-    public override void Reset()
-    {
-        base.Reset();
-        time = 0f;
-        monsters.Clear();
-        monsterUniqueIDs.Clear();
-    }
-
-    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
-    {
-        base.Init(launcher, inst, fixedTarget);
-        if (inst != null)
-            duration = inst.durationFinal;
-        else
-            duration = 5f; // 아이템에 의한 지속 시간
-    }
-
-    public override void OnStart()
-    {
-        base.OnStart();
-
-        monsters = new List<Unit>(GameMgr.Instance.spawnMgr.AliveEnemies);
-        foreach (Unit monster in monsters)
-        {
-            monsterUniqueIDs.Add(monster.UniqueID);
-        }
-
-        ApplySlowEffect();
-    }
-
-    public override void OnUpdate(float deltaTime)
-    {
-        time += deltaTime;
-        if (time < duration)
-            return;
-
-        ApplySlowEffect();
-        OnEnd();
-    }
-
-    private void ApplySlowEffect()
-    {
-        foreach (Unit monster in monsters)
-        {
-            if (monster.IsDead || !monsterUniqueIDs.Contains(monster.UniqueID))
-                continue;
-
-            monster.AddStatModifier(StatType.MoveSpeed, SLOW_PERCENT);
-            monster.UpdateMoveSpeed();
-        }
-    }
-}
-
-public class Effect_ExplosionComponent : Attack_AOEComponent
-{
-    public override SkillComponentType Type => SkillComponentType.Explosion;
-    private const float EXPLOSION_RADIUS = 20f;
-    private const float EXPLOSION_DAMAGE = 100f;
-
-    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
-    {
-        base.Init(launcher, inst, fixedTarget);
-        radius = EXPLOSION_RADIUS;
-        damage = EXPLOSION_DAMAGE;
     }
 }
 

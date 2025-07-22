@@ -11,7 +11,6 @@ public class RewardMgr : MonoBehaviour
         CollectibleType.Magnet, CollectibleType.Freeze, CollectibleType.Explosion, CollectibleType.Heal
     };
 
-    
     // 자석 스탯
     private float baseMagnetRange = 3f;
     private float baseMagnetSpeed = 10f;
@@ -25,7 +24,7 @@ public class RewardMgr : MonoBehaviour
     // 배치 처리를 위한 데이터 구조
     private List<CollectibleItem> itemsInMagnetRange = new();
     private List<CollectibleItem> itemsOutsideMagnetRange = new();
-    
+
     // 배치 처리용 임시 데이터
     private Vector3[] itemPositions;
     private float[] itemDistances;
@@ -124,7 +123,11 @@ public class RewardMgr : MonoBehaviour
                 break;
 
             case CollectibleType.Freeze:
-                GameMgr.Instance.skillMgr.ExecuteItemSkill(playerUnit, CollectibleType.Freeze);
+                List<Unit> monsters = GameMgr.Instance.spawnMgr.AliveEnemies;
+                foreach (Unit monster in monsters)
+                {
+                    monster.AddBuff(BuffKey.Freeze, playerUnit);
+                }
                 break;
 
             case CollectibleType.Explosion:
@@ -207,7 +210,7 @@ public class RewardMgr : MonoBehaviour
 
             Vector3 itemPos = item.transform.position;
             itemPositions[i] = itemPos;
-            
+
             Vector3 direction = playerPos - itemPos;
             itemDistances[i] = direction.sqrMagnitude;
         }
@@ -224,11 +227,11 @@ public class RewardMgr : MonoBehaviour
             float distance = itemDistances[i];
             bool shouldMove = item.IsGolbalMagentEffect || distance <= magnetRangeSqr;
             if (!shouldMove)
-                continue;;
+                continue; ;
 
             Vector3 direction = (playerPos - itemPositions[i]).normalized;
             float curSpeed = item.IsGolbalMagentEffect ? magnetSpeed * CollectibleItem.MAGNET_EFFECT_SPEED_MULTIPLIER : magnetSpeed;
-            
+
             Vector3 newPos = itemPositions[i] + direction * curSpeed * Time.deltaTime;
             item.transform.position = newPos;
             itemPositions[i] = newPos;

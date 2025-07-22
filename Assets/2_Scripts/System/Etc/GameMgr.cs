@@ -73,6 +73,7 @@ public class GameMgr : MonoBehaviour
         UIMgr.Instance.UpdateUI();
 
 #if UNITY_EDITOR
+        // playerUnit.LearnSkill(SkillKey.IseAttack);
         // playerUnit.AddBuff(BuffKey.Freeze, playerUnit);
         // playerUnit.AddBuff(BuffKey.Stun, playerUnit);
 #endif
