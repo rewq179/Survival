@@ -9595,6 +9595,7 @@ MonoBehaviour:
   skillDataReader: {fileID: 11400000, guid: c8a0d3e542c49c947b8aab98514e9298, type: 2}
   subSkillDataReader: {fileID: 11400000, guid: 2ad8e467b429c7040b01f36820b68f07, type: 2}
   waveDataReader: {fileID: 11400000, guid: 0ccf7f79a9063804cbf338947227de0b, type: 2}
+  buffDataReader: {fileID: 11400000, guid: b975f7e6b64e1c645ace6b0454a1bf96, type: 2}
 --- !u!1 &269721178
 GameObject:
   m_ObjectHideFlags: 0
@@ -48004,7 +48005,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 130, y: 0.1, z: 130}
+  m_Size: {x: 140, y: 0.1, z: 140}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1429093529
 GameObject:

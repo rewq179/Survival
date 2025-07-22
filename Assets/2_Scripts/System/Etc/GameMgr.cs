@@ -50,6 +50,7 @@ public class GameMgr : MonoBehaviour
     private void ResetStaticValues()
     {
         SpawnMgr.UNIT_UNIQUE_ID = 0;
+        BuffHolder.InitInputer();
     }
 
     private void CreatePlayerUnit()
@@ -70,6 +71,11 @@ public class GameMgr : MonoBehaviour
         playerUnit.Init(SpawnMgr.UNIT_UNIQUE_ID++, 100, Vector3.zero);
 
         UIMgr.Instance.UpdateUI();
+
+#if UNITY_EDITOR
+        // playerUnit.AddBuff(BuffKey.Freeze, playerUnit);
+        // playerUnit.AddBuff(BuffKey.Stun, playerUnit);
+#endif
 
         spawnMgr.Init();
         OnGameResume();

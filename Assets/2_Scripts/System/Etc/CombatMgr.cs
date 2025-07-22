@@ -9,6 +9,7 @@ public struct DamageInfo
     public float damageFinal;
     public Vector3 hitPoint;
     public SkillKey skillKey;
+    public BuffKey buffKey;
 
     public void Reset()
     {
@@ -18,28 +19,50 @@ public struct DamageInfo
         damageFinal = 0;
         hitPoint = Vector3.zero;
         skillKey = SkillKey.None;
+        buffKey = BuffKey.None;
     }
 
     public void Init(Unit attacker, Unit defender, float damage, Vector3 hitPoint, SkillKey skillKey)
+    {
+        Init(attacker, defender, damage, hitPoint);
+        this.skillKey = skillKey;
+    }
+
+    public void Init(Unit attacker, Unit defender, float damage, Vector3 hitPoint, BuffKey buffKey)
+    {
+        Init(attacker, defender, damage, hitPoint);
+        this.buffKey = buffKey;
+    }
+
+    private void Init(Unit attacker, Unit defender, float damage, Vector3 hitPoint)
     {
         this.attacker = attacker;
         this.defender = defender;
         this.damage = damage;
         this.hitPoint = hitPoint;
-        this.skillKey = skillKey;
     }
 }
 
 /// <summary>
-/// 데미지 처리 시스템
+/// 전투 처리 시스템
 /// </summary>
 public static class CombatMgr
 {
     private static Stack<DamageInfo> damageStack = new();
+    private static Stack<BuffInstance> buffInstancePool = new();
 
-    public static void PushDamage(DamageInfo damageInfo)
+    public static void ApplyDamageBySkill(Unit attacker, Unit defender, float damage, Vector3 hitPoint, SkillKey skillKey)
     {
-        damageStack.Push(damageInfo);
+        DamageInfo damageInfo = PopDamageInfo();
+        damageInfo.Init(attacker, defender, damage, hitPoint, skillKey);
+        ProcessDamage(damageInfo);
+    }
+
+    public static void ApplyDamageByBuff(Unit attacker, Unit defender, float damage, Vector3 hitPoint, BuffKey buffKey)
+    {
+        DamageInfo damageInfo = PopDamageInfo();
+        damageInfo.Init(attacker, defender, damage, hitPoint, buffKey);
+        ProcessDamage(damageInfo);
     }
 
     public static void ProcessDamage(DamageInfo damageInfo)
@@ -69,7 +92,7 @@ public static class CombatMgr
     {
         damageInfo.damageFinal *= 1 - damageInfo.defender.GetFinalStat(StatType.Defense);
     }
-    
+
     public static DamageInfo PopDamageInfo()
     {
         if (!damageStack.TryPop(out DamageInfo damageInfo))
@@ -82,5 +105,19 @@ public static class CombatMgr
     public static void PushDamageInfo(DamageInfo damageInfo)
     {
         damageStack.Push(damageInfo);
+    }
+
+    public static BuffInstance PopBuffInstance()
+    {
+        if (buffInstancePool.TryPop(out BuffInstance instance))
+            return instance;
+
+        return new BuffInstance();
+    }
+
+    public static void PushBuffInstance(BuffInstance instance)
+    {
+        instance.Reset();
+        buffInstancePool.Push(instance);
     }
 }

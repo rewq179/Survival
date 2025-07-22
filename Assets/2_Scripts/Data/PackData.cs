@@ -141,6 +141,7 @@ public class SkillElement
     public FirePoint firePoint;
     public float maxDistance;
     public float[] parameters = new float[(int)ElementType.Max];
+    public List<BuffKey> buffKeys = new();
 
     public bool IsMainIndicator => index == 0;
     public float Speed => GetParameter(ElementType.Speed);
@@ -177,6 +178,7 @@ public class SkillElement
     public void SetFirePoint(FirePoint value) => firePoint = value;
     public void SetOrder(int value) => order = value;
     public void SetTiming(ExecutionTiming value) => timing = value;
+    public void AddBuffKey(BuffKey buffKey) => buffKeys.Add(buffKey);
 
     public void SetFloatParameter(ElementType key, float value)
     {
@@ -184,6 +186,7 @@ public class SkillElement
         if (index >= 0 && index < parameters.Length)
             parameters[index] = value;
     }
+
 
     public void SetMaxDistance()
     {
@@ -409,5 +412,52 @@ public class ActiveWave
             return false;
 
         return groupCount >= groupMaxCount;
+    }
+}
+
+public enum BuffKey
+{
+    None = -1,
+    Burn,
+    Freeze,
+    Stun,
+    Max,
+}
+
+[Serializable]
+public class BuffData
+{
+    public BuffKey buffKey;
+    public string name;
+    public string desc;
+    public BuffElement element;
+
+    public void Init(BuffKey buffKey, string name, string desc, BuffElement element)
+    {
+        this.buffKey = buffKey;
+        this.name = name;
+        this.desc = desc;
+        this.element = element;
+    }
+}
+
+[Serializable]
+public class BuffElement
+{
+    public BuffKey buffKey;
+    public int stack;
+    public int maxStack;
+    public float duration;
+    public float tick;
+    public float dmg;
+
+    public void Init(BuffKey buffKey, int stack, int maxStack, float duration, float tick, float dmg)
+    {
+        this.buffKey = buffKey;
+        this.stack = stack;
+        this.maxStack = maxStack;
+        this.duration = duration;
+        this.tick = tick;
+        this.dmg = dmg;
     }
 }

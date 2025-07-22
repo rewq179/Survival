@@ -92,8 +92,8 @@ public class SkillLauncher : MonoBehaviour
     private void CreateComponentBySkill(SkillInstance inst, Unit fixedTarget)
     {
         // 컴포넌트 생성 및 Order별 그룹화
-        List<InstanceValue> values = inst.Values;
-        foreach (InstanceValue instValue in values)
+        List<SkillHolder> values = inst.Values;
+        foreach (SkillHolder instValue in values)
         {
             SkillComponent component = CreateComponent(instValue.type, instValue.order);
             if (component == null)

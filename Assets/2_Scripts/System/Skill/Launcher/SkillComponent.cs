@@ -33,7 +33,6 @@ public abstract class SkillComponent
 
     protected SkillLauncher launcher;
     protected UnitType enemyType;
-    protected float damage;
 
     public ComponentState State => state;
     public virtual SkillEffectController EffectController => null;
@@ -45,11 +44,10 @@ public abstract class SkillComponent
         launcher = null;
         order = 0;
         timing = ExecutionTiming.Instant;
-        damage = 0f;
         enemyType = UnitType.Monster;
     }
 
-    public virtual void Init(SkillLauncher launcher, InstanceValue inst, Unit fixedTarget)
+    public virtual void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
     {
         this.launcher = launcher;
         enemyType = launcher.Caster.UnitType == UnitType.Player ? UnitType.Monster : UnitType.Player;
@@ -80,13 +78,6 @@ public abstract class SkillComponent
     }
 
     public virtual void OnHit(Unit target) { }
-    protected void ApplyDamage(Unit target)
-    {
-        DamageInfo damageInfo = CombatMgr.PopDamageInfo();
-        damageInfo.Init(launcher.Caster, target, damage, launcher.Position, launcher.SkillKey);
-        CombatMgr.ProcessDamage(damageInfo);
-    }
-
     public bool IsHittable(Unit target) => target != null && !target.IsDead && target.UnitType == enemyType;
 
     #region 타겟 Getter
@@ -115,10 +106,21 @@ public abstract class SkillComponent
 public abstract class Attack_Component : SkillComponent
 {
     protected SkillEffectController effectController;
+    protected float damage;
+    protected List<BuffKey> buffKeys;
 
-    public override void Init(SkillLauncher launcher, InstanceValue inst, Unit fixedTarget)
+    public override void Reset()
+    {
+        base.Reset();
+        effectController = null;
+        buffKeys = null;
+    }
+
+    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
     {
         base.Init(launcher, inst, fixedTarget);
+        damage = inst.damageFinal;
+        buffKeys = inst.BuffKeys;
 
         // 공격 컴포넌트에만 파티클 할당
         effectController = GameMgr.Instance.skillMgr.PopSkillObject(launcher.SkillKey, launcher.transform);
@@ -149,6 +151,20 @@ public abstract class Attack_Component : SkillComponent
         base.OnEnd(forceEnd);
         effectController?.StopMain();
     }
+
+    protected void ApplyToTarget(Unit target)
+    {
+        Vector3 hitPoint = target.transform.position;
+        CombatMgr.ApplyDamageBySkill(launcher.Caster, target, damage, hitPoint, launcher.SkillKey);
+
+        if (buffKeys == null || target.IsDead)
+            return;
+
+        foreach (BuffKey buffKey in buffKeys)
+        {
+            target.AddBuff(buffKey, launcher.Caster);
+        }
+    }
 }
 
 /// <summary> 투사체 공격 컴포넌트 </summary>
@@ -172,10 +188,9 @@ public class Attack_ProjectileComponent : Attack_Component
         hittedUnitIDs.Clear();
     }
 
-    public override void Init(SkillLauncher launcher, InstanceValue inst, Unit fixedTarget)
+    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
     {
         base.Init(launcher, inst, fixedTarget);
-        damage = inst.damageFinal;
         moveSpeed = inst.moveSpeedFinal;
         richocet = inst.ricochetFinal.GetInt();
         piercing = inst.piercingFinal.GetInt();
@@ -212,7 +227,7 @@ public class Attack_ProjectileComponent : Attack_Component
 
         // 피해 적용
         hittedUnitIDs.Add(target.UniqueID);
-        ApplyDamage(target);
+        ApplyToTarget(target);
         isHit = true;
         effectController.PlayHit();
 
@@ -286,7 +301,7 @@ public class Attack_AOEComponent : Attack_Component
     protected float maxDistance;
 
     protected virtual bool IsInstantComplete => true;
-    public override void Init(SkillLauncher launcher, InstanceValue inst, Unit fixedTarget)
+    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
     {
         base.Init(launcher, inst, fixedTarget);
         damage = inst.damageFinal;
@@ -356,7 +371,7 @@ public class Attack_AOEComponent : Attack_Component
 
     public override void OnHit(Unit target)
     {
-        ApplyDamage(target);
+        ApplyToTarget(target);
         effectController.PlayHit();
     }
 }
@@ -378,7 +393,7 @@ public class Attack_PeriodicAOEComponent : Attack_AOEComponent
         lastTickTime = 0f;
     }
 
-    public override void Init(SkillLauncher launcher, InstanceValue inst, Unit fixedTarget)
+    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
     {
         base.Init(launcher, inst, fixedTarget);
         tick = inst.damageTickFinal;
@@ -409,7 +424,7 @@ public class Attack_InstantComponent : Attack_Component
     public override SkillComponentType Type => SkillComponentType.InstantAttack;
     private Unit target;
 
-    public override void Init(SkillLauncher launcher, InstanceValue inst, Unit fixedTarget)
+    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
     {
         base.Init(launcher, inst, fixedTarget);
         target = fixedTarget;
@@ -425,7 +440,7 @@ public class Attack_InstantComponent : Attack_Component
 
     public override void OnHit(Unit target)
     {
-        ApplyDamage(target);
+        ApplyToTarget(target);
     }
 }
 
@@ -460,7 +475,7 @@ public class Attack_BeamComponent : Attack_Component
         finalIndicator = null;
     }
 
-    public override void Init(SkillLauncher launcher, InstanceValue inst, Unit fixedTarget)
+    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
     {
         base.Init(launcher, inst, fixedTarget);
         damage = inst.damageFinal;
@@ -561,7 +576,7 @@ public class Attack_BeamComponent : Attack_Component
         if (!IsHittable(target))
             return;
 
-        ApplyDamage(target);
+        ApplyToTarget(target);
     }
 }
 
@@ -573,7 +588,7 @@ public class Movement_LinearComponent : SkillComponent
 {
     public override SkillComponentType Type => SkillComponentType.Linear;
 
-    public override void Init(SkillLauncher launcher, InstanceValue inst, Unit fixedTarget)
+    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
     {
         base.Init(launcher, inst, fixedTarget);
     }
@@ -607,7 +622,7 @@ public class Movement_LeapComponent : SkillComponent
         finalIndicator = null;
     }
 
-    public override void Init(SkillLauncher launcher, InstanceValue inst, Unit fixedTarget)
+    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
     {
         base.Init(launcher, inst, fixedTarget);
         targetPos = fixedTarget.transform.position;
@@ -688,7 +703,7 @@ public class Effect_GravityComponent : SkillComponent
         startTimes.Clear();
     }
 
-    public override void Init(SkillLauncher launcher, InstanceValue inst, Unit fixedTarget)
+    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
     {
         base.Init(launcher, inst, fixedTarget);
         gravityForce = inst.gravityFinal;
@@ -774,7 +789,7 @@ public class Effect_FreezeComponent : SkillComponent
         monsterUniqueIDs.Clear();
     }
 
-    public override void Init(SkillLauncher launcher, InstanceValue inst, Unit fixedTarget)
+    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
     {
         base.Init(launcher, inst, fixedTarget);
         if (inst != null)
@@ -819,29 +834,18 @@ public class Effect_FreezeComponent : SkillComponent
     }
 }
 
-public class Effect_ExplosionComponent : SkillComponent
+public class Effect_ExplosionComponent : Attack_AOEComponent
 {
     public override SkillComponentType Type => SkillComponentType.Explosion;
     private const float EXPLOSION_RADIUS = 20f;
     private const float EXPLOSION_DAMAGE = 100f;
 
-    public void Init()
+    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
     {
+        base.Init(launcher, inst, fixedTarget);
+        radius = EXPLOSION_RADIUS;
         damage = EXPLOSION_DAMAGE;
     }
-
-    public override void OnStart()
-    {
-        base.OnStart();
-
-        List<Unit> targets = GetHitTargetsBySphere(launcher.Position, EXPLOSION_RADIUS);
-        foreach (Unit target in targets)
-        {
-            OnHit(target);
-        }
-    }
-
-    public override void OnHit(Unit target) => ApplyDamage(target);
 }
 
 #endregion

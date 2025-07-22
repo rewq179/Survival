@@ -14,6 +14,16 @@ public enum UnitType
     Monster,
 }
 
+public enum StatusEffect
+{
+    None = 0,
+    Stunned = 1 << 0,
+    Silenced = 1 << 2,
+
+    BanMove = Stunned,
+    CanAttack = Stunned | Silenced,
+}
+
 public class Unit : MonoBehaviour
 {
     [Header("Components")]
@@ -27,6 +37,7 @@ public class Unit : MonoBehaviour
     private BehaviourModule behaviourModule;
     private CombatModule combatModule = new();
     private SkillModule skillModule = new();
+    private BuffModule buffModule = new();
 
     // 기본 정보
     private PlayerSaveData playerSaveData = new();
@@ -40,6 +51,8 @@ public class Unit : MonoBehaviour
     public int UniqueID => uniqueID;
     public int UnitID => unitID;
     public bool IsPlayer => unitType == UnitType.Player;
+    public bool CanMove => buffModule.CanMove;
+    public bool CanAttack => buffModule.CanAttack;
     public UnitType UnitType => unitType;
     public SkillModule SkillModule => skillModule;
 
@@ -50,14 +63,14 @@ public class Unit : MonoBehaviour
         skillModule.Reset();
         behaviourModule?.Reset();
         playerSaveData.Reset();
-        
+
         uniqueID = -1;
         unitID = 0;
         unitType = UnitType.Player;
         mainCamera = null;
         transform.position = Vector3.zero;
         transform.rotation = Quaternion.identity;
-        
+
         if (healthBar != null)
         {
             OnHpChanged -= healthBar.UpdateHealthBar;
@@ -95,6 +108,7 @@ public class Unit : MonoBehaviour
         statModule.Init(data);
         combatModule.Init(this);
         skillModule.Init(this, data);
+        buffModule.Init(this);
         behaviourModule.Init(this);
     }
 
@@ -109,9 +123,11 @@ public class Unit : MonoBehaviour
 
     private void Update()
     {
+        float deltaTime = Time.deltaTime;
         behaviourModule?.Update();
-        skillModule.UpdateCooldowns();
-        skillModule.UpdateAutoAttack();
+        skillModule.UpdateCooldowns(deltaTime);
+        skillModule.UpdateAutoAttack(deltaTime);
+        buffModule.UpdateBuff(deltaTime);
     }
 
     private void LateUpdate()
@@ -140,7 +156,7 @@ public class Unit : MonoBehaviour
 
     // BehaviourModule
     public void OnAnimationEnd(AnimEvent animEvent) => behaviourModule.OnAnimationEnd(animEvent);
-    
+
     // CombatModule
     public bool IsDead => combatModule.IsDead;
     public float CurHp => combatModule.CurHp;
@@ -223,4 +239,11 @@ public class Unit : MonoBehaviour
         add => skillModule.OnSkillLevelChanged += value;
         remove => skillModule.OnSkillLevelChanged -= value;
     }
+
+    // BuffModule
+    public BuffInstance GetBuffInstance(BuffKey buffKey) => buffModule.GetBuffInstance(buffKey);
+    public bool HasBuff(BuffKey buffKey) => buffModule.HasBuff(buffKey);
+    public void AddBuff(BuffKey buffKey, Unit giver) => buffModule.AddBuff(buffKey, giver);
+    public void ReduceBuff(BuffKey buffKey, int value) => buffModule.ReduceBuff(buffKey, value);
+    public void RemoveBuff(BuffKey buffKey) => buffModule.RemoveBuff(buffKey);
 }

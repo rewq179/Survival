@@ -8,7 +8,6 @@ public class PlayerController : MonoBehaviour
     private PlayerInputAction PlayerInputAction;
     private Animator animator;
     private Vector2 moveInput;
-    private bool isAttacking;
     private Rigidbody rigidBody;
     private float moveSpeed;
     private float rotationSpeed = 10f;
@@ -55,7 +54,6 @@ public class PlayerController : MonoBehaviour
         // 이벤트 구독
         PlayerInputAction.Player.Move.performed += OnMove;
         PlayerInputAction.Player.Move.canceled += OnMove;
-        PlayerInputAction.Player.Attack.performed += OnAttack;
         PlayerInputAction.Player.Attack.performed += OnSkillActivate;
     }
 
@@ -64,7 +62,6 @@ public class PlayerController : MonoBehaviour
         // 이벤트 구독 해제
         PlayerInputAction.Player.Move.performed -= OnMove;
         PlayerInputAction.Player.Move.canceled -= OnMove;
-        PlayerInputAction.Player.Attack.performed -= OnAttack;
         PlayerInputAction.Player.Attack.performed -= OnSkillActivate;
 
         // 액션 비활성화
@@ -91,11 +88,6 @@ public class PlayerController : MonoBehaviour
         moveInput = Vector2.zero;
     }
 
-    private void OnAttack(InputAction.CallbackContext context)
-    {
-        isAttacking = context.performed;
-    }
-
     private void OnSkillActivate(InputAction.CallbackContext context)
     {
         skillManager.ActivateSkill(owner);
@@ -105,6 +97,14 @@ public class PlayerController : MonoBehaviour
     {
         if (owner.IsDead)
             return;
+
+        if (!owner.CanMove)
+        {
+            moveInput = Vector2.zero;
+            rigidBody.linearVelocity = Vector3.zero;
+            animator.SetFloat("Movement", 0f, 0.1f, Time.fixedDeltaTime);
+            return;
+        }
 
         Vector3 movement = new Vector3(moveInput.x, 0, moveInput.y);
         UpdateMovement(movement);

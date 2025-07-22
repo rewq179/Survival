@@ -13,7 +13,7 @@ public class SkillElementDrawer : PropertyDrawer
     private static readonly int maxElementTypes = elementTypes.Length - 1; // Max 제외
     private int createdCount;
     private const int COLUMN_COUNT = 3;
-    
+
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
         void DrawElement(string name)
@@ -32,13 +32,23 @@ public class SkillElementDrawer : PropertyDrawer
         DrawElement("componentType");
         DrawElement("indicatorType");
 
-        // 파라미터 섹션
-        EditorGUI.LabelField(position, "Parameters", EditorStyles.boldLabel);
-        position.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
-
         SkillElement element = GetSkillElements(property, ExtractElementIndex(property.displayName));
         if (element != null)
         {
+            // 버프 섹션
+            SerializedProperty buffKeysProperty = property.FindPropertyRelative("buffKeys");
+            if (buffKeysProperty != null && buffKeysProperty.arraySize > 0)
+            {
+                float buffKeysHeight = EditorGUI.GetPropertyHeight(buffKeysProperty);
+                Rect buffKeysRect = new Rect(position.x, position.y, position.width, buffKeysHeight);
+                EditorGUI.PropertyField(buffKeysRect, buffKeysProperty, true);
+                position.y += buffKeysHeight + EditorGUIUtility.standardVerticalSpacing;
+            }
+
+            // 파라미터 섹션
+            EditorGUI.LabelField(position, "Parameters", EditorStyles.boldLabel);
+            position.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+
             DrawAllParameters(position, element);
         }
 
@@ -115,8 +125,38 @@ public class SkillElementDrawer : PropertyDrawer
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
     {
-        int parameterRows = Mathf.CeilToInt(createdCount / (float)COLUMN_COUNT);
-        return (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing) * (7 + parameterRows);
+        // 기본 필드들 높이
+        float height = (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing) * 5;
+
+        // 버프 높이 추가
+        SerializedProperty buffKeysProperty = property.FindPropertyRelative("buffKeys");
+        if (buffKeysProperty != null && buffKeysProperty.arraySize > 0)
+        {
+            height += EditorGUI.GetPropertyHeight(buffKeysProperty) + EditorGUIUtility.standardVerticalSpacing;
+        }
+
+        // 파라미터 높이 추가
+        height += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing; // "Parameters" 라벨
+
+        // 파라미터들 높이 계산
+        SkillElement element = GetSkillElements(property, ExtractElementIndex(property.displayName));
+        if (element == null)
+            return height;
+
+        int parameterCount = 0;
+        for (int i = 0; i < maxElementTypes; i++)
+        {
+            ElementType elementType = elementTypes[i];
+            if (element.GetParameter(elementType) != 0)
+            {
+                parameterCount++;
+            }
+        }
+
+        int parameterRows = Mathf.CeilToInt(parameterCount / (float)COLUMN_COUNT);
+        height += parameterRows * (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
+
+        return height;
     }
 }
 

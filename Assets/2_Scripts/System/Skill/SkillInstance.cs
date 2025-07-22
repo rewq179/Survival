@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InstanceValue
+public class SkillHolder
 {
     public int order;
     public ExecutionTiming timing;
@@ -57,6 +57,9 @@ public class InstanceValue
     public float gravityFinal;
 
     public float angle;
+    private List<BuffKey> buffKeys = new();
+
+    public List<BuffKey> BuffKeys => buffKeys;
 
     public void SetFix(SkillElement skillElement)
     {
@@ -76,6 +79,7 @@ public class InstanceValue
         type = skillElement.componentType;
         order = skillElement.order;
         timing = skillElement.timing;
+        buffKeys = skillElement.buffKeys;
     }
 
     public void Reset()
@@ -170,9 +174,9 @@ public class SkillInstance
     private float cooldownAdditive;
     private float cooldownMultiplier;
     public float cooldownFinal;
-    private List<InstanceValue> values = new();
+    private List<SkillHolder> values = new();
 
-    public List<InstanceValue> Values => values;
+    public List<SkillHolder> Values => values;
 
     private void ResetValue()
     {
@@ -198,7 +202,7 @@ public class SkillInstance
 
         for (int i = 0; i < data.skillElements.Count; i++)
         {
-            InstanceValue value = new InstanceValue();
+            SkillHolder value = new SkillHolder();
             value.SetFix(data.skillElements.Get(i));
             values.Add(value);
         }
@@ -267,7 +271,7 @@ public class SkillInstance
 
     public bool IsMultipleProjectile()
     {
-        foreach (InstanceValue value in values)
+        foreach (SkillHolder value in values)
         {
             if (value.type == SkillComponentType.Projectile && value.ShotFinal > 1)
                 return true;
@@ -281,7 +285,7 @@ public class SkillInstance
         string debug = $"[{skillKey}]\n쿨다운: {cooldownFinal:F2}초";
         for (int i = 0; i < values.Count; i++)
         {
-            InstanceValue value = values[i];
+            SkillHolder value = values[i];
             debug += $"\n[스킬 {i}] 데미지: {value.damageFinal:F1}, 범위: {value.radiusFinal:F1}, 지속시간: {value.durationFinal:F1}초, 피해주기: {value.damageTickFinal:F1}초, 투사체: {value.ShotFinal:F0}개, 도탄: {value.ricochetFinal:F0}회, 관통: {value.piercingFinal:F0}회";
         }
     }

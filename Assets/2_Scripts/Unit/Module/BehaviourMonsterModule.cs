@@ -46,6 +46,10 @@ public class BehaviourMonsterModule : BehaviourModule
         if (owner.IsDead || target.IsDead)
             return;
 
+        // 상태이상 체크
+        if (!owner.CanMove)
+            return;
+
         UpdatePlayerPosition();
         UpdateState();
         UpdateMovement();
@@ -70,12 +74,14 @@ public class BehaviourMonsterModule : BehaviourModule
         switch (currentState)
         {
             case AIState.Chasing:
-                ChasePlayer();
+                if (owner.CanMove)
+                    ChasePlayer();
                 break;
 
             case AIState.MeleeAttack:
             case AIState.RangedAttack:
-                AttackPlayer();
+                if (owner.CanAttack)
+                    AttackPlayer();
                 break;
         }
     }

@@ -169,6 +169,11 @@ public class SkillDataReader : ScriptableObject
                     element.SetFirePoint(Enum.Parse<FirePoint>(value));
                     break;
 
+                case "buff":
+                    if (Enum.TryParse(value, true, out BuffKey parsedBuffKey))
+                        element.AddBuffKey(parsedBuffKey);
+                    break;
+
                 default:
                     if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedValue))
                         element.SetFloatParameter(ParsedElementType(key), parsedValue);

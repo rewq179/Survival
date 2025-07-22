@@ -77,14 +77,14 @@ public class SkillModule : MonoBehaviour
         }
     }
 
-    public void UpdateCooldowns()
+    public void UpdateCooldowns(float deltaTime)
     {
         for (int i = activatedSkills.Count - 1; i >= 0; i--)
         {
             SkillKey skillKey = activatedSkills[i];
 
             if (cooldowns[skillKey] > 0f)
-                cooldowns[skillKey] -= Time.deltaTime;
+                cooldowns[skillKey] -= deltaTime;
 
             float cool = cooldowns[skillKey];
             if (cool <= 0f)
@@ -100,12 +100,16 @@ public class SkillModule : MonoBehaviour
         }
     }
 
-    public void UpdateAutoAttack()
+    public void UpdateAutoAttack(float deltaTime)
     {
         if (!isAutoAttack)
             return;
+            
+        // 상태이상 체크 - 공격 불가능하면 자동 공격 무시
+        if (!owner.CanAttack)
+            return;
 
-        autoAttackTime += Time.deltaTime;
+        autoAttackTime += deltaTime;
         if (autoAttackTime < AUTO_ATTACK_DURATION)
             return;
 
@@ -209,11 +213,17 @@ public class SkillModule : MonoBehaviour
 
     public bool CanUseSkill(SkillKey skillKey)
     {
+        if (!owner.CanAttack)
+            return false;
+            
         return cooldowns.ContainsKey(skillKey) && cooldowns[skillKey] <= 0f;
     }
 
     public bool CanUseSkillType(bool isMelee)
     {
+        if (!owner.CanAttack)
+            return false;
+            
         foreach (SkillKey key in skills)
         {
             if (DataMgr.IsActiveSkill(key) && CanUseSkill(key) && IsMeleeSkill(key) == isMelee)
@@ -478,7 +488,7 @@ public class SkillModule : MonoBehaviour
 
     private void OnAutoAttack(SkillKey skillKey)
     {
-        if (!isAutoAttack)
+        if (!isAutoAttack || !owner.CanAttack)
             return;
 
         Unit target = FindNearestMonster();
