@@ -47,16 +47,12 @@ public abstract class SkillComponent
         enemyType = UnitType.Monster;
     }
 
-    public virtual void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
+    public virtual void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
         this.launcher = launcher;
         enemyType = launcher.Caster.UnitType == UnitType.Player ? UnitType.Monster : UnitType.Player;
-
-        if (inst != null)
-        {
-            order = inst.order;
-            timing = inst.timing;
-        }
+        order = holder.order;
+        timing = holder.timing;
     }
 
     public virtual void OnStart()
@@ -116,11 +112,11 @@ public abstract class Attack_Component : SkillComponent
         buffKeys = null;
     }
 
-    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
+    public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
-        base.Init(launcher, inst, fixedTarget);
-        damage = inst.damageFinal;
-        buffKeys = inst.BuffKeys;
+        base.Init(launcher, holder, fixedTarget);
+        damage = holder.damageFinal;
+        buffKeys = holder.BuffKeys;
 
         // 공격 컴포넌트에만 파티클 할당
         effectController = GameMgr.Instance.skillMgr.PopSkillObject(launcher.SkillKey, launcher.transform);
@@ -182,10 +178,10 @@ public abstract class Attack_ProjectileBaseComponent : Attack_Component
         hittedUnitIDs.Clear();
     }
 
-    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
+    public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
-        base.Init(launcher, inst, fixedTarget);
-        moveSpeed = inst.moveSpeedFinal;
+        base.Init(launcher, holder, fixedTarget);
+        moveSpeed = holder.moveSpeedFinal;
         maxLength = GameValue.PROJECTILE_MAX_LENGTH_POW;
         startPos = launcher.Position;
         direction = launcher.transform.forward;
@@ -237,11 +233,11 @@ public class Attack_ProjectileComponent : Attack_ProjectileBaseComponent
         piercing = 0;
     }
 
-    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
+    public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
-        base.Init(launcher, inst, fixedTarget);
-        richocet = inst.ricochetFinal.GetInt();
-        piercing = inst.piercingFinal.GetInt();
+        base.Init(launcher, holder, fixedTarget);
+        richocet = holder.ricochetFinal.GetInt();
+        piercing = holder.piercingFinal.GetInt();
     }
 
     public override void OnUpdate(float deltaTime)
@@ -331,9 +327,9 @@ public class Attack_BoomerangComponent : Attack_ProjectileBaseComponent
         isReturning = false;
     }
 
-    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
+    public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
-        base.Init(launcher, inst, fixedTarget);
+        base.Init(launcher, holder, fixedTarget);
         originalDamage = damage;
         returnSpeed = moveSpeed * RETURN_SPEED_MULTIPLIER;
         returnDirection = -direction;
@@ -402,11 +398,11 @@ public class Attack_RotatingOrbsComponent : Attack_ProjectileBaseComponent
         currentAngle = 0f;
     }
 
-    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
+    public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
-        base.Init(launcher, inst, fixedTarget);
-        rotationSpeed = inst.rotationSpeedFinal;
-        orbCount = inst.ShotFinal.GetInt();
+        base.Init(launcher, holder, fixedTarget);
+        rotationSpeed = holder.rotationSpeedFinal;
+        orbCount = holder.ShotFinal.GetInt();
         anglePerOrb = 360f / orbCount; // 360도를 구체 개수로 나누어 균등 배치
         currentAngle = 0f;
 
@@ -485,12 +481,12 @@ public class Attack_AOEComponent : Attack_Component
     protected float maxDistance;
 
     protected virtual bool IsInstantComplete => true;
-    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
+    public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
-        base.Init(launcher, inst, fixedTarget);
-        damage = inst.damageFinal;
-        radius = inst.radiusFinal;
-        angle = inst.angle;
+        base.Init(launcher, holder, fixedTarget);
+        damage = holder.damageFinal;
+        radius = holder.radiusFinal;
+        angle = holder.angle;
         maxDistance = radius * radius;
         type = angle == 360f ? SkillIndicatorType.Circle : SkillIndicatorType.Sector;
     }
@@ -577,11 +573,11 @@ public class Attack_PeriodicAOEComponent : Attack_AOEComponent
         lastTickTime = 0f;
     }
 
-    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
+    public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
-        base.Init(launcher, inst, fixedTarget);
-        tick = inst.damageTickFinal;
-        duration = inst.durationFinal;
+        base.Init(launcher, holder, fixedTarget);
+        tick = holder.damageTickFinal;
+        duration = holder.durationFinal;
         lastTickTime = Time.time;
     }
 
@@ -608,11 +604,11 @@ public class Attack_InstantComponent : Attack_Component
     public override SkillComponentType Type => SkillComponentType.InstantAttack;
     private Unit target;
 
-    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
+    public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
-        base.Init(launcher, inst, fixedTarget);
+        base.Init(launcher, holder, fixedTarget);
         target = fixedTarget;
-        damage = inst.damageFinal;
+        damage = holder.damageFinal;
     }
 
     public override void OnStart()
@@ -659,13 +655,13 @@ public class Attack_BeamComponent : Attack_Component
         finalIndicator = null;
     }
 
-    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
+    public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
-        base.Init(launcher, inst, fixedTarget);
-        damage = inst.damageFinal;
+        base.Init(launcher, holder, fixedTarget);
+        damage = holder.damageFinal;
         length = GameValue.PROJECTILE_MAX_LENGTH;
-        tick = inst.damageTickFinal;
-        duration = inst.durationFinal;
+        tick = holder.damageTickFinal;
+        duration = holder.durationFinal;
 
         isIndicatorTime = true;
         targetPos = fixedTarget.transform.position;
@@ -772,9 +768,9 @@ public class Movement_LinearComponent : SkillComponent
 {
     public override SkillComponentType Type => SkillComponentType.Linear;
 
-    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
+    public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
-        base.Init(launcher, inst, fixedTarget);
+        base.Init(launcher, holder, fixedTarget);
     }
 
     public override void OnUpdate(float deltaTime)
@@ -806,12 +802,12 @@ public class Movement_LeapComponent : SkillComponent
         finalIndicator = null;
     }
 
-    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
+    public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
-        base.Init(launcher, inst, fixedTarget);
+        base.Init(launcher, holder, fixedTarget);
         targetPos = fixedTarget.transform.position;
         isLeapCompleted = false;
-        duration = inst.durationFinal;
+        duration = holder.durationFinal;
         invDuration = 1f / duration;
         startPos = launcher.Position;
         Vector3 dir = (launcher.Position - targetPos).normalized;
@@ -887,12 +883,12 @@ public class Effect_GravityComponent : SkillComponent
         startTimes.Clear();
     }
 
-    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
+    public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
-        base.Init(launcher, inst, fixedTarget);
-        gravityForce = inst.gravityFinal;
-        duration = inst.durationFinal;
-        radius = inst.radiusFinal;
+        base.Init(launcher, holder, fixedTarget);
+        gravityForce = holder.gravityFinal;
+        duration = holder.durationFinal;
+        radius = holder.radiusFinal;
         radiusSqr = radius * radius;
         rotationSpeed = 15f;
         gravityCenter = launcher.Position;
