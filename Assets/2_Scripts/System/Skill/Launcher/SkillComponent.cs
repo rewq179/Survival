@@ -5,6 +5,7 @@ using System.Linq;
 public enum SkillComponentType
 {
     Projectile,
+    Boomerang,
     InstantAOE,
     PeriodicAOE,
     InstantAttack,
@@ -165,24 +166,18 @@ public abstract class Attack_Component : SkillComponent
     }
 }
 
-/// <summary> 투사체 공격 컴포넌트 </summary>
-public class Attack_ProjectileComponent : Attack_Component
+/// <summary> 투사체 계열 컴포넌트들의 기본 클래스 </summary>
+public abstract class Attack_ProjectileBaseComponent : Attack_Component
 {
-    private float moveSpeed;
-    private float maxLength;
-    private int richocet;
-    private int piercing;
-    private Vector3 startPos;
-    private Vector3 direction;
-    private bool isHit;
-    private HashSet<int> hittedUnitIDs = new();
-
-    public override SkillComponentType Type => SkillComponentType.Projectile;
+    protected float moveSpeed;
+    protected float maxLength;
+    protected Vector3 startPos;
+    protected Vector3 direction;
+    protected HashSet<int> hittedUnitIDs = new();
 
     public override void Reset()
     {
         base.Reset();
-        isHit = false;
         hittedUnitIDs.Clear();
     }
 
@@ -190,29 +185,10 @@ public class Attack_ProjectileComponent : Attack_Component
     {
         base.Init(launcher, inst, fixedTarget);
         moveSpeed = inst.moveSpeedFinal;
-        richocet = inst.ricochetFinal.GetInt();
-        piercing = inst.piercingFinal.GetInt();
         maxLength = GameValue.PROJECTILE_MAX_LENGTH_POW;
         startPos = launcher.Position;
         direction = launcher.transform.forward;
         hittedUnitIDs.Add(launcher.Caster.UniqueID);
-    }
-
-    public override void OnUpdate(float deltaTime)
-    {
-        if (isHit)
-            return;
-
-        float moveDistance = moveSpeed * deltaTime;
-        launcher.transform.position += direction * moveDistance;
-
-        // 최대 거리 체크
-        float currentDistance = (launcher.Position - startPos).sqrMagnitude;
-        if (currentDistance >= maxLength)
-        {
-            OnEnd();
-            return;
-        }
     }
 
     public override void OnHit(Unit target)
@@ -226,17 +202,65 @@ public class Attack_ProjectileComponent : Attack_Component
         // 피해 적용
         hittedUnitIDs.Add(target.UniqueID);
         ApplyToTarget(target);
-        isHit = true;
         effectController.PlayHit();
 
-        // 도탄
-        if (richocet > 0)
+        OnProjectileHit(target);
+    }
+
+    protected abstract void OnProjectileHit(Unit target);
+    protected void MoveProjectile(Vector3 moveDirection, float speed, float deltaTime)
+    {
+        float moveDistance = speed * deltaTime;
+        launcher.transform.position += moveDirection * moveDistance;
+    }
+
+    protected bool HasReachedMaxDistance()
+    {
+        float currentDistance = (launcher.Position - startPos).sqrMagnitude;
+        return currentDistance >= maxLength;
+    }
+}
+
+/// <summary> 일반 투사체 컴포넌트 </summary>
+public class Attack_ProjectileComponent : Attack_ProjectileBaseComponent
+{
+    public override SkillComponentType Type => SkillComponentType.Projectile;
+    private int richocet;
+    private int piercing;
+    private const float RICOCET_RADIUS = 8f;
+
+    public override void Reset()
+    {
+        base.Reset();
+        richocet = 0;
+        piercing = 0;
+    }
+
+    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
+    {
+        base.Init(launcher, inst, fixedTarget);
+        richocet = inst.ricochetFinal.GetInt();
+        piercing = inst.piercingFinal.GetInt();
+    }
+
+    public override void OnUpdate(float deltaTime)
+    {
+        MoveProjectile(direction, moveSpeed, deltaTime);
+
+        if (HasReachedMaxDistance())
         {
-            Unit nextTarget = FindRicochetTarget(launcher.Position, 8f);
+            OnEnd();
+        }
+    }
+
+    protected override void OnProjectileHit(Unit target)
+    {
+        if (richocet > 0) // 도탄
+        {
+            Unit nextTarget = FindRicochetTarget(launcher.Position, RICOCET_RADIUS);
             if (nextTarget != null)
             {
                 richocet--;
-                isHit = false;
 
                 startPos = launcher.Position;
                 Vector3 targetPos = nextTarget.transform.position;
@@ -247,10 +271,8 @@ public class Attack_ProjectileComponent : Attack_Component
             }
         }
 
-        // 관통
-        if (piercing > 0)
+        if (piercing > 0) // 관통
         {
-            isHit = false;
             piercing--;
             return;
         }
@@ -263,11 +285,10 @@ public class Attack_ProjectileComponent : Attack_Component
     /// </summary>
     private Unit FindRicochetTarget(Vector3 position, float radius)
     {
-        Collider[] colliders = Physics.OverlapSphere(position, radius, GameValue.UNIT_LAYERS);
-
         Unit target = null;
         float maxDist = float.MaxValue;
 
+        Collider[] colliders = Physics.OverlapSphere(position, radius, GameValue.UNIT_LAYERS);
         foreach (Collider col in colliders)
         {
             Unit unit = col.GetComponent<Unit>();
@@ -276,8 +297,8 @@ public class Attack_ProjectileComponent : Attack_Component
 
             Vector3 targetPos = unit.transform.position;
             targetPos.y = position.y;
-            float dist = (position - targetPos).sqrMagnitude;
 
+            float dist = (position - targetPos).sqrMagnitude;
             if (dist < maxDist)
             {
                 maxDist = dist;
@@ -286,6 +307,67 @@ public class Attack_ProjectileComponent : Attack_Component
         }
 
         return target;
+    }
+}
+
+/// <summary> 부메랑 투사체 컴포넌트 </summary>
+public class Attack_BoomerangComponent : Attack_ProjectileBaseComponent
+{
+    public override SkillComponentType Type => SkillComponentType.Boomerang;
+    private float originalDamage;
+    private float returnSpeed;
+    private Vector3 returnDirection;
+    private bool isReturning;
+    
+    // 상수
+    private const float RETURN_SPEED_MULTIPLIER = 1.5f; // 돌아올 때 속도 증가 배율
+    private const float DAMAGE_REDUCTION_PER_HIT = 0.15f; // 15%씩 감소
+    private const float MIN_DAMAGE_RATIO = 0.1f; // 최소 10%까지
+
+    public override void Reset()
+    {
+        base.Reset();
+        isReturning = false;
+    }
+
+    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
+    {
+        base.Init(launcher, inst, fixedTarget);
+        originalDamage = damage;
+        returnSpeed = moveSpeed * RETURN_SPEED_MULTIPLIER;
+        returnDirection = -direction;
+    }
+
+    public override void OnUpdate(float deltaTime)
+    {
+        if (isReturning) // 돌아가는 중
+        {
+            MoveProjectile(returnDirection, returnSpeed, deltaTime);
+
+            float distanceSqr = (launcher.Position - startPos).sqrMagnitude;
+            if (distanceSqr <= 0.1f)
+            {
+                OnEnd();
+            }
+        }
+
+        else // 앞으로 나가는 중
+        {
+            MoveProjectile(direction, moveSpeed, deltaTime);
+
+            if (HasReachedMaxDistance())
+            {
+                damage = originalDamage;
+                isReturning = true;
+            }
+        }
+    }
+
+    protected override void OnProjectileHit(Unit target)
+    {
+        // 관통 횟수 별 데미지 감소
+        float multiplier = 1f - hittedUnitIDs.Count * DAMAGE_REDUCTION_PER_HIT;
+        damage = Mathf.Max(originalDamage * multiplier, MIN_DAMAGE_RATIO);
     }
 }
 

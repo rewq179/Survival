@@ -461,6 +461,7 @@ public class SkillMgr : MonoBehaviour
         return type switch
         {
             SkillComponentType.Projectile => new Attack_ProjectileComponent(),
+            SkillComponentType.Boomerang => new Attack_BoomerangComponent(),
             SkillComponentType.InstantAOE => new Attack_AOEComponent(),
             SkillComponentType.PeriodicAOE => new Attack_PeriodicAOEComponent(),
             SkillComponentType.InstantAttack => new Attack_InstantComponent(),
