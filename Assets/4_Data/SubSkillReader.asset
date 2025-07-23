@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SubSkillDataReader
   sheetName: SubSkill
   startRow: 2
-  endRow: 39
+  endRow: 41
   subSkillDatas:
   - skillKey: 1
     parentSkillKey: 0
@@ -72,248 +72,264 @@ MonoBehaviour:
     perLevelValue: 0.15
     maxLevel: 5
     type: 0
-  - skillKey: 9
-    parentSkillKey: 5
-    name: Dagger
-    description: "\uAD00\uD1B5 \uD69F\uC218 +{F0}"
+  - skillKey: 10
+    parentSkillKey: 9
+    name: 
+    description: "\uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 {F0}\uCD08 \uAC10\uC18C"
+    baseValue: 1
+    perLevelValue: 1
+    maxLevel: 3
+    type: 0
+  - skillKey: 11
+    parentSkillKey: 9
+    name: 
+    description: "\uC624\uBE0C \uAC1C\uC218 +{F0}"
+    baseValue: 0.15
+    perLevelValue: 0.15
+    maxLevel: 5
+    type: 1
+  - skillKey: 12
+    parentSkillKey: 9
+    name: 
+    description: "\uC624\uBE0C \uB370\uBBF8\uC9C0 +{P0}"
     baseValue: 1
     perLevelValue: 0
     maxLevel: 1
-    type: 2
-  - skillKey: 11
-    parentSkillKey: 10
+    type: 0
+  - skillKey: 14
+    parentSkillKey: 13
     name: FrontSpike
     description: "\uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 {F0}\uCD08 \uAC10\uC18C"
     baseValue: 0.3
     perLevelValue: 0.3
     maxLevel: 5
     type: 0
-  - skillKey: 12
-    parentSkillKey: 10
+  - skillKey: 15
+    parentSkillKey: 13
     name: FrontSpike
     description: "\uBD80\uCC44\uAF34 \uB370\uBBF8\uC9C0 +{P0}"
     baseValue: 0.2
     perLevelValue: 0.2
     maxLevel: 5
     type: 0
-  - skillKey: 14
-    parentSkillKey: 13
+  - skillKey: 17
+    parentSkillKey: 16
     name: EnergyExplosion
     description: "\uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 {F0}\uCD08 \uAC10\uC18C"
     baseValue: 0.5
     perLevelValue: 0.5
     maxLevel: 5
     type: 0
-  - skillKey: 15
-    parentSkillKey: 13
+  - skillKey: 18
+    parentSkillKey: 16
     name: EnergyExplosion
     description: "\uD3ED\uBC1C \uB370\uBBF8\uC9C0 +{P0}"
     baseValue: 0.25
     perLevelValue: 0.25
     maxLevel: 5
     type: 0
-  - skillKey: 16
-    parentSkillKey: 13
+  - skillKey: 19
+    parentSkillKey: 16
     name: EnergyExplosion
     description: "\uD3ED\uBC1C \uBC94\uC704 +{P0}"
     baseValue: 0.1
     perLevelValue: 0.1
     maxLevel: 5
     type: 6
-  - skillKey: 18
-    parentSkillKey: 17
+  - skillKey: 21
+    parentSkillKey: 20
     name: Meteor
     description: "\uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 {F0}\uCD08 \uAC10\uC18C"
     baseValue: 0.8
     perLevelValue: 0.8
     maxLevel: 5
     type: 0
-  - skillKey: 19
-    parentSkillKey: 17
+  - skillKey: 22
+    parentSkillKey: 20
     name: Meteor
     description: "\uC720\uC131 \uB370\uBBF8\uC9C0 +{P0}"
     baseValue: 0.2
     perLevelValue: 0.2
     maxLevel: 5
     type: 0
-  - skillKey: 20
-    parentSkillKey: 17
+  - skillKey: 23
+    parentSkillKey: 20
     name: Meteor
     description: "\uC720\uC131 \uBC94\uC704 +{P0}"
     baseValue: 0.15
     perLevelValue: 0.15
     maxLevel: 5
     type: 6
-  - skillKey: 21
-    parentSkillKey: 17
-    name: Meteor
-    description: "\uC9C0\uC18D \uC2DC\uAC04 +{F0}\uCD08"
-    baseValue: 0.5
-    perLevelValue: 0.5
-    maxLevel: 5
-    type: 5
-  - skillKey: 22
-    parentSkillKey: 17
-    name: Meteor
-    description: "\uD53C\uD574 \uC8FC\uAE30 {F0}\uCD08 \uAC10\uC18C"
-    baseValue: -0.05
-    perLevelValue: -0.05
-    maxLevel: 5
-    type: 7
   - skillKey: 24
-    parentSkillKey: 23
+    parentSkillKey: 20
+    name: Meteor
+    description: "\uC9C0\uC18D \uC2DC\uAC04 +{F0}\uCD08"
+    baseValue: 0.5
+    perLevelValue: 0.5
+    maxLevel: 5
+    type: 5
+  - skillKey: 25
+    parentSkillKey: 20
+    name: Meteor
+    description: "\uD53C\uD574 \uC8FC\uAE30 {F0}\uCD08 \uAC10\uC18C"
+    baseValue: -0.05
+    perLevelValue: -0.05
+    maxLevel: 5
+    type: 7
+  - skillKey: 27
+    parentSkillKey: 26
     name: Blackhole
     description: "\uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 {F0}\uCD08 \uAC10\uC18C"
     baseValue: 0.8
     perLevelValue: 0.8
     maxLevel: 5
     type: 0
-  - skillKey: 25
-    parentSkillKey: 23
+  - skillKey: 28
+    parentSkillKey: 26
     name: Blackhole
     description: "\uB370\uBBF8\uC9C0 +{P0}"
     baseValue: 0.2
     perLevelValue: 0.2
     maxLevel: 5
     type: 0
-  - skillKey: 26
-    parentSkillKey: 23
+  - skillKey: 29
+    parentSkillKey: 26
     name: Blackhole
     description: "\uBC94\uC704 +{P0}"
     baseValue: 0.15
     perLevelValue: 0.15
     maxLevel: 5
     type: 6
-  - skillKey: 27
-    parentSkillKey: 23
+  - skillKey: 30
+    parentSkillKey: 26
     name: Blackhole
     description: "\uC9C0\uC18D \uC2DC\uAC04 +{F0}\uCD08"
     baseValue: 0.5
     perLevelValue: 0.5
     maxLevel: 5
     type: 5
-  - skillKey: 28
-    parentSkillKey: 23
+  - skillKey: 31
+    parentSkillKey: 26
     name: Blackhole
     description: "\uD53C\uD574 \uC8FC\uAE30 {F0}\uCD08 \uAC10\uC18C"
     baseValue: -0.05
     perLevelValue: -0.05
     maxLevel: 5
     type: 7
-  - skillKey: 30
-    parentSkillKey: 29
+  - skillKey: 33
+    parentSkillKey: 32
     name: IceAttack
     description: "\uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 {F0}\uCD08 \uAC10\uC18C"
     baseValue: 0.8
     perLevelValue: 0.8
     maxLevel: 5
     type: 0
-  - skillKey: 31
-    parentSkillKey: 29
+  - skillKey: 34
+    parentSkillKey: 32
     name: IceAttack
     description: "\uB370\uBBF8\uC9C0 +{P0}"
     baseValue: 0.2
     perLevelValue: 0.2
     maxLevel: 5
     type: 0
-  - skillKey: 32
-    parentSkillKey: 29
+  - skillKey: 35
+    parentSkillKey: 32
     name: IceAttack
     description: "\uBC94\uC704 +{P0}"
     baseValue: 0.15
     perLevelValue: 0.15
     maxLevel: 5
     type: 6
-  - skillKey: 34
-    parentSkillKey: 33
+  - skillKey: 37
+    parentSkillKey: 36
     name: "\uCCB4\uB825 \uC99D\uAC00"
     description: "\uCD5C\uB300 \uCCB4\uB825 +{P0}"
     baseValue: 0.15
     perLevelValue: 0.15
     maxLevel: 5
     type: 9
-  - skillKey: 36
-    parentSkillKey: 35
+  - skillKey: 39
+    parentSkillKey: 38
     name: "\uC774\uB3D9 \uC18D\uB3C4 \uC99D\uAC00"
     description: "\uC774\uB3D9 \uC18D\uB3C4 +{P0}"
     baseValue: 0.1
     perLevelValue: 0.1
     maxLevel: 5
     type: 10
-  - skillKey: 38
-    parentSkillKey: 37
+  - skillKey: 41
+    parentSkillKey: 40
     name: "\uBC29\uC5B4\uB825 \uC99D\uAC00"
     description: "\uBC1B\uB294 \uD53C\uD574 -{P0}"
     baseValue: 0.1
     perLevelValue: 0.1
     maxLevel: 5
     type: 11
-  - skillKey: 40
-    parentSkillKey: 39
+  - skillKey: 43
+    parentSkillKey: 42
     name: "\uC790\uC11D \uBC94\uC704 \uC99D\uAC00"
     description: "\uC544\uC774\uD15C \uC790\uC11D \uBC94\uC704 +{P0}"
     baseValue: 0.2
     perLevelValue: 0.2
     maxLevel: 5
     type: 12
-  - skillKey: 42
-    parentSkillKey: 41
+  - skillKey: 45
+    parentSkillKey: 44
     name: "\uACBD\uD5D8\uCE58 \uD68D\uB4DD \uC99D\uAC00"
     description: "\uACBD\uD5D8\uCE58 \uD68D\uB4DD\uB7C9 +{P0}"
     baseValue: 0.15
     perLevelValue: 0.15
     maxLevel: 5
     type: 13
-  - skillKey: 44
-    parentSkillKey: 43
+  - skillKey: 47
+    parentSkillKey: 46
     name: "\uACE8\uB4DC \uD68D\uB4DD \uC99D\uAC00"
     description: "\uACE8\uB4DC \uD68D\uB4DD\uB7C9 +{P0}"
     baseValue: 0.2
     perLevelValue: 0.2
     maxLevel: 5
     type: 14
-  - skillKey: 46
-    parentSkillKey: 45
+  - skillKey: 49
+    parentSkillKey: 48
     name: "\uCE58\uBA85\uD0C0 \uD655\uB960 \uC99D\uAC00"
     description: "\uCE58\uBA85\uD0C0 \uD655\uB960 +{P0}"
     baseValue: 0.05
     perLevelValue: 0.05
     maxLevel: 5
     type: 15
-  - skillKey: 48
-    parentSkillKey: 47
+  - skillKey: 51
+    parentSkillKey: 50
     name: "\uCE58\uBA85\uD0C0 \uD53C\uD574 \uC99D\uAC00"
     description: "\uCE58\uBA85\uD0C0 \uD53C\uD574 +{P0}"
     baseValue: 0.2
     perLevelValue: 0.2
     maxLevel: 5
     type: 16
-  - skillKey: 50
-    parentSkillKey: 49
+  - skillKey: 53
+    parentSkillKey: 52
     name: "\uC2A4\uD0AC \uBC94\uC704 \uC99D\uAC00"
     description: "\uBAA8\uB4E0 \uC2A4\uD0AC \uBC94\uC704 +{P0}"
     baseValue: 0.1
     perLevelValue: 0.1
     maxLevel: 5
     type: 17
-  - skillKey: 52
-    parentSkillKey: 51
+  - skillKey: 55
+    parentSkillKey: 54
     name: "\uC2A4\uD0AC \uCFE8\uB2E4\uC6B4 \uAC10\uC18C"
     description: "\uBAA8\uB4E0 \uC2A4\uD0AC \uCFE8\uB2E4\uC6B4 -{P0}"
     baseValue: 0.05
     perLevelValue: 0.05
     maxLevel: 5
     type: 18
-  - skillKey: 54
-    parentSkillKey: 53
+  - skillKey: 57
+    parentSkillKey: 56
     name: "\uC2A4\uD0AC \uB370\uBBF8\uC9C0 \uC99D\uAC00"
     description: "\uBAA8\uB4E0 \uC2A4\uD0AC \uB370\uBBF8\uC9C0 +{P0}"
     baseValue: 0.1
     perLevelValue: 0.1
     maxLevel: 5
     type: 19
-  - skillKey: 56
-    parentSkillKey: 55
+  - skillKey: 59
+    parentSkillKey: 58
     name: "\uC2A4\uD0AC \uC9C0\uC18D\uC2DC\uAC04 \uC99D\uAC00"
     description: "\uBAA8\uB4E0 \uC2A4\uD0AC \uC9C0\uC18D\uC2DC\uAC04 +{P0}"
     baseValue: 0.2

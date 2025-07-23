@@ -462,6 +462,7 @@ public class SkillMgr : MonoBehaviour
         {
             SkillComponentType.Projectile => new Attack_ProjectileComponent(),
             SkillComponentType.Boomerang => new Attack_BoomerangComponent(),
+            SkillComponentType.RotatingOrbs => new Attack_RotatingOrbsComponent(),
             SkillComponentType.InstantAOE => new Attack_AOEComponent(),
             SkillComponentType.PeriodicAOE => new Attack_PeriodicAOEComponent(),
             SkillComponentType.InstantAttack => new Attack_InstantComponent(),

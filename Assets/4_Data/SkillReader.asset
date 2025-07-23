@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sheetName: Skill
   startRow: 2
-  endRow: 30
+  endRow: 31
   skillDatas:
   - skillKey: 0
     skillType: 0
@@ -47,6 +47,7 @@ MonoBehaviour:
       - 1.4
       - 2.2
       - 0
+      - 0
       buffKeys: 
   - skillKey: 5
     skillType: 0
@@ -57,7 +58,7 @@ MonoBehaviour:
     skillElements:
     - skillKey: 5
       index: 0
-      componentType: 0
+      componentType: 1
       indicatorType: 1
       order: 0
       timing: 0
@@ -67,8 +68,8 @@ MonoBehaviour:
       - 0
       - 0
       - 0
-      - 10
-      - 18
+      - 12
+      - 15
       - 0
       - 0
       - 0
@@ -77,19 +78,53 @@ MonoBehaviour:
       - 0
       - 0
       - 0
-      - 3.4
+      - 2.2
+      - 0
       - 0
       buffKeys: 
-  - skillKey: 10
+  - skillKey: 9
+    skillType: 0
+    name: Orbital
+    desc: 
+    cooldown: 3
+    baseValue: 0
+    skillElements:
+    - skillKey: 9
+      index: 0
+      componentType: 2
+      indicatorType: 1
+      order: 0
+      timing: 0
+      firePoint: 1
+      maxDistance: 15
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 5
+      - 11
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 3.3
+      - 0
+      - 360
+      buffKeys: 
+  - skillKey: 13
     skillType: 0
     name: FrontSpike
     desc: 
     cooldown: 3
     baseValue: 0
     skillElements:
-    - skillKey: 10
+    - skillKey: 13
       index: 0
-      componentType: 1
+      componentType: 3
       indicatorType: 3
       order: 0
       timing: 0
@@ -111,17 +146,18 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 13
+  - skillKey: 16
     skillType: 0
     name: EnergyExplosion
     desc: 
     cooldown: 4.2
     baseValue: 0
     skillElements:
-    - skillKey: 13
+    - skillKey: 16
       index: 0
-      componentType: 1
+      componentType: 3
       indicatorType: 4
       order: 0
       timing: 0
@@ -143,17 +179,18 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 17
+  - skillKey: 20
     skillType: 0
     name: Meteor
     desc: 
     cooldown: 6
     baseValue: 0
     skillElements:
-    - skillKey: 17
+    - skillKey: 20
       index: 0
-      componentType: 2
+      componentType: 4
       indicatorType: 4
       order: 0
       timing: 0
@@ -175,17 +212,18 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 23
+  - skillKey: 26
     skillType: 0
     name: Blackhole
     desc: 
     cooldown: 10
     baseValue: 0
     skillElements:
-    - skillKey: 23
+    - skillKey: 26
       index: 0
-      componentType: 7
+      componentType: 9
       indicatorType: 4
       order: 0
       timing: 0
@@ -207,10 +245,11 @@ MonoBehaviour:
       - 0
       - 0
       - 30
+      - 0
       buffKeys: 
-    - skillKey: 23
+    - skillKey: 26
       index: 1
-      componentType: 1
+      componentType: 3
       indicatorType: 0
       order: 0
       timing: 1
@@ -232,17 +271,18 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 29
+  - skillKey: 32
     skillType: 0
     name: IceAttack
     desc: 
     cooldown: 8
     baseValue: 0
     skillElements:
-    - skillKey: 29
+    - skillKey: 32
       index: 0
-      componentType: 2
+      componentType: 4
       indicatorType: 4
       order: 0
       timing: 0
@@ -264,8 +304,9 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 01000000
-  - skillKey: 33
+  - skillKey: 36
     skillType: 1
     name: "\uCCB4\uB825 \uC99D\uAC00"
     desc: "\uCD5C\uB300 \uCCB4\uB825 +{P0}"
@@ -296,8 +337,9 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 35
+  - skillKey: 38
     skillType: 1
     name: "\uC774\uB3D9 \uC18D\uB3C4 \uC99D\uAC00"
     desc: "\uC774\uB3D9 \uC18D\uB3C4 +{P0}"
@@ -328,8 +370,9 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 37
+  - skillKey: 40
     skillType: 1
     name: "\uBC29\uC5B4\uB825 \uC99D\uAC00"
     desc: "\uBC1B\uB294 \uD53C\uD574 -{P0}"
@@ -360,8 +403,9 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 39
+  - skillKey: 42
     skillType: 1
     name: "\uC790\uC11D \uBC94\uC704 \uC99D\uAC00"
     desc: "\uC544\uC774\uD15C \uC790\uC11D \uBC94\uC704 +{P0}"
@@ -392,8 +436,9 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 41
+  - skillKey: 44
     skillType: 1
     name: "\uACBD\uD5D8\uCE58 \uD68D\uB4DD \uC99D\uAC00"
     desc: "\uACBD\uD5D8\uCE58 \uD68D\uB4DD\uB7C9 +{P0}"
@@ -424,8 +469,9 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 43
+  - skillKey: 46
     skillType: 1
     name: "\uACE8\uB4DC \uD68D\uB4DD \uC99D\uAC00"
     desc: "\uACE8\uB4DC \uD68D\uB4DD\uB7C9 +{P0}"
@@ -456,8 +502,9 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 45
+  - skillKey: 48
     skillType: 1
     name: "\uCE58\uBA85\uD0C0 \uD655\uB960 \uC99D\uAC00"
     desc: "\uCE58\uBA85\uD0C0 \uD655\uB960 +{P0}"
@@ -488,8 +535,9 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 47
+  - skillKey: 50
     skillType: 1
     name: "\uCE58\uBA85\uD0C0 \uD53C\uD574 \uC99D\uAC00"
     desc: "\uCE58\uBA85\uD0C0 \uD53C\uD574 +{P0}"
@@ -520,8 +568,9 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 49
+  - skillKey: 52
     skillType: 1
     name: "\uC2A4\uD0AC \uBC94\uC704 \uC99D\uAC00"
     desc: "\uBAA8\uB4E0 \uC2A4\uD0AC \uBC94\uC704 +{P0}"
@@ -552,8 +601,9 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 51
+  - skillKey: 54
     skillType: 1
     name: "\uC2A4\uD0AC \uCFE8\uB2E4\uC6B4 \uAC10\uC18C"
     desc: "\uBAA8\uB4E0 \uC2A4\uD0AC \uCFE8\uB2E4\uC6B4 -{P0}"
@@ -584,8 +634,9 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 53
+  - skillKey: 56
     skillType: 1
     name: "\uC2A4\uD0AC \uB370\uBBF8\uC9C0 \uC99D\uAC00"
     desc: "\uBAA8\uB4E0 \uC2A4\uD0AC \uB370\uBBF8\uC9C0 +{P0}"
@@ -616,8 +667,9 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 55
+  - skillKey: 58
     skillType: 1
     name: "\uC2A4\uD0AC \uC9C0\uC18D\uC2DC\uAC04 \uC99D\uAC00"
     desc: "\uBAA8\uB4E0 \uC2A4\uD0AC \uC9C0\uC18D\uC2DC\uAC04 +{P0}"
@@ -648,17 +700,18 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 57
+  - skillKey: 60
     skillType: 0
     name: "\uB3C5\uCE68"
     desc: 
     cooldown: 0.5
     baseValue: 0
     skillElements:
-    - skillKey: 57
+    - skillKey: 60
       index: 0
-      componentType: 3
+      componentType: 5
       indicatorType: 0
       order: 0
       timing: 0
@@ -680,15 +733,16 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 58
+  - skillKey: 61
     skillType: 0
     name: "\uD654\uC5FC \uD22C\uC0AC\uCCB4"
     desc: 
     cooldown: 5
     baseValue: 0
     skillElements:
-    - skillKey: 58
+    - skillKey: 61
       index: 0
       componentType: 0
       indicatorType: 1
@@ -712,17 +766,18 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 59
+  - skillKey: 62
     skillType: 0
     name: "\uADFC\uC811 \uACF5\uACA9"
     desc: 
     cooldown: 0.5
     baseValue: 0
     skillElements:
-    - skillKey: 59
+    - skillKey: 62
       index: 0
-      componentType: 3
+      componentType: 5
       indicatorType: 0
       order: 0
       timing: 0
@@ -744,17 +799,18 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 60
+  - skillKey: 63
     skillType: 0
     name: '-'
     desc: 
     cooldown: 0.5
     baseValue: 0
     skillElements:
-    - skillKey: 60
+    - skillKey: 63
       index: 0
-      componentType: 3
+      componentType: 5
       indicatorType: 0
       order: 0
       timing: 0
@@ -776,15 +832,16 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 61
+  - skillKey: 64
     skillType: 0
     name: '-'
     desc: 
     cooldown: 1.5
     baseValue: 0
     skillElements:
-    - skillKey: 61
+    - skillKey: 64
       index: 0
       componentType: 0
       indicatorType: 1
@@ -808,17 +865,18 @@ MonoBehaviour:
       - 0
       - 3.1
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 62
+  - skillKey: 65
     skillType: 0
     name: '-'
     desc: 
     cooldown: 0.6
     baseValue: 0
     skillElements:
-    - skillKey: 62
+    - skillKey: 65
       index: 0
-      componentType: 3
+      componentType: 5
       indicatorType: 0
       order: 0
       timing: 0
@@ -840,17 +898,18 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 63
+  - skillKey: 66
     skillType: 0
     name: '-'
     desc: 
     cooldown: 2.5
     baseValue: 0
     skillElements:
-    - skillKey: 63
+    - skillKey: 66
       index: 0
-      componentType: 6
+      componentType: 8
       indicatorType: 4
       order: 0
       timing: 0
@@ -872,10 +931,11 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-    - skillKey: 63
+    - skillKey: 66
       index: 1
-      componentType: 1
+      componentType: 3
       indicatorType: 0
       order: 1
       timing: 1
@@ -897,17 +957,18 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 64
+  - skillKey: 67
     skillType: 0
     name: '-'
     desc: 
     cooldown: 0.5
     baseValue: 0
     skillElements:
-    - skillKey: 64
+    - skillKey: 67
       index: 0
-      componentType: 3
+      componentType: 5
       indicatorType: 0
       order: 0
       timing: 0
@@ -929,17 +990,18 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 65
+  - skillKey: 68
     skillType: 0
     name: '-'
     desc: 
     cooldown: 8
     baseValue: 0
     skillElements:
-    - skillKey: 65
+    - skillKey: 68
       index: 0
-      componentType: 4
+      componentType: 6
       indicatorType: 1
       order: 0
       timing: 0
@@ -961,17 +1023,18 @@ MonoBehaviour:
       - 0
       - 0
       - 0
+      - 0
       buffKeys: 
-  - skillKey: 66
+  - skillKey: 69
     skillType: 0
     name: '-'
     desc: 
     cooldown: 0
     baseValue: 0
     skillElements:
-    - skillKey: 66
+    - skillKey: 69
       index: 0
-      componentType: 1
+      componentType: 3
       indicatorType: 0
       order: 0
       timing: 0
@@ -989,6 +1052,7 @@ MonoBehaviour:
       - 0
       - 360
       - 12
+      - 0
       - 0
       - 0
       - 0

@@ -85,7 +85,7 @@ public class SkillDataReader : ScriptableObject
     {
         List<SkillElement> elements = new();
 
-        // Projectile : Speed = 15, Dmg = 12, Ricochet=2, Piercing=1, Shot=3.2, InstantAOE : Angle = 360, Radius = 4, Dmg = 10
+        // Projectile : MoveSpeed = 15, Dmg = 12, Ricochet=2, Piercing=1, Shot=3.2, InstantAOE : Angle = 360, Radius = 4, Dmg = 10
         string[] splits = skillString.Split('/');
         foreach (string str in splits)
         {
@@ -105,7 +105,8 @@ public class SkillDataReader : ScriptableObject
         {
             return key switch
             {
-                "speed" => ElementType.Speed,
+                "movespeed" => ElementType.MoveSpeed,
+                "rotationspeed" => ElementType.RotationSpeed,
                 "dmg" => ElementType.Damage,
                 "height" => ElementType.Height,
                 "width" => ElementType.Width,

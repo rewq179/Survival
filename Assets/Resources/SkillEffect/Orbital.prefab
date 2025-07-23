@@ -19754,7 +19754,7 @@ GameObject:
   - component: {fileID: 5221510488998455123}
   - component: {fileID: 7317962171405296175}
   m_Layer: 9
-  m_Name: Nova
+  m_Name: Orbital
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19805,7 +19805,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52bc9e8b256968047afcfa4eb40a1c28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playParticles: []
+  playParticles:
+  - {fileID: 5221510488998455123}
+  - {fileID: 3873449436362689468}
+  - {fileID: 3873446021988181914}
+  - {fileID: 3872670500647524056}
+  - {fileID: 3872582076245682232}
   hittedParticles: []
 --- !u!114 &2444469842276608223
 MonoBehaviour:

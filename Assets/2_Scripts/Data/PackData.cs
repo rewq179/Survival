@@ -17,7 +17,11 @@ public enum SkillKey
     Dagger_Cooldown,
     Dagger_Shot,
     Dagger_DamageInc,
-    Dagger_Piercing,
+
+    Orbital,
+    Orbital_Cooldown,
+    Orbital_Shot,
+    Orbital_DamageInc,
 
     FrontSpike,
     FrontSpike_Cooldown,
@@ -104,7 +108,7 @@ public enum ElementType
     Timing,
     FirePoint,
     Damage,
-    Speed,
+    MoveSpeed,
     Duration,
     Tick,
     Height,
@@ -115,6 +119,7 @@ public enum ElementType
     Piercing,
     Shot,
     Gravity,
+    RotationSpeed,
     Max,
 }
 
@@ -147,7 +152,7 @@ public class SkillElement
     public List<BuffKey> buffKeys = new();
 
     public bool IsMainIndicator => index == 0;
-    public float Speed => GetParameter(ElementType.Speed);
+    public float MoveSpeed => GetParameter(ElementType.MoveSpeed);
     public float Damage => GetParameter(ElementType.Damage);
     public float Radius => GetParameter(ElementType.Radius);
     public float Angle => GetParameter(ElementType.Angle);
@@ -159,6 +164,7 @@ public class SkillElement
     public float Piercing => GetParameter(ElementType.Piercing);
     public float Shot => GetParameter(ElementType.Shot);
     public float Gravity => GetParameter(ElementType.Gravity);
+    public float RotationSpeed => GetParameter(ElementType.RotationSpeed);
 
     public void Init(SkillKey skillKey, int index, SkillComponentType componentType)
     {

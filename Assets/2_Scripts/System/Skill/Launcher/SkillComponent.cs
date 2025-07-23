@@ -6,6 +6,7 @@ public enum SkillComponentType
 {
     Projectile,
     Boomerang,
+    RotatingOrbs,
     InstantAOE,
     PeriodicAOE,
     InstantAttack,
@@ -318,7 +319,7 @@ public class Attack_BoomerangComponent : Attack_ProjectileBaseComponent
     private float returnSpeed;
     private Vector3 returnDirection;
     private bool isReturning;
-    
+
     // 상수
     private const float RETURN_SPEED_MULTIPLIER = 1.5f; // 돌아올 때 속도 증가 배율
     private const float DAMAGE_REDUCTION_PER_HIT = 0.15f; // 15%씩 감소
@@ -369,6 +370,109 @@ public class Attack_BoomerangComponent : Attack_ProjectileBaseComponent
         float multiplier = 1f - hittedUnitIDs.Count * DAMAGE_REDUCTION_PER_HIT;
         damage = Mathf.Max(originalDamage * multiplier, MIN_DAMAGE_RATIO);
     }
+}
+
+/// <summary> 회전하는 구체들로 구성된 이동 공격 컴포넌트 </summary>
+public class Attack_RotatingOrbsComponent : Attack_ProjectileBaseComponent
+{
+    public override SkillComponentType Type => SkillComponentType.RotatingOrbs;
+    private float rotationSpeed;
+    private int orbCount;
+    private float anglePerOrb;
+    private float currentAngle;
+    private List<SkillEffectController> orbs = new();
+
+    // 구체들의 위치 계산용
+    private List<Vector3> orbPositions = new();
+    private const float CIRCLE_RADIUS = 2f; // 고정된 반지름 5
+
+    public override void Reset()
+    {
+        SkillKey skillKey = launcher.SkillKey;
+        base.Reset();
+        orbPositions.Clear();
+
+        SkillMgr skillMgr = GameMgr.Instance.skillMgr;
+        for (int i = orbs.Count - 1; i > 0; i--) // 0번째는 런처가 제거해줌
+        {
+            skillMgr.PushSkillObject(skillKey, orbs[i]);
+        }
+
+        orbs.Clear();
+        currentAngle = 0f;
+    }
+
+    public override void Init(SkillLauncher launcher, SkillHolder inst, Unit fixedTarget)
+    {
+        base.Init(launcher, inst, fixedTarget);
+        rotationSpeed = inst.rotationSpeedFinal;
+        orbCount = inst.ShotFinal.GetInt();
+        anglePerOrb = 360f / orbCount; // 360도를 구체 개수로 나누어 균등 배치
+        currentAngle = 0f;
+
+        orbs.Add(launcher.GetComponentInChildren<SkillEffectController>());
+        CalculateOrbPositions();
+        CreateOrbs();
+    }
+
+    private void CreateOrbs()
+    {
+        SkillMgr skillMgr = GameMgr.Instance.skillMgr;
+        for (int i = 1; i < orbCount; i++)
+        {
+            SkillEffectController effect = skillMgr.PopSkillObject(launcher.SkillKey, launcher.transform);
+            effect.transform.position = orbPositions[i];
+            orbs.Add(effect);
+        }
+    }
+
+    public override void OnUpdate(float deltaTime)
+    {
+        MoveProjectile(direction, moveSpeed, deltaTime);
+        currentAngle += rotationSpeed * deltaTime;
+        CalculateOrbPositions();
+        UpdateOrbTransform();
+
+        if (HasReachedMaxDistance())
+        {
+            OnEnd();
+        }
+    }
+
+    private void CalculateOrbPositions()
+    {
+        orbPositions.Clear();
+        Vector3 center = launcher.Position;
+
+        for (int i = 0; i < orbCount; i++)
+        {
+            // 각 구체를 원의 경계에 균등하게 배치
+            float angle = currentAngle + anglePerOrb * i;
+            float radian = angle * Mathf.Deg2Rad;
+
+            // 반지름 5의 원의 경계에 정확히 배치
+            Vector3 orbPos = center + new Vector3(
+                Mathf.Cos(radian) * CIRCLE_RADIUS,
+                0f,
+                Mathf.Sin(radian) * CIRCLE_RADIUS
+            );
+            orbPositions.Add(orbPos);
+        }
+    }
+
+    private void UpdateOrbTransform()
+    {
+        // 각 구체의 위치를 실제로 업데이트
+        for (int i = 0; i < orbs.Count && i < orbPositions.Count; i++)
+        {
+            orbs[i].transform.position = orbPositions[i];
+        }
+
+        Quaternion rotation = Quaternion.Euler(0f, currentAngle, 0f);
+        launcher.transform.rotation = rotation;
+    }
+
+    protected override void OnProjectileHit(Unit target) { }
 }
 
 /// <summary> 범위 공격 컴포넌트 </summary>

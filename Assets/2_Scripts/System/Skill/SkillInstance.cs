@@ -56,6 +56,10 @@ public class SkillHolder
     private float gravityFix;
     public float gravityFinal;
 
+    // 회전 속도
+    private float rotationSpeedFix;
+    public float rotationSpeedFinal;
+
     public float angle;
     private List<BuffKey> buffKeys = new();
 
@@ -70,11 +74,12 @@ public class SkillHolder
         durationFix = skillElement.Duration;
         damageTickFix = skillElement.Tick;
         radiusFix = skillElement.Radius;
-        moveSpeedFix = skillElement.Speed;
+        moveSpeedFix = skillElement.MoveSpeed;
         ricochetFix = skillElement.Ricochet;
         piercingFix = skillElement.Piercing;
         ShotFix = Mathf.Max(1, skillElement.Shot);
         gravityFix = skillElement.Gravity;
+        rotationSpeedFix = skillElement.RotationSpeed;
         angle = skillElement.Angle;
         type = skillElement.componentType;
         order = skillElement.order;
@@ -162,6 +167,7 @@ public class SkillHolder
         ricochetFinal = ricochetFix + ricochetAdditive;
         piercingFinal = piercingFix + piercingAdditive;
         moveSpeedFinal = (moveSpeedFix + moveSpeedAdditive) * (1 + moveSpeedMultiplier);
+        rotationSpeedFinal = rotationSpeedFix;
         gravityFinal = gravityFix;
     }
 }
