@@ -104,7 +104,7 @@ public class SkillModule : MonoBehaviour
     {
         if (!isAutoAttack)
             return;
-            
+
         // 상태이상 체크 - 공격 불가능하면 자동 공격 무시
         if (!owner.CanAttack)
             return;
@@ -215,7 +215,7 @@ public class SkillModule : MonoBehaviour
     {
         if (!owner.CanAttack)
             return false;
-            
+
         return cooldowns.ContainsKey(skillKey) && cooldowns[skillKey] <= 0f;
     }
 
@@ -223,7 +223,7 @@ public class SkillModule : MonoBehaviour
     {
         if (!owner.CanAttack)
             return false;
-            
+
         foreach (SkillKey key in skills)
         {
             if (DataMgr.IsActiveSkill(key) && CanUseSkill(key) && IsMeleeSkill(key) == isMelee)
@@ -256,6 +256,17 @@ public class SkillModule : MonoBehaviour
     public bool HasSkill(SkillKey skillKey)
     {
         return skills.Contains(skillKey) || subSkills.ContainsKey(skillKey);
+    }
+
+    public bool HasRangedAttackSkill()
+    {
+        foreach (SkillKey key in skills)
+        {
+            if (DataMgr.IsActiveSkill(key) && !IsMeleeSkill(key))
+                return true;
+        }
+
+        return false;
     }
 
     public bool IsSkillLearnable(SkillKey key)
@@ -307,19 +318,20 @@ public class SkillModule : MonoBehaviour
         return cnt;
     }
 
-    public void UseRandomSkill(Unit target, AIState state)
+    public void UseRandomSkill(Unit target, RangeType rangeType)
     {
-        if (skills.Count == 0)
+        if (skills.Count == 0 || !owner.CanAttack)
             return;
 
+        owner.SetAttacking(true);
         List<SkillKey> availableSkills = new();
         foreach (SkillKey key in skills)
         {
             if (!CanUseSkill(key))
                 continue;
 
-            bool isMelee = IsMeleeSkill(key);
-            if ((state == AIState.MeleeAttack && isMelee) || (state == AIState.RangedAttack && !isMelee))
+            bool isMelee = IsMeleeSkill(key); // TODO: 수정할 것
+            if ((rangeType == RangeType.Melee && isMelee) || (rangeType == RangeType.Ranged && !isMelee))
                 availableSkills.Add(key);
         }
 

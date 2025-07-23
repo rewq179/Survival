@@ -2480,6 +2480,8 @@ GameObject:
   - component: {fileID: 5696829833923267141}
   - component: {fileID: 95212052626076970}
   - component: {fileID: 3187248452699600711}
+  - component: {fileID: 4341370915723155682}
+  - component: {fileID: -7104860107387539396}
   m_Layer: 8
   m_Name: Bee
   m_TagString: Untagged
@@ -2619,6 +2621,53 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &4341370915723155682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1692177501903460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0038c16c34866b4f9e25c9c0dc0f7e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Graph: {fileID: -7319040094733663698, guid: d5566569f9659ca4cb32c19f3aac3603, type: 2}
+  m_BlackboardVariableOverridesList:
+  - rid: 6654579145194340521
+  m_IsInitialised: 0
+  m_IsStarted: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 6654579145194340521
+      type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 1
+          m_Value1: 0
+        Name: Self
+        m_Value: {fileID: 1692177501903460}
+--- !u!114 &-7104860107387539396
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1692177501903460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0038c16c34866b4f9e25c9c0dc0f7e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Graph: {fileID: 0}
+  m_BlackboardVariableOverridesList: []
+  m_IsInitialised: 0
+  m_IsStarted: 0
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &1698306973309258
 GameObject:
   m_ObjectHideFlags: 0

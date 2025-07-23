@@ -1,110 +1,96 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
+using Unity.Behavior;
 
+[BlackboardEnum]
 public enum AIState
 {
     Chasing,
-    MeleeAttack,
-    RangedAttack,
-    Stun
+    Attack,
 }
 
 public class BehaviourMonsterModule : BehaviourModule
 {
-    private Unit target;
+    private BehaviorGraphAgent agent;
     private SkillModule skillModule;
-    private AIState currentState = AIState.Chasing;
-    private float moveSpeed;
+
+    // 블랙보드
+    private Unit target;
+    private AIState currentState;
+    private float distanceSqr;
     private bool isAttacking;
-    private Vector3 lastPlayerPosition;
+    private bool hasRangedAttackSkill;
+    private bool canRangedAttack;
+    private bool canMeleeAttack;
 
     // 상수
-    private const float ROTATION_SPEED = 5f;
-    private const float CHASE_ROTION_SPEED_FACTOR = 1f;
-    private const float ATTACK_ROTION_SPEED_FACTOR = 2f;
-    private const float MELEE_ATTACK_RANGE = 1.5f;
-    private const float MELEE_ATTACK_RANGE_SQR = MELEE_ATTACK_RANGE * MELEE_ATTACK_RANGE;
-    private const float RANGED_ATTACK_RANGE = 8f;
-    private const float RANGED_ATTACK_RANGE_SQR = RANGED_ATTACK_RANGE * RANGED_ATTACK_RANGE;
+    private const float ATTACK_MELEE_RANGE = 1.5f;
+    private const float ATTACK_MELEE_RANGE_SQR = ATTACK_MELEE_RANGE * ATTACK_MELEE_RANGE;
+    private const float ATTACK_RANGED_RANGE = 6f;
+    private const float ATTACK_RANGED_RANGE_SQR = ATTACK_RANGED_RANGE * ATTACK_RANGED_RANGE;
 
     public override void Reset()
     {
-        currentState = AIState.Chasing;
-        isAttacking = false;
+        SetAIState(AIState.Chasing);
     }
 
     public override void Init(Unit unit)
     {
         owner = unit;
         target = GameMgr.Instance.PlayerUnit;
-        moveSpeed = unit.MoveSpeed;
-        skillModule = unit.SkillModule;
+        skillModule = owner.SkillModule;
+
+        agent = owner.GetComponent<BehaviorGraphAgent>();
+        agent.SetVariableValue("Target", target);
+        SetAttacking(false);
+        SetHasRangedAttackSkill(owner.HasRangedAttackSkill());
+        SetRangedAttackRange(false);
+        SetMeleeAttackRange(false);
     }
 
-    public override void Update()
+    public override void UpdateBehaviour()
     {
-        if (owner.IsDead || target.IsDead)
-            return;
+        distanceSqr = (owner.transform.position - target.transform.position).sqrMagnitude;
 
-        // 상태이상 체크
-        if (!owner.CanMove)
-            return;
-
-        UpdatePlayerPosition();
-        UpdateState();
-        UpdateMovement();
-    }
-
-    private void UpdatePlayerPosition() => lastPlayerPosition = target.transform.position;
-    public override void UpdateMoveSpeed() => moveSpeed = owner.MoveSpeed;
-
-    private void UpdateState()
-    {
-        float distanceSqr = (owner.transform.position - lastPlayerPosition).sqrMagnitude;
-        if (distanceSqr <= MELEE_ATTACK_RANGE_SQR && skillModule.CanUseSkillType(true))
-            ChangeState(AIState.MeleeAttack);
-        else if (distanceSqr <= RANGED_ATTACK_RANGE_SQR && skillModule.CanUseSkillType(false))
-            ChangeState(AIState.RangedAttack);
-        else
-            ChangeState(AIState.Chasing);
-    }
-
-    private void UpdateMovement()
-    {
-        switch (currentState)
+        if (hasRangedAttackSkill)
         {
-            case AIState.Chasing:
-                if (owner.CanMove)
-                    ChasePlayer();
-                break;
-
-            case AIState.MeleeAttack:
-            case AIState.RangedAttack:
-                if (owner.CanAttack)
-                    AttackPlayer();
-                break;
+            bool canUseRangedAttack = skillModule.CanUseSkillType(false);
+            SetRangedAttackRange(canUseRangedAttack && distanceSqr < ATTACK_RANGED_RANGE_SQR);
         }
+
+        bool canUseMeleeAttack = skillModule.CanUseSkillType(true);
+        SetMeleeAttackRange(canUseMeleeAttack && distanceSqr < ATTACK_MELEE_RANGE_SQR);
     }
 
-    private void ChasePlayer()
+    public override void SetAttacking(bool isAttacking)
     {
-        Vector3 direction = GetDirection();
-        Transform transform = owner.transform;
-        transform.position += direction * moveSpeed * Time.deltaTime;
-        transform.rotation = GetRotation(transform.rotation, direction, CHASE_ROTION_SPEED_FACTOR);
+        this.isAttacking = isAttacking;
+        agent.SetVariableValue("IsAttacking", isAttacking);
     }
 
-    private void AttackPlayer()
+    private void SetHasRangedAttackSkill(bool hasRangedAttackSkill)
     {
-        if (isAttacking)
-            return;
+        this.hasRangedAttackSkill = hasRangedAttackSkill;
+        agent.SetVariableValue("HasRangedAttackSkill", hasRangedAttackSkill);
+    }
 
-        isAttacking = true;
-        Vector3 direction = GetDirection();
+    public override void SetAIState(AIState state)
+    {
+        currentState = state;
+        agent.SetVariableValue("CurrentState", currentState);
+    }
 
-        Transform transform = owner.transform;
-        transform.rotation = GetRotation(transform.rotation, direction, ATTACK_ROTION_SPEED_FACTOR);
-        skillModule.UseRandomSkill(target, currentState);
+    private void SetRangedAttackRange(bool isInRange)
+    {
+        canRangedAttack = isInRange;
+        agent.SetVariableValue("CanRangedAttack", isInRange);
+    }
+
+    private void SetMeleeAttackRange(bool isInRange)
+    {
+        canMeleeAttack = isInRange;
+        agent.SetVariableValue("CanMeleeAttack", isInRange);
     }
 
     public override void OnAnimationEnd(AnimEvent animEvent)
@@ -112,9 +98,7 @@ public class BehaviourMonsterModule : BehaviourModule
         switch (animEvent)
         {
             case AnimEvent.Attack:
-                isAttacking = false;
-                UpdatePlayerPosition();
-                ChangeState(AIState.Chasing);
+                SetAttacking(false);
                 break;
 
             case AnimEvent.Die:
@@ -122,29 +106,4 @@ public class BehaviourMonsterModule : BehaviourModule
                 break;
         }
     }
-
-    #region 유틸리티
-
-    private Vector3 GetDirection()
-    {
-        Vector3 direction = (lastPlayerPosition - owner.transform.position).normalized;
-        direction.y = 0f;
-        return direction;
-    }
-
-    private Quaternion GetRotation(Quaternion rotation, Vector3 direction, float speedFactor)
-    {
-        Quaternion targetRotation = Quaternion.LookRotation(direction);
-        return Quaternion.Slerp(rotation, targetRotation, ROTATION_SPEED * speedFactor * Time.deltaTime);
-    }
-
-    private void ChangeState(AIState newState)
-    {
-        if (isAttacking)
-            return;
-
-        currentState = newState;
-    }
-
-    #endregion
 }

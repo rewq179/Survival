@@ -51,10 +51,9 @@ public class Unit : MonoBehaviour
     public int UniqueID => uniqueID;
     public int UnitID => unitID;
     public bool IsPlayer => unitType == UnitType.Player;
-    public bool CanMove => buffModule.CanMove;
-    public bool CanAttack => buffModule.CanAttack;
+    public bool CanMove => !IsDead && buffModule.CanMove;
+    public bool CanAttack => !IsDead && buffModule.CanAttack;
     public UnitType UnitType => unitType;
-    public SkillModule SkillModule => skillModule;
 
     public void Reset()
     {
@@ -124,7 +123,7 @@ public class Unit : MonoBehaviour
     private void Update()
     {
         float deltaTime = Time.deltaTime;
-        behaviourModule?.Update();
+        behaviourModule.UpdateBehaviour();
         skillModule.UpdateCooldowns(deltaTime);
         skillModule.UpdateAutoAttack(deltaTime);
         buffModule.UpdateBuff(deltaTime);
@@ -155,7 +154,10 @@ public class Unit : MonoBehaviour
     public void AddStatModifier(StatType statType, float value) => statModule.AddStatModifier(statType, value);
 
     // BehaviourModule
+    public bool IsAttacking => behaviourModule.IsAttacking;
     public void OnAnimationEnd(AnimEvent animEvent) => behaviourModule.OnAnimationEnd(animEvent);
+    public void SetAIState(AIState state) => behaviourModule.SetAIState(state);
+    public void SetAttacking(bool isAttacking) => behaviourModule.SetAttacking(isAttacking);
 
     // CombatModule
     public bool IsDead => combatModule.IsDead;
@@ -199,16 +201,18 @@ public class Unit : MonoBehaviour
     public int AddExp(float amount) => playerSaveData.AddExp(amount);
 
     // SkillModule
+    public SkillModule SkillModule => skillModule;
     public void SetAutoAttack(bool isAutoAttack) => skillModule.SetAutoAttack(isAutoAttack);
-
     public void LearnSkill(SkillKey skillKey) => skillModule.LearnSkill(skillKey);
     public bool CanUseSkill(SkillKey skillKey) => skillModule.CanUseSkill(skillKey);
     public void StartCooldown(SkillKey skillKey) => skillModule.StartCooldown(skillKey);
     public int GetSkillLevel(SkillKey skillKey) => skillModule.GetSkillLevel(skillKey);
     public List<SkillKey> GetSubSkills(SkillKey skillKey) => skillModule.GetSubSkills(skillKey);
     public bool HasSkill(SkillKey skillKey) => skillModule.HasSkill(skillKey);
+    public bool HasRangedAttackSkill() => skillModule.HasRangedAttackSkill();
     public bool IsSkillLearnable(SkillKey skillKey) => skillModule.IsSkillLearnable(skillKey);
     public SkillInstance GetSkillInstance(SkillKey skillKey) => skillModule.GetSkillInstance(skillKey);
+    public void UseRandomSkill(Unit target, RangeType rangeType) => skillModule.UseRandomSkill(target, rangeType);
 
     public event Action<SkillKey, float> OnSkillCooldownChanged
     {
