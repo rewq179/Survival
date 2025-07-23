@@ -15,26 +15,28 @@ public class SkillEffectController : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void Init()
+    public void Init(SkillLauncher launcher, Action<Unit> onHitTarget, Action onParticleFinished)
     {
-        collision?.Init();
+        if (collision != null) // 콜라이더
+        {
+            collision.Init();
+            collision.OnHitTarget += onHitTarget;
+        }
+
+        // 파티클
         particle.Init();
+        particle.OnParticleFinished += onParticleFinished;
+
+        launcher.SetParticleFinished(false);
+        transform.position = launcher.Position;
         gameObject.SetActive(true);
     }
 
+    public void SetPosition(Vector3 position) => transform.position = position;
     public void Play() => particle.Play();
     public void PlayHit() => particle.PlayHit();
     public void StopMain() => particle.StopMain();
     public void StopHitted() => particle.StopHitted();
-    
-    public void SubscribeHitTarget(Action<Unit> onHitTarget)
-    {
-        if (collision != null)
-            collision.OnHitTarget += onHitTarget;
-    }
 
-    public void SubscribeParticleFinished(Action onParticleFinished)
-    {
-        particle.OnParticleFinished += onParticleFinished;
-    }
+
 }

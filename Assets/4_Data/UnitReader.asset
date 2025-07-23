@@ -20,14 +20,14 @@ MonoBehaviour:
     name: "\uD50C\uB808\uC774\uC5B4"
     hp: 300
     moveSpeed: 7
-    skills: 00000000
+    skills: 09000000
     exp: 0
     gold: 0
   - id: 1001
     name: "\uBC8C"
     hp: 20
     moveSpeed: 5.5
-    skills: 
+    skills: 3c000000
     exp: 1
     gold: 5
   - id: 1002

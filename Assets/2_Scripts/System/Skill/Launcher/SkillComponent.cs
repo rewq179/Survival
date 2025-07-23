@@ -123,14 +123,11 @@ public abstract class Attack_Component : SkillComponent
         if (effectController == null)
             return;
 
-        effectController.Init();
-        launcher.SetParticleFinished(false);
-        effectController.SubscribeParticleFinished(OnParticleFinished);
-        effectController.SubscribeHitTarget(OnHit);
+        effectController.Init(launcher, OnHit, OnParticleFinished);
     }
 
     public override SkillEffectController EffectController => effectController;
-    private void OnParticleFinished()
+    protected void OnParticleFinished()
     {
         launcher.SetParticleFinished(true);
         launcher.CheckDeactivate(false);
@@ -376,11 +373,11 @@ public class Attack_RotatingOrbsComponent : Attack_ProjectileBaseComponent
     private int orbCount;
     private float anglePerOrb;
     private float currentAngle;
-    private List<SkillEffectController> orbs = new();
+    private List<SkillEffectController> orbEffects = new();
 
     // 구체들의 위치 계산용
     private List<Vector3> orbPositions = new();
-    private const float CIRCLE_RADIUS = 2f; // 고정된 반지름 5
+    private const float CIRCLE_RADIUS = 2f;
 
     public override void Reset()
     {
@@ -389,12 +386,12 @@ public class Attack_RotatingOrbsComponent : Attack_ProjectileBaseComponent
         orbPositions.Clear();
 
         SkillMgr skillMgr = GameMgr.Instance.skillMgr;
-        for (int i = orbs.Count - 1; i > 0; i--) // 0번째는 런처가 제거해줌
+        for (int i = orbEffects.Count - 1; i > 0; i--) // 0번째는 런처시 제거시 자동
         {
-            skillMgr.PushSkillObject(skillKey, orbs[i]);
+            skillMgr.PushSkillObject(skillKey, orbEffects[i]);
         }
 
-        orbs.Clear();
+        orbEffects.Clear();
         currentAngle = 0f;
     }
 
@@ -405,8 +402,8 @@ public class Attack_RotatingOrbsComponent : Attack_ProjectileBaseComponent
         orbCount = holder.ShotFinal.GetInt();
         anglePerOrb = 360f / orbCount; // 360도를 구체 개수로 나누어 균등 배치
         currentAngle = 0f;
-
-        orbs.Add(launcher.GetComponentInChildren<SkillEffectController>());
+        
+        orbEffects.Add(launcher.GetComponentInChildren<SkillEffectController>());
         CalculateOrbPositions();
         CreateOrbs();
     }
@@ -417,15 +414,17 @@ public class Attack_RotatingOrbsComponent : Attack_ProjectileBaseComponent
         for (int i = 1; i < orbCount; i++)
         {
             SkillEffectController effect = skillMgr.PopSkillObject(launcher.SkillKey, launcher.transform);
-            effect.transform.position = orbPositions[i];
-            orbs.Add(effect);
+            effect.Init(launcher, OnHit, OnParticleFinished);
+            effect.SetPosition(orbPositions[i]);
+            orbEffects.Add(effect);
         }
     }
 
     public override void OnUpdate(float deltaTime)
     {
-        MoveProjectile(direction, moveSpeed, deltaTime);
         currentAngle += rotationSpeed * deltaTime;
+        
+        MoveProjectile(direction, moveSpeed, deltaTime);
         CalculateOrbPositions();
         UpdateOrbTransform();
 
@@ -434,7 +433,7 @@ public class Attack_RotatingOrbsComponent : Attack_ProjectileBaseComponent
             OnEnd();
         }
     }
-
+    
     private void CalculateOrbPositions()
     {
         orbPositions.Clear();
@@ -446,7 +445,7 @@ public class Attack_RotatingOrbsComponent : Attack_ProjectileBaseComponent
             float angle = currentAngle + anglePerOrb * i;
             float radian = angle * Mathf.Deg2Rad;
 
-            // 반지름 5의 원의 경계에 정확히 배치
+            // 현재 반지름으로 구체 배치
             Vector3 orbPos = center + new Vector3(
                 Mathf.Cos(radian) * CIRCLE_RADIUS,
                 0f,
@@ -458,10 +457,9 @@ public class Attack_RotatingOrbsComponent : Attack_ProjectileBaseComponent
 
     private void UpdateOrbTransform()
     {
-        // 각 구체의 위치를 실제로 업데이트
-        for (int i = 0; i < orbs.Count && i < orbPositions.Count; i++)
+        for (int i = 0; i < orbEffects.Count && i < orbPositions.Count; i++)
         {
-            orbs[i].transform.position = orbPositions[i];
+            orbEffects[i].transform.position = orbPositions[i];
         }
 
         Quaternion rotation = Quaternion.Euler(0f, currentAngle, 0f);
