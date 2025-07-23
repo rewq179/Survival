@@ -54,7 +54,20 @@ public class DataMgr : MonoBehaviour
         for (int i = 0; i < subSkillDataReader.subSkillDatas.Count; i++)
         {
             SubSkillData data = subSkillDataReader.subSkillDatas[i];
-            data.SetName(GetSkillData(data.parentSkillKey).name);
+            if (data == null)
+            {
+                Debug.LogError($"SubSkillDataReader: {data.skillKey} is null");
+                continue;
+            }
+
+            SkillData parentSkillData = GetSkillData(data.parentSkillKey);
+            if (parentSkillData == null)
+            {
+                Debug.LogError($"SubSkillDataReader: {data.skillKey} has no parent skill");
+                continue;
+            }
+
+            data.SetName(parentSkillData.name);
             if (subSkillDatas.ContainsKey(data.skillKey))
             {
                 Debug.LogError($"SubSkil: {data.skillKey} is already exists");
