@@ -12,6 +12,7 @@ public partial class ChaseAction : Action
     [SerializeReference] public BlackboardVariable<GameObject> Self;
     [SerializeReference] public BlackboardVariable<Unit> Target;
     private Unit selfUnit;
+    private Unit targetUnit;
     private Transform selfTransform;
     private Transform targetTransform;
     private const float ROTATION_SPEED = 5f;
@@ -28,7 +29,7 @@ public partial class ChaseAction : Action
 
     protected override Status OnUpdate()
     {
-        if (Self.Value == null || Target.Value == null)
+        if (Self.Value == null || selfUnit.IsDead || Target.Value == null || targetUnit.IsDead)
         {
             return Status.Failure;
         }
@@ -44,6 +45,7 @@ public partial class ChaseAction : Action
     {
         selfUnit = Self.Value.GetComponent<Unit>();
         selfTransform = selfUnit.transform;
+        targetUnit = Target.Value;
         targetTransform = Target.Value.transform;
 
         return Status.Running;
