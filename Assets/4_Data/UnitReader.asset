@@ -20,7 +20,7 @@ MonoBehaviour:
     name: "\uD50C\uB808\uC774\uC5B4"
     hp: 300
     moveSpeed: 7
-    skills: 09000000
+    skills: 00000000
     exp: 0
     gold: 0
   - id: 1001

@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Linq;
+using static Easing;
 
 public enum SkillComponentType
 {
@@ -377,15 +377,18 @@ public class Attack_RotatingOrbsComponent : Attack_ProjectileBaseComponent
 
     // 구체들의 위치 계산용
     private List<Vector3> orbPositions = new();
+    private float currentRadius;
     private const float CIRCLE_MAX_RADIUS = 2.5f;
     private const float CIRCLE_MIN_RADIUS = 0.5f;
-    
-    // 반지름 변화 관련 변수들
-    private bool isExpanding;
-    private float currentRadius;
-    private float changeTime;
-    private const float CHANGE_DURATION = 0.4f;
-    private const float CHANGE_INV_DURATION = 1f / CHANGE_DURATION;
+    private const float RADIUS_DIFF = CIRCLE_MAX_RADIUS - CIRCLE_MIN_RADIUS;
+
+    // 구체들의 확장/축소 용
+    private float cycleTime;
+    private const float EXPAND_DURATION = 0.4f;
+    private const float INV_EXPAND_DURATION = 1f / EXPAND_DURATION;
+    private const float WAIT_DURATION = 0.2f;
+    private const float HALF_DURATION = EXPAND_DURATION + WAIT_DURATION;
+    private const float CYCLE_DURATION = EXPAND_DURATION * 2f + WAIT_DURATION * 2f;
 
     public override void Reset()
     {
@@ -401,23 +404,22 @@ public class Attack_RotatingOrbsComponent : Attack_ProjectileBaseComponent
 
         orbEffects.Clear();
         currentAngle = 0f;
-        changeTime = 0f;
-        isExpanding = true;
+        cycleTime = 0f;
     }
 
     public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
         base.Init(launcher, holder, fixedTarget);
+        orbEffects.Add(launcher.GetComponentInChildren<SkillEffectController>());
+
+        // 구체
         rotationSpeed = holder.rotationSpeedFinal;
         orbCount = holder.ShotFinal.GetInt();
         anglePerOrb = 360f / orbCount; // 360도를 구체 개수로 나누어 균등 배치
-        currentAngle = 0f;
-        
-        // 반지름 변화 설정
-        currentRadius = CIRCLE_MIN_RADIUS;
-        isExpanding = true;
 
-        orbEffects.Add(launcher.GetComponentInChildren<SkillEffectController>());
+        // 확장 축소
+        currentRadius = CIRCLE_MIN_RADIUS;
+
         CalculateOrbPositions();
         CreateOrbs();
     }
@@ -437,10 +439,14 @@ public class Attack_RotatingOrbsComponent : Attack_ProjectileBaseComponent
     public override void OnUpdate(float deltaTime)
     {
         currentAngle += rotationSpeed * deltaTime;
-        
+        cycleTime += deltaTime;
+
         MoveProjectile(direction, moveSpeed, deltaTime);
-        UpdateRadiusChange(deltaTime);
+        // 반지름 확장/축소
+        CalculateOrbRadius();
+        // 구체 위치 업데이트
         CalculateOrbPositions();
+        // 구체 이동/회전
         UpdateOrbTransform();
 
         if (HasReachedMaxDistance())
@@ -448,25 +454,34 @@ public class Attack_RotatingOrbsComponent : Attack_ProjectileBaseComponent
             OnEnd();
         }
     }
-    
-    private void UpdateRadiusChange(float deltaTime)
+
+    private void CalculateOrbRadius()
     {
-        changeTime += deltaTime;
-        if (changeTime >= CHANGE_DURATION)
+        if (cycleTime < EXPAND_DURATION) // 확장 단계
         {
-            changeTime = 0f;
-            isExpanding = !isExpanding;
+            float easing = Quadratic.Out(cycleTime * INV_EXPAND_DURATION);
+            currentRadius = CIRCLE_MIN_RADIUS + RADIUS_DIFF * easing;
         }
-        
-        float p = changeTime * CHANGE_INV_DURATION;
-        if (isExpanding)
+
+        else if (cycleTime < HALF_DURATION) // 확장 후 대기
         {
-            currentRadius = Mathf.Lerp(CIRCLE_MIN_RADIUS, CIRCLE_MAX_RADIUS, p);
+            currentRadius = CIRCLE_MAX_RADIUS;
+        }
+
+        else if (cycleTime < HALF_DURATION + EXPAND_DURATION) // 축소 단계
+        {
+            float easing = Quadratic.Out((cycleTime - HALF_DURATION) * INV_EXPAND_DURATION);
+            currentRadius = CIRCLE_MAX_RADIUS - RADIUS_DIFF * easing;
+        }
+
+        else if (cycleTime < CYCLE_DURATION) // 축소 후 대기
+        {
+            currentRadius = CIRCLE_MIN_RADIUS;
         }
 
         else
         {
-            currentRadius = Mathf.Lerp(CIRCLE_MAX_RADIUS, CIRCLE_MIN_RADIUS, p);
+            cycleTime %= CYCLE_DURATION;
         }
     }
 
@@ -477,11 +492,9 @@ public class Attack_RotatingOrbsComponent : Attack_ProjectileBaseComponent
 
         for (int i = 0; i < orbCount; i++)
         {
-            // 각 구체를 원의 경계에 균등하게 배치
             float angle = currentAngle + anglePerOrb * i;
             float radian = angle * Mathf.Deg2Rad;
 
-            // 현재 반지름으로 구체 배치
             Vector3 orbPos = center + new Vector3(
                 Mathf.Cos(radian) * currentRadius,
                 0f,
