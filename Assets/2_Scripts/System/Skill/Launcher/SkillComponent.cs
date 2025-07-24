@@ -43,9 +43,9 @@ public abstract class SkillComponent
     public ComponentState State => state;
     public virtual SkillEffectController EffectController => null;
     public bool IsCompleted => state == ComponentState.Completed;
-    private static Stack<ComponentData> pools = new();
+    private static Stack<MovementData> pools = new();
 
-    protected class ComponentData
+    protected class MovementData
     {
         public Vector3 startPos;
         public Vector3 direction;
@@ -136,22 +136,22 @@ public abstract class SkillComponent
 
     #region 데이터 풀
 
-    protected ComponentData CreateComponentData(Unit target, Vector3 direct, float duration)
+    protected MovementData CreateComponentData(Unit target, Vector3 direct, float duration)
     {
-        ComponentData data = new();
+        MovementData data = new();
         data.Init(target.transform.position, direct, duration);
         return data;
     }
 
-    protected void PushComponentData(ComponentData data)
+    protected void PushComponentData(MovementData data)
     {
         pools.Push(data);
     }
 
-    protected ComponentData PopComponentData()
+    protected MovementData PopComponentData()
     {
-        if (!pools.TryPop(out ComponentData data))
-            data = new ComponentData();
+        if (!pools.TryPop(out MovementData data))
+            data = new MovementData();
 
         return data;
     }
@@ -609,7 +609,7 @@ public class Attack_AOEComponent : Attack_Component
         }
     }
 
-    protected virtual void ExecuteAction()
+    protected void ExecuteAction()
     {
         Vector3 position = launcher.Position;
         Vector3 direction = launcher.Direction;
@@ -694,7 +694,7 @@ public class Attack_RiseAOEComponent : Attack_PeriodicAOEComponent
     public override SkillComponentType Type => SkillComponentType.RiseAOE;
 
     // Y축 이동 관리
-    private Dictionary<Unit, ComponentData> verticalData = new();
+    private Dictionary<Unit, MovementData> verticalData = new();
     private const float RISE_DURATION = 0.5f;
     private const float RISE_FORCE = 2.5f;
 
@@ -742,7 +742,7 @@ public class Attack_RiseAOEComponent : Attack_PeriodicAOEComponent
                 continue;
             }
 
-            ComponentData data = pair.Value;
+            MovementData data = pair.Value;
             data.remainingTime -= deltaTime;
             if (data.remainingTime <= 0f) // y축 이동 완료
             {
@@ -1030,20 +1030,18 @@ public class Movement_LeapComponent : SkillComponent
 
 #region 효과 컴포넌트
 
-public class Effect_KnockbackComponent : SkillComponent
+public class Effect_KnockbackComponent : Attack_AOEComponent
 {
     public override SkillComponentType Type => SkillComponentType.Knockback;
-    private SkillIndicatorType type;
     private float knockbackForce;
-    private float radius;
-    private float angle;
 
     // 넉백
     private float time;
     private float KNOCKBACK_DURATION = 0.5f;
     private List<Unit> knockbackTargets = new();
-    private Dictionary<Unit, ComponentData> knockbackData = new();
-
+    private Dictionary<Unit, MovementData> knockbackData = new();
+    protected override bool IsInstantComplete => false;
+    
     public override void Reset()
     {
         base.Reset();
@@ -1062,40 +1060,6 @@ public class Effect_KnockbackComponent : SkillComponent
     {
         base.Init(launcher, holder, fixedTarget);
         knockbackForce = holder.gravityFinal;
-        radius = holder.radiusFinal;
-        angle = holder.angle;
-        type = angle == 360f ? SkillIndicatorType.Circle : SkillIndicatorType.Sector;
-    }
-
-    public override void OnStart()
-    {
-        base.OnStart();
-
-        Vector3 startPos = launcher.Position;
-        Vector3 direction = launcher.Direction;
-        float maxDistance = radius * radius;
-
-        List<Unit> targets = GetHitTargetsBySphere(startPos, radius);
-        foreach (Unit target in targets)
-        {
-            Vector3 targetPos = target.transform.position;
-            switch (type)
-            {
-                case SkillIndicatorType.Sector:
-                    if (IsTargetInSectorArea(startPos, direction, targetPos, angle, maxDistance))
-                        StartKnockback(target);
-                    break;
-
-                case SkillIndicatorType.Circle:
-                    StartKnockback(target);
-                    break;
-
-                case SkillIndicatorType.Rectangle:
-                    if (IsTargetInRectangleArea(startPos, direction, targetPos))
-                        StartKnockback(target);
-                    break;
-            }
-        }
     }
 
     public override void OnUpdate(float deltaTime)
@@ -1122,7 +1086,7 @@ public class Effect_KnockbackComponent : SkillComponent
         }
     }
 
-    private void StartKnockback(Unit target)
+    public override void OnHit(Unit target)
     {
         if (knockbackTargets.Contains(target))
             return;
@@ -1131,28 +1095,16 @@ public class Effect_KnockbackComponent : SkillComponent
         Vector3 direction = (targetPos - launcher.Position).normalized;
         direction.y = 0f;
 
-        ComponentData data = CreateComponentData(target, direction, KNOCKBACK_DURATION);
+        MovementData data = CreateComponentData(target, direction, KNOCKBACK_DURATION);
         knockbackTargets.Add(target);
         knockbackData[target] = data;
 
         target.AddBuff(BuffKey.Stun, launcher.Caster);
     }
 
-    private void RemoveKnockbackData(Unit target)
-    {
-        knockbackTargets.Remove(target);
-        if (knockbackData.TryGetValue(target, out ComponentData data))
-        {
-            PushComponentData(data);
-            knockbackData.Remove(target);
-        }
-
-        target.RemoveBuff(BuffKey.Stun);
-    }
-
     private void ApplyKnockbackEffect(Unit target, float deltaTime)
     {
-        if (!knockbackData.TryGetValue(target, out ComponentData data))
+        if (!knockbackData.TryGetValue(target, out MovementData data))
             return;
 
         data.remainingTime -= deltaTime;
@@ -1169,6 +1121,18 @@ public class Effect_KnockbackComponent : SkillComponent
         // 넉백 적용
         Vector3 knockbackMovement = data.direction * force * deltaTime;
         target.transform.position += knockbackMovement;
+    }
+
+    private void RemoveKnockbackData(Unit target)
+    {
+        knockbackTargets.Remove(target);
+        if (knockbackData.TryGetValue(target, out MovementData data))
+        {
+            PushComponentData(data);
+            knockbackData.Remove(target);
+        }
+
+        target.RemoveBuff(BuffKey.Stun);
     }
 }
 
