@@ -51,7 +51,7 @@ public class Unit : MonoBehaviour
     public int UniqueID => uniqueID;
     public int UnitID => unitID;
     public bool IsPlayer => unitType == UnitType.Player;
-    public bool CanMove => !IsDead && buffModule.CanMove;
+    public bool CanMove => !IsDead && !IsAttacking && buffModule.CanMove;
     public bool CanAttack => !IsDead && buffModule.CanAttack;
     public UnitType UnitType => unitType;
 

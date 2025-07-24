@@ -30,6 +30,8 @@ public class BehaviourMonsterModule : BehaviourModule
     private const float ATTACK_RANGED_RANGE = 6f;
     private const float ATTACK_RANGED_RANGE_SQR = ATTACK_RANGED_RANGE * ATTACK_RANGED_RANGE;
 
+    public override bool IsAttacking => isAttacking;
+
     public override void Reset()
     {
         SetAIState(AIState.Chasing);

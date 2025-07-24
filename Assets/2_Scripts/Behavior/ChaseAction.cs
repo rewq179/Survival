@@ -29,7 +29,7 @@ public partial class ChaseAction : Action
 
     protected override Status OnUpdate()
     {
-        if (selfUnit == null || !selfUnit.CanMove || targetUnit == null)
+        if (selfUnit == null || !selfUnit.CanMove)
         {
             return Status.Failure;
         }
