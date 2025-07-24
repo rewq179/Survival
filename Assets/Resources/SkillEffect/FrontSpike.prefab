@@ -84127,9 +84127,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6154492579065096758}
+  - component: {fileID: 4729768461367090395}
   - component: {fileID: 955248918329936317}
   - component: {fileID: 6402890574704194380}
-  - component: {fileID: 4729768461367090395}
   m_Layer: 0
   m_Name: Visuals
   m_TagString: Untagged
@@ -84169,6 +84169,38 @@ Transform:
   - {fileID: 4117720601246906}
   m_Father: {fileID: 4693226928840970}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4729768461367090395
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 929990484303233794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52bc9e8b256968047afcfa4eb40a1c28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playParticles:
+  - {fileID: 6402890574704194380}
+  - {fileID: 198026034677794528}
+  - {fileID: 198884999592258096}
+  - {fileID: 198216150902984232}
+  - {fileID: 198891092428853246}
+  - {fileID: 198908740109031512}
+  - {fileID: 198826772286252394}
+  - {fileID: 198389469010234896}
+  - {fileID: 198592877127020366}
+  - {fileID: 198716265461419484}
+  - {fileID: 198583042933347762}
+  - {fileID: 198657137756700210}
+  - {fileID: 198552206960045286}
+  - {fileID: 198563204125421940}
+  - {fileID: 198850202209962820}
+  - {fileID: 198072726731358976}
+  - {fileID: 198309288121017052}
+  - {fileID: 198099198785602818}
+  hittedParticles: []
 --- !u!199 &955248918329936317
 ParticleSystemRenderer:
   serializedVersion: 6
@@ -89057,35 +89089,3 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
---- !u!114 &4729768461367090395
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 929990484303233794}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 52bc9e8b256968047afcfa4eb40a1c28, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playParticles:
-  - {fileID: 0}
-  - {fileID: 198026034677794528}
-  - {fileID: 198884999592258096}
-  - {fileID: 198216150902984232}
-  - {fileID: 198891092428853246}
-  - {fileID: 198908740109031512}
-  - {fileID: 198826772286252394}
-  - {fileID: 198389469010234896}
-  - {fileID: 198592877127020366}
-  - {fileID: 198716265461419484}
-  - {fileID: 198583042933347762}
-  - {fileID: 198657137756700210}
-  - {fileID: 198552206960045286}
-  - {fileID: 198563204125421940}
-  - {fileID: 198850202209962820}
-  - {fileID: 198072726731358976}
-  - {fileID: 198309288121017052}
-  - {fileID: 198099198785602818}
-  hittedParticles: []
