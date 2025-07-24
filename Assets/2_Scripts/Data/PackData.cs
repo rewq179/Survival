@@ -50,6 +50,15 @@ public enum SkillKey
     IseAttack_Cooldown,
     IseAttack_DamageInc,
     IseAttack_Radius,
+    IseAttack_Duration,
+    IseAttack_DamageTick,
+
+    LeavesRise,
+    LeavesRise_Cooldown,
+    LeavesRise_DamageInc,
+    LeavesRise_Radius,
+    LeavesRise_Duration,
+    LeavesRise_DamageTick,
 
     // 패시브
     Health,

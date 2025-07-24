@@ -11,6 +11,7 @@ public enum SkillComponentType
     RotatingOrbs,
     InstantAOE,
     PeriodicAOE,
+    RiseAOE,
     InstantAttack,
     Beam,
     // 이동
@@ -42,6 +43,23 @@ public abstract class SkillComponent
     public ComponentState State => state;
     public virtual SkillEffectController EffectController => null;
     public bool IsCompleted => state == ComponentState.Completed;
+    private static Stack<ComponentData> pools = new();
+
+    protected class ComponentData
+    {
+        public Vector3 startPos;
+        public Vector3 direction;
+        public float remainingTime;
+        public float totalInvTime;
+
+        public void Init(Vector3 startPos, Vector3 direction, float totalTime)
+        {
+            this.startPos = startPos;
+            this.direction = direction;
+            this.remainingTime = totalTime;
+            this.totalInvTime = 1f / totalTime;
+        }
+    }
 
     public virtual void Reset()
     {
@@ -109,15 +127,33 @@ public abstract class SkillComponent
         return targetAngle <= angle * 0.5f;
     }
 
-    protected bool IsTargetInCircleArea(Vector3 position, Vector3 targetPosition, float maxDistance)
-    {
-        float sqrDistance = (targetPosition - position).sqrMagnitude;
-        return sqrDistance < maxDistance;
-    }
-
     protected bool IsTargetInRectangleArea(Vector3 position, Vector3 direction, Vector3 targetPosition)
     {
         return false; // TODO: 사각형 형태로 구현할 것
+    }
+
+    #endregion
+
+    #region 데이터 풀
+
+    protected ComponentData CreateComponentData(Unit target, Vector3 direct, float duration)
+    {
+        ComponentData data = new();
+        data.Init(target.transform.position, direct, duration);
+        return data;
+    }
+
+    protected void PushComponentData(ComponentData data)
+    {
+        pools.Push(data);
+    }
+
+    protected ComponentData PopComponentData()
+    {
+        if (!pools.TryPop(out ComponentData data))
+            data = new ComponentData();
+
+        return data;
     }
 
     #endregion
@@ -176,6 +212,7 @@ public abstract class Attack_Component : SkillComponent
     {
         Vector3 hitPoint = target.transform.position;
         CombatMgr.ApplyDamageBySkill(launcher.Caster, target, damage, hitPoint, launcher.SkillKey);
+        effectController?.PlayHit();
 
         if (buffKeys == null || target.IsDead)
             return;
@@ -223,8 +260,6 @@ public abstract class Attack_ProjectileBaseComponent : Attack_Component
         // 피해 적용
         hittedUnitIDs.Add(target.UniqueID);
         ApplyToTarget(target);
-        effectController.PlayHit();
-
         OnProjectileHit(target);
     }
 
@@ -566,14 +601,15 @@ public class Attack_AOEComponent : Attack_Component
     public override void OnStart()
     {
         base.OnStart();
-        ExecuteAttack();
+
+        ExecuteAction();
         if (IsInstantComplete)
         {
             OnEnd();
         }
     }
 
-    protected void ExecuteAttack()
+    protected virtual void ExecuteAction()
     {
         Vector3 position = launcher.Position;
         Vector3 direction = launcher.Direction;
@@ -582,9 +618,6 @@ public class Attack_AOEComponent : Attack_Component
         List<Unit> targets = GetHitTargetsBySphere(position, radius);
         foreach (Unit target in targets)
         {
-            if (!IsHittable(target))
-                continue;
-
             Vector3 targetPos = target.transform.position;
 
             switch (type)
@@ -595,8 +628,7 @@ public class Attack_AOEComponent : Attack_Component
                     break;
 
                 case SkillIndicatorType.Circle:
-                    if (IsTargetInCircleArea(position, targetPos, maxDistance))
-                        OnHit(target);
+                    OnHit(target);
                     break;
 
                 case SkillIndicatorType.Rectangle:
@@ -610,7 +642,6 @@ public class Attack_AOEComponent : Attack_Component
     public override void OnHit(Unit target)
     {
         ApplyToTarget(target);
-        effectController.PlayHit();
     }
 }
 
@@ -618,10 +649,10 @@ public class Attack_AOEComponent : Attack_Component
 public class Attack_PeriodicAOEComponent : Attack_AOEComponent
 {
     public override SkillComponentType Type => SkillComponentType.PeriodicAOE;
-    private float duration;
-    private float time;
-    private float tick;
-    private float lastTickTime;
+    protected float duration;
+    protected float time;
+    protected float tick;
+    protected float lastTickTime;
 
     protected override bool IsInstantComplete => false;
     public override void Reset()
@@ -642,16 +673,98 @@ public class Attack_PeriodicAOEComponent : Attack_AOEComponent
     public override void OnUpdate(float deltaTime)
     {
         time += deltaTime;
+
         float currentTime = Time.time;
         if (currentTime - lastTickTime >= tick)
         {
-            ExecuteAttack();
+            ExecuteAction();
             lastTickTime = currentTime;
         }
 
         if (time >= duration)
         {
             OnEnd();
+        }
+    }
+}
+
+/// <summary> 수직 이동 & 스턴 범위 공격 컴포넌트 </summary>
+public class Attack_RiseAOEComponent : Attack_PeriodicAOEComponent
+{
+    public override SkillComponentType Type => SkillComponentType.RiseAOE;
+
+    // Y축 이동 관리
+    private Dictionary<Unit, ComponentData> verticalData = new();
+    private const float RISE_DURATION = 0.5f;
+    private const float RISE_FORCE = 2.5f;
+
+    public override void Reset()
+    {
+        base.Reset();
+
+        foreach (var data in verticalData)
+        {
+            PushComponentData(data.Value);
+        }
+        verticalData.Clear();
+    }
+
+    public override void OnUpdate(float deltaTime)
+    {
+        base.OnUpdate(deltaTime);
+        UpdateVerticalMovement(deltaTime);
+    }
+
+    public override void OnHit(Unit target)
+    {
+        ApplyToTarget(target);
+        target.AddBuff(BuffKey.Stun, launcher.Caster);
+        StartVerticalMovement(target, Vector3.up, RISE_DURATION);
+    }
+
+    private void StartVerticalMovement(Unit target, Vector3 direct, float duration)
+    {
+        if (verticalData.ContainsKey(target))
+            return;
+
+        verticalData[target] = CreateComponentData(target, direct, duration);
+    }
+
+    private void UpdateVerticalMovement(float deltaTime)
+    {
+        List<Unit> completedUnits = new();
+        foreach (var pair in verticalData)
+        {
+            Unit unit = pair.Key;
+            if (unit.IsDead)
+            {
+                completedUnits.Add(unit);
+                continue;
+            }
+
+            ComponentData data = pair.Value;
+            data.remainingTime -= deltaTime;
+            if (data.remainingTime <= 0f) // y축 이동 완료
+            {
+                unit.transform.position = data.startPos;
+                unit.RemoveBuff(BuffKey.Stun);
+                completedUnits.Add(unit);
+            }
+
+            else // Y축 이동 적용
+            {
+                float p = 1f - (data.remainingTime * data.totalInvTime);
+                float offsetY = Mathf.Sin(p * Mathf.PI) * RISE_FORCE;
+                Vector3 pos = data.startPos;
+                pos.y += offsetY;
+                unit.transform.position = pos;
+            }
+        }
+
+        foreach (Unit unit in completedUnits)
+        {
+            PushComponentData(verticalData[unit]);
+            verticalData.Remove(unit);
         }
     }
 }
@@ -929,24 +1042,7 @@ public class Effect_KnockbackComponent : SkillComponent
     private float time;
     private float KNOCKBACK_DURATION = 0.5f;
     private List<Unit> knockbackTargets = new();
-    private Dictionary<Unit, KnockbackData> knockbackData = new();
-    private static Stack<KnockbackData> pools = new();
-
-    private class KnockbackData
-    {
-        public Vector3 startPos;
-        public Vector3 direction;
-        public float remainingTime;
-        public float totalInvTime;
-
-        public void Init(Vector3 startPos, Vector3 direction, float totalTime)
-        {
-            this.startPos = startPos;
-            this.direction = direction;
-            this.remainingTime = totalTime;
-            this.totalInvTime = 1f / totalTime;
-        }
-    }
+    private Dictionary<Unit, ComponentData> knockbackData = new();
 
     public override void Reset()
     {
@@ -955,7 +1051,7 @@ public class Effect_KnockbackComponent : SkillComponent
 
         foreach (var data in knockbackData)
         {
-            PushKnockbackData(data.Value);
+            PushComponentData(data.Value);
         }
 
         knockbackData.Clear();
@@ -982,25 +1078,21 @@ public class Effect_KnockbackComponent : SkillComponent
         List<Unit> targets = GetHitTargetsBySphere(startPos, radius);
         foreach (Unit target in targets)
         {
-            if (!IsHittable(target))
-                continue;
-
             Vector3 targetPos = target.transform.position;
             switch (type)
             {
                 case SkillIndicatorType.Sector:
                     if (IsTargetInSectorArea(startPos, direction, targetPos, angle, maxDistance))
-                        CreateKnockbackData(target);
+                        StartKnockback(target);
                     break;
 
                 case SkillIndicatorType.Circle:
-                    if (IsTargetInCircleArea(startPos, targetPos, maxDistance))
-                        CreateKnockbackData(target);
+                    StartKnockback(target);
                     break;
 
                 case SkillIndicatorType.Rectangle:
                     if (IsTargetInRectangleArea(startPos, direction, targetPos))
-                        CreateKnockbackData(target);
+                        StartKnockback(target);
                     break;
             }
         }
@@ -1030,7 +1122,7 @@ public class Effect_KnockbackComponent : SkillComponent
         }
     }
 
-    private void CreateKnockbackData(Unit target)
+    private void StartKnockback(Unit target)
     {
         if (knockbackTargets.Contains(target))
             return;
@@ -1039,8 +1131,7 @@ public class Effect_KnockbackComponent : SkillComponent
         Vector3 direction = (targetPos - launcher.Position).normalized;
         direction.y = 0f;
 
-        KnockbackData data = PopKnockbackData();
-        data.Init(targetPos, direction, KNOCKBACK_DURATION);
+        ComponentData data = CreateComponentData(target, direction, KNOCKBACK_DURATION);
         knockbackTargets.Add(target);
         knockbackData[target] = data;
 
@@ -1050,9 +1141,9 @@ public class Effect_KnockbackComponent : SkillComponent
     private void RemoveKnockbackData(Unit target)
     {
         knockbackTargets.Remove(target);
-        if (knockbackData.TryGetValue(target, out KnockbackData data))
+        if (knockbackData.TryGetValue(target, out ComponentData data))
         {
-            PushKnockbackData(data);
+            PushComponentData(data);
             knockbackData.Remove(target);
         }
 
@@ -1061,7 +1152,7 @@ public class Effect_KnockbackComponent : SkillComponent
 
     private void ApplyKnockbackEffect(Unit target, float deltaTime)
     {
-        if (!knockbackData.TryGetValue(target, out KnockbackData data))
+        if (!knockbackData.TryGetValue(target, out ComponentData data))
             return;
 
         data.remainingTime -= deltaTime;
@@ -1078,19 +1169,6 @@ public class Effect_KnockbackComponent : SkillComponent
         // 넉백 적용
         Vector3 knockbackMovement = data.direction * force * deltaTime;
         target.transform.position += knockbackMovement;
-    }
-
-    private void PushKnockbackData(KnockbackData data)
-    {
-        pools.Push(data);
-    }
-
-    private KnockbackData PopKnockbackData()
-    {
-        if (!pools.TryPop(out KnockbackData data))
-            data = new KnockbackData();
-
-        return data;
     }
 }
 
@@ -1137,9 +1215,6 @@ public class Effect_GravityComponent : SkillComponent
         List<Unit> targets = GetHitTargetsBySphere(gravityCenter, radius);
         foreach (Unit target in targets)
         {
-            if (!IsHittable(target))
-                continue;
-
             units.Add(target);
             startTimes[target] = time;
         }

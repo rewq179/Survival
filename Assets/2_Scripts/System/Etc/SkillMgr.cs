@@ -466,6 +466,7 @@ public class SkillMgr : MonoBehaviour
             SkillComponentType.RotatingOrbs => new Attack_RotatingOrbsComponent(),
             SkillComponentType.InstantAOE => new Attack_AOEComponent(),
             SkillComponentType.PeriodicAOE => new Attack_PeriodicAOEComponent(),
+            SkillComponentType.RiseAOE => new Attack_RiseAOEComponent(),
             SkillComponentType.InstantAttack => new Attack_InstantComponent(),
             SkillComponentType.Beam => new Attack_BeamComponent(),
             // 이동

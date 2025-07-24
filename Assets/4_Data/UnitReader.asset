@@ -27,34 +27,34 @@ MonoBehaviour:
     name: "\uBC8C"
     hp: 20
     moveSpeed: 5.5
-    skills: 3c000000
+    skills: 44000000
     exp: 1
     gold: 5
   - id: 1002
     name: "\uBC15\uC950"
     hp: 28
     moveSpeed: 6
-    skills: 3e0000003d000000
+    skills: 4600000045000000
     exp: 3
     gold: 8
   - id: 1003
     name: "\uCF54\uBE0C\uB77C"
     hp: 45
     moveSpeed: 4.5
-    skills: 3f00000040000000
+    skills: 4700000048000000
     exp: 10
     gold: 20
   - id: 1004
     name: "\uACE8\uB818"
     hp: 88
     moveSpeed: 3.8
-    skills: 4100000042000000
+    skills: 490000004a000000
     exp: 20
     gold: 30
   - id: 1005
     name: "\uC6A9"
     hp: 150
     moveSpeed: 3.5
-    skills: 4300000044000000
+    skills: 4b0000004c000000
     exp: 100
     gold: 150
