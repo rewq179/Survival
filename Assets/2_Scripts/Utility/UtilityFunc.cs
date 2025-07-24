@@ -62,3 +62,19 @@ public static class RandomPickerByWeight
         return default;
     }
 }
+
+public static class Easing
+{
+    public static class Quadratic
+    {
+        public static float In(float t)
+        {
+            return t * t;
+        }
+        
+        public static float Out(float t)
+        {
+            return t * (2f - t);
+        }
+    }
+}
