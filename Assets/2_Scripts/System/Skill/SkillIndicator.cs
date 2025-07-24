@@ -129,6 +129,8 @@ public class SkillIndicator : MonoBehaviour
 
     public void DrawIndicator(Vector3 start, Vector3 mouse)
     {
+        mouse.y = start.y;
+
         if (isMainIndicator)
         {
             switch (skillElement.indicatorType)
@@ -221,11 +223,11 @@ public class SkillIndicator : MonoBehaviour
             case SkillIndicatorType.Circle:
                 if (element.firePoint == FirePoint.Self)
                     return startPoint;
-                
+
                 float distanceToMouse = (mouse - startPoint).magnitude;
                 if (distanceToMouse > element.maxDistance)
                     return startPoint + direction * element.maxDistance;
-                
+
                 return mouse;
         }
 
