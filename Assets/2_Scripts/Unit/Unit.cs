@@ -20,8 +20,8 @@ public enum StatusEffect
     Stunned = 1 << 0,
     Silenced = 1 << 2,
 
-    BanMove = Stunned,
-    CanAttack = Stunned | Silenced,
+    CanNotMove = Stunned,
+    CanNotAttack = Stunned | Silenced,
 }
 
 public class Unit : MonoBehaviour
