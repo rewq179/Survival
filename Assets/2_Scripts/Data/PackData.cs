@@ -225,17 +225,19 @@ public class SkillData
 {
     public SkillKey skillKey;
     public SkillType skillType;
+    public RangeType rangeType;
     public string name;
     public string desc;
     public float cooldown;
     public float baseValue;
     public List<SkillElement> skillElements;
 
-    public SkillData(SkillKey skillKey, SkillType skillType, string name, string description, float cooldown, float baseValue,
+    public SkillData(SkillKey skillKey, SkillType skillType, RangeType rangeType, string name, string description, float cooldown, float baseValue,
         List<SkillElement> elements)
     {
         this.skillKey = skillKey;
         this.skillType = skillType;
+        this.rangeType = rangeType;
         this.name = name;
         this.desc = description;
         this.cooldown = cooldown;

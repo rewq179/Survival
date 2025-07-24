@@ -206,11 +206,6 @@ public class SkillModule : MonoBehaviour
         return skillInstances.ContainsKey(skillKey) ? skillInstances[skillKey] : null;
     }
 
-    public bool IsMeleeSkill(SkillKey skillKey)
-    {
-        return GetSkillInstance(skillKey).Values[0].type == SkillComponentType.InstantAttack;
-    }
-
     public bool CanUseSkill(SkillKey skillKey)
     {
         if (!owner.CanAttack)
@@ -219,14 +214,18 @@ public class SkillModule : MonoBehaviour
         return cooldowns.ContainsKey(skillKey) && cooldowns[skillKey] <= 0f;
     }
 
-    public bool CanUseSkillType(bool isMelee)
+    public bool CanUseSkillType(RangeType rangeType)
     {
         if (!owner.CanAttack)
             return false;
 
         foreach (SkillKey key in skills)
         {
-            if (DataMgr.IsActiveSkill(key) && CanUseSkill(key) && IsMeleeSkill(key) == isMelee)
+            if (!DataMgr.IsActiveSkill(key) || !CanUseSkill(key))
+                continue;
+
+            SkillData data = DataMgr.GetSkillData(key);
+            if (data.rangeType == rangeType)
                 return true;
         }
 
@@ -262,7 +261,11 @@ public class SkillModule : MonoBehaviour
     {
         foreach (SkillKey key in skills)
         {
-            if (DataMgr.IsActiveSkill(key) && !IsMeleeSkill(key))
+            if (!DataMgr.IsActiveSkill(key))
+                continue;
+
+            SkillData data = DataMgr.GetSkillData(key);
+            if (data.rangeType == RangeType.Ranged)
                 return true;
         }
 
@@ -323,21 +326,23 @@ public class SkillModule : MonoBehaviour
         if (skills.Count == 0 || !owner.CanAttack)
             return;
 
-        owner.SetAttacking(true);
         List<SkillKey> availableSkills = new();
         foreach (SkillKey key in skills)
         {
             if (!CanUseSkill(key))
                 continue;
 
-            bool isMelee = IsMeleeSkill(key); // TODO: 수정할 것
-            if ((rangeType == RangeType.Melee && isMelee) || (rangeType == RangeType.Ranged && !isMelee))
+            SkillData data = DataMgr.GetSkillData(key);
+            if (data.rangeType == rangeType)
+            {
                 availableSkills.Add(key);
+            }
         }
 
         if (availableSkills.Count == 0)
             return;
 
+        owner.SetAttacking(true);
         SkillKey skillKey = availableSkills[UnityEngine.Random.Range(0, availableSkills.Count)];
         owner.PlayAnimation(skillKey.ToString());
         GameMgr.Instance.skillMgr.ActivateSkill(skillKey, owner, target);

@@ -28,6 +28,7 @@ public class SkillParticle : MonoBehaviour
         }
 
         StopAllParticles();
+        gameObject.SetActive(false);
     }
 
     public void Init()

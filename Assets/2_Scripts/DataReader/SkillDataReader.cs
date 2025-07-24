@@ -25,6 +25,7 @@ public class SkillDataReader : ScriptableObject
     {
         SkillKey skillKey = SkillKey.Max;
         SkillType skillType = SkillType.Active;
+        RangeType rangeType = RangeType.None;
         string name = string.Empty;
         string description = string.Empty;
         float cooldown = 0;
@@ -45,6 +46,11 @@ public class SkillDataReader : ScriptableObject
                 case "skilltype":
                     if (Enum.TryParse(cells[i].value, true, out SkillType parsedSkillType))
                         skillType = parsedSkillType;
+                    break;
+
+                case "rangetype":
+                    if (Enum.TryParse(cells[i].value, true, out RangeType parsedRangeType))
+                        rangeType = parsedRangeType;
                     break;
 
                 case "name":
@@ -74,7 +80,7 @@ public class SkillDataReader : ScriptableObject
             }
         }
 
-        skillDatas.Add(new SkillData(skillKey, skillType, name, description, cooldown,
+        skillDatas.Add(new SkillData(skillKey, skillType, rangeType, name, description, cooldown,
             baseValue, elements));
 
         // 마지막에 추가된 SkillData의 elements 정렬

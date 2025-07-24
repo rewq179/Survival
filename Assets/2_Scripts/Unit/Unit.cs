@@ -51,8 +51,9 @@ public class Unit : MonoBehaviour
     public int UniqueID => uniqueID;
     public int UnitID => unitID;
     public bool IsPlayer => unitType == UnitType.Player;
-    public bool CanMove => !IsDead && !IsAttacking && buffModule.CanMove;
-    public bool CanAttack => !IsDead && buffModule.CanAttack;
+    public bool CanMove => IsActionable && buffModule.CanMove;
+    public bool CanAttack => IsActionable && buffModule.CanAttack;
+    public bool IsActionable => !IsDead && !IsForceMoving && !IsAttacking;
     public UnitType UnitType => unitType;
 
     public void Reset()
@@ -155,6 +156,8 @@ public class Unit : MonoBehaviour
 
     // BehaviourModule
     public bool IsAttacking => behaviourModule.IsAttacking;
+    public bool IsForceMoving => behaviourModule.IsForceMoving;
+    public void SetForceMoving(bool isForceMoving) => behaviourModule.SetForceMoving(isForceMoving);
     public void OnAnimationEnd(AnimEvent animEvent) => behaviourModule.OnAnimationEnd(animEvent);
     public void SetAIState(AIState state) => behaviourModule.SetAIState(state);
     public void SetAttacking(bool isAttacking) => behaviourModule.SetAttacking(isAttacking);

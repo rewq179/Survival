@@ -4856,7 +4856,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4424731503520034}
   - component: {fileID: 5679013296332911942}
-  - component: {fileID: 6651429628413646001}
   - component: {fileID: 7523453293987951505}
   - component: {fileID: 135206474481286692}
   - component: {fileID: 8675601449181307911}
@@ -4896,32 +4895,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   collision: {fileID: 7523453293987951505}
-  particle: {fileID: 6651429628413646001}
---- !u!114 &6651429628413646001
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1347034509603832}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 52bc9e8b256968047afcfa4eb40a1c28, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playParticles:
-  - {fileID: 192425388666632839}
-  - {fileID: 998582122949122667}
-  - {fileID: 998580346544750817}
-  - {fileID: 983058221626571575}
-  - {fileID: 198106405273273764}
-  - {fileID: 198347469227822328}
-  hittedParticles:
-  - {fileID: 7172500568181788774}
-  - {fileID: 7172556146714300184}
-  - {fileID: 7172347427743654060}
-  - {fileID: 7172653613914019202}
-  - {fileID: 7172684566984885356}
+  particle: {fileID: 7522189807403623085}
 --- !u!114 &7523453293987951505
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4963,10 +4937,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1347034509603832}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -9837,13 +9811,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2607686436613172566}
+  - component: {fileID: 7522189807403623085}
   m_Layer: 0
   m_Name: Visuals
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2607686436613172566
 Transform:
   m_ObjectHideFlags: 0
@@ -9863,6 +9838,31 @@ Transform:
   - {fileID: 4119478665583912}
   m_Father: {fileID: 4424731503520034}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7522189807403623085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6174011551918612663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52bc9e8b256968047afcfa4eb40a1c28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playParticles:
+  - {fileID: 192425388666632839}
+  - {fileID: 998582122949122667}
+  - {fileID: 998580346544750817}
+  - {fileID: 983058221626571575}
+  - {fileID: 198106405273273764}
+  - {fileID: 198347469227822328}
+  hittedParticles:
+  - {fileID: 7172500568181788774}
+  - {fileID: 7172556146714300184}
+  - {fileID: 7172347427743654060}
+  - {fileID: 7172653613914019202}
+  - {fileID: 7172684566984885356}
 --- !u!1 &6706102590028733963
 GameObject:
   m_ObjectHideFlags: 0

@@ -455,28 +455,34 @@ public class SkillMgr : MonoBehaviour
 
     public SkillComponent PopSkillComponent(SkillComponentType type)
     {
-        if (componentPools.TryGetValue(type, out Stack<SkillComponent> pools) && pools.Count > 0)
-            return pools.Pop();
-
-        return type switch
+        SkillComponent component = type switch
         {
-            // 공격
-            SkillComponentType.Projectile => new Attack_ProjectileComponent(),
-            SkillComponentType.Boomerang => new Attack_BoomerangComponent(),
-            SkillComponentType.RotatingOrbs => new Attack_RotatingOrbsComponent(),
-            SkillComponentType.InstantAOE => new Attack_AOEComponent(),
-            SkillComponentType.PeriodicAOE => new Attack_PeriodicAOEComponent(),
-            SkillComponentType.RiseAOE => new Attack_RiseAOEComponent(),
-            SkillComponentType.InstantAttack => new Attack_InstantComponent(),
-            SkillComponentType.Beam => new Attack_BeamComponent(),
+            // 투사체
+            SkillComponentType.Projectile => new ProjectileComponent(),
+            SkillComponentType.Boomerang => new BoomerangComponent(),
+            SkillComponentType.RotatingOrbs => new RotatingOrbs_Component(),
+            // 즉각적인 범위
+            SkillComponentType.InstantAOE => new InstantAOE_Component(),
+            SkillComponentType.KnockbackAOE => new KnockbackAOE_Component(),
+            // 지속형 범위
+            SkillComponentType.PeriodicAOE => new PeriodicAOE_Component(),
+            SkillComponentType.RiseAOE => new RiseAOE_Component(),
+            SkillComponentType.GravityAOE => new GravityAOE_Component(),
+            // 즉시 공격
+            SkillComponentType.InstantAttack => new InstantAttack_Component(),
+            // 빔
+            SkillComponentType.Beam => new Beam_Component(),
             // 이동
-            SkillComponentType.Linear => new Movement_LinearComponent(),
-            SkillComponentType.Leap => new Movement_LeapComponent(),
-            // 효과
-            SkillComponentType.Gravity => new Effect_GravityComponent(),
-            SkillComponentType.Knockback => new Effect_KnockbackComponent(),
+            SkillComponentType.Leap => new Leap_Component(),
             _ => null,
         };
+
+        if (component == null)
+        {
+            Debug.LogError($"SkillComponent {type} is not found");
+        }
+
+        return component;
     }
 
     #endregion

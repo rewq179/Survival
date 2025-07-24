@@ -14763,7 +14763,7 @@ Transform:
   - {fileID: 4240062993006118}
   - {fileID: 4236062239136334}
   - {fileID: 4072790905984924}
-  m_Father: {fileID: 4377817723901784}
+  m_Father: {fileID: 1153662629493369803}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!198 &198201873886598266
 ParticleSystem:
@@ -19668,7 +19668,7 @@ Transform:
   m_Children:
   - {fileID: 4833799636110226}
   - {fileID: 4258199669054270}
-  m_Father: {fileID: 4377817723901784}
+  m_Father: {fileID: 1153662629493369803}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!198 &198080461927093774
 ParticleSystem:
@@ -53766,8 +53766,6 @@ GameObject:
   - component: {fileID: 4377817723901784}
   - component: {fileID: 120269725676574324}
   - component: {fileID: 7618617680568419384}
-  - component: {fileID: 6577801179061552619}
-  - component: {fileID: 2049253249179165312}
   m_Layer: 9
   m_Name: BreathAttack
   m_TagString: Untagged
@@ -53788,8 +53786,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4118572504237920}
-  - {fileID: 4569726889156158}
+  - {fileID: 1153662629493369803}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!120 &120269725676574324
@@ -53921,14 +53918,67 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   collision: {fileID: 0}
-  particle: {fileID: 6577801179061552619}
---- !u!114 &6577801179061552619
+  particle: {fileID: 7258580784964963019}
+--- !u!1 &3555372576531262748
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1153662629493369803}
+  - component: {fileID: 2633261746892133079}
+  - component: {fileID: 7258580784964963019}
+  m_Layer: 9
+  m_Name: Visuals
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1153662629493369803
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3555372576531262748}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4118572504237920}
+  - {fileID: 4569726889156158}
+  m_Father: {fileID: 4377817723901784}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2633261746892133079
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1955173974842222}
+  m_GameObject: {fileID: 3555372576531262748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43499789f67b066459fe79e0466f2c09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitEffect: {fileID: 1221893910213332}
+  hitOffset: 0.1
+  useBeamRotation: 0
+  mainTextureLength: 0.5
+  noiseTextureLength: 0.5
+  beamRenderer: {fileID: 120269725676574324}
+--- !u!114 &7258580784964963019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3555372576531262748}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 52bc9e8b256968047afcfa4eb40a1c28, type: 3}
@@ -53947,21 +53997,3 @@ MonoBehaviour:
   - {fileID: 198085508117193198}
   - {fileID: 198512455813703994}
   - {fileID: 198576085876932960}
---- !u!114 &2049253249179165312
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1955173974842222}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 43499789f67b066459fe79e0466f2c09, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hitEffect: {fileID: 1221893910213332}
-  hitOffset: 0.1
-  useBeamRotation: 0
-  mainTextureLength: 0.5
-  noiseTextureLength: 0.5
-  beamRenderer: {fileID: 120269725676574324}

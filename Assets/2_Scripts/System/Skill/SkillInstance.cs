@@ -62,7 +62,6 @@ public class SkillHolder
 
     public float angle;
     private List<BuffKey> buffKeys = new();
-
     public List<BuffKey> BuffKeys => buffKeys;
 
     public void SetFix(SkillElement skillElement)
@@ -184,6 +183,11 @@ public class SkillInstance
 
     public List<SkillHolder> Values => values;
 
+    private static HashSet<SkillComponentType> projectileTypes = new()
+    {
+        SkillComponentType.Projectile,  SkillComponentType.Boomerang,
+    };
+
     private void ResetValue()
     {
         cooldownAdditive = 0;
@@ -279,7 +283,7 @@ public class SkillInstance
     {
         foreach (SkillHolder value in values)
         {
-            if (value.type == SkillComponentType.Projectile && value.ShotFinal > 1)
+            if (projectileTypes.Contains(value.type) && value.ShotFinal > 1)
                 return true;
         }
 

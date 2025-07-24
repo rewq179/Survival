@@ -17,7 +17,7 @@ public class BuffModule
         {
             if (buffInstances[i] == null)
                 continue;
-            
+
             CombatMgr.PushBuffInstance(buffInstances[i]);
             buffInstances[i] = null;
         }
@@ -102,6 +102,12 @@ public class BuffModule
 
         statusCounters[effect]++;
         statusEffects |= effect;
+
+        // 공격중에 상태 이상에 걸릴 경우 해제할 것
+        if (owner.IsAttacking && HasStatusEffect(StatusEffect.CanNotMove))
+        {
+            owner.SetAttacking(false);
+        }
     }
 
     private void RemoveStatusEffect(StatusEffect effect)

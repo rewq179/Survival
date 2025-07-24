@@ -57,11 +57,11 @@ public class BehaviourMonsterModule : BehaviourModule
 
         if (hasRangedAttackSkill)
         {
-            bool canUseRangedAttack = skillModule.CanUseSkillType(false);
+            bool canUseRangedAttack = skillModule.CanUseSkillType(RangeType.Ranged);
             SetRangedAttackRange(canUseRangedAttack && distanceSqr < ATTACK_RANGED_RANGE_SQR);
         }
 
-        bool canUseMeleeAttack = skillModule.CanUseSkillType(true);
+        bool canUseMeleeAttack = skillModule.CanUseSkillType(RangeType.Melee);
         SetMeleeAttackRange(canUseMeleeAttack && distanceSqr < ATTACK_MELEE_RANGE_SQR);
     }
 
@@ -71,10 +71,10 @@ public class BehaviourMonsterModule : BehaviourModule
         agent.SetVariableValue("IsAttacking", isAttacking);
     }
 
-    private void SetHasRangedAttackSkill(bool hasRangedAttackSkill)
+    private void SetHasRangedAttackSkill(bool HasRangedSkill)
     {
-        this.hasRangedAttackSkill = hasRangedAttackSkill;
-        agent.SetVariableValue("HasRangedAttackSkill", hasRangedAttackSkill);
+        this.hasRangedAttackSkill = HasRangedSkill;
+        agent.SetVariableValue("HasRangedSkill", HasRangedSkill);
     }
 
     public override void SetAIState(AIState state)

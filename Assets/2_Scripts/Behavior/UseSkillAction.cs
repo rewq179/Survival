@@ -7,6 +7,7 @@ using Unity.Properties;
 [BlackboardEnum]
 public enum RangeType
 {
+    None,
     Melee,
     Ranged,
 }

@@ -18,6 +18,7 @@ MonoBehaviour:
   skillDatas:
   - skillKey: 0
     skillType: 0
+    rangeType: 2
     name: Arrow
     desc: 
     cooldown: 0.7
@@ -36,7 +37,7 @@ MonoBehaviour:
       - 0
       - 0
       - 8
-      - 15
+      - 18
       - 0
       - 0
       - 0
@@ -51,6 +52,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 5
     skillType: 0
+    rangeType: 2
     name: Dagger
     desc: 
     cooldown: 0.8
@@ -69,7 +71,7 @@ MonoBehaviour:
       - 0
       - 0
       - 12
-      - 15
+      - 32
       - 0
       - 0
       - 0
@@ -84,6 +86,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 9
     skillType: 0
+    rangeType: 2
     name: Orbital
     desc: 
     cooldown: 3
@@ -117,6 +120,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 13
     skillType: 0
+    rangeType: 2
     name: FrontSpike
     desc: 
     cooldown: 3
@@ -124,7 +128,7 @@ MonoBehaviour:
     skillElements:
     - skillKey: 13
       index: 0
-      componentType: 3
+      componentType: 8
       indicatorType: 3
       order: 0
       timing: 0
@@ -136,33 +140,7 @@ MonoBehaviour:
       - 0
       - 22
       - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      - 60
-      - 8.2
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      buffKeys: 
-    - skillKey: 13
-      index: 1
-      componentType: 10
-      indicatorType: 0
-      order: 0
-      timing: 0
-      firePoint: 0
-      maxDistance: 0
-      parameters:
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
+      - 0.5
       - 0
       - 0
       - 0
@@ -171,11 +149,12 @@ MonoBehaviour:
       - 0
       - 0
       - 0
-      - 10
+      - 6.5
       - 0
       buffKeys: 
   - skillKey: 16
     skillType: 0
+    rangeType: 2
     name: EnergyExplosion
     desc: 
     cooldown: 4.2
@@ -209,6 +188,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 20
     skillType: 0
+    rangeType: 2
     name: Meteor
     desc: 
     cooldown: 6
@@ -242,6 +222,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 26
     skillType: 0
+    rangeType: 2
     name: Blackhole
     desc: 
     cooldown: 10
@@ -249,7 +230,7 @@ MonoBehaviour:
     skillElements:
     - skillKey: 26
       index: 0
-      componentType: 11
+      componentType: 9
       indicatorType: 4
       order: 0
       timing: 0
@@ -259,7 +240,7 @@ MonoBehaviour:
       - 0
       - 0
       - 0
-      - 0
+      - 5
       - 0
       - 3
       - 0
@@ -270,37 +251,12 @@ MonoBehaviour:
       - 0
       - 0
       - 0
-      - 30
-      - 0
-      buffKeys: 
-    - skillKey: 26
-      index: 1
-      componentType: 3
-      indicatorType: 0
-      order: 0
-      timing: 1
-      firePoint: 1
-      maxDistance: 0
-      parameters:
-      - 0
-      - 0
-      - 0
-      - 75
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      - 360
-      - 3
-      - 0
-      - 0
-      - 0
-      - 0
+      - 2
       - 0
       buffKeys: 
   - skillKey: 32
     skillType: 0
+    rangeType: 2
     name: IseAttack
     desc: 
     cooldown: 8
@@ -334,6 +290,7 @@ MonoBehaviour:
       buffKeys: 01000000
   - skillKey: 38
     skillType: 0
+    rangeType: 2
     name: LeavesRise
     desc: 
     cooldown: 5
@@ -367,6 +324,7 @@ MonoBehaviour:
       buffKeys: 02000000
   - skillKey: 44
     skillType: 1
+    rangeType: 0
     name: "\uCCB4\uB825 \uC99D\uAC00"
     desc: "\uCD5C\uB300 \uCCB4\uB825 +{P0}"
     cooldown: 0
@@ -400,6 +358,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 46
     skillType: 1
+    rangeType: 0
     name: "\uC774\uB3D9 \uC18D\uB3C4 \uC99D\uAC00"
     desc: "\uC774\uB3D9 \uC18D\uB3C4 +{P0}"
     cooldown: 0
@@ -433,6 +392,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 48
     skillType: 1
+    rangeType: 0
     name: "\uBC29\uC5B4\uB825 \uC99D\uAC00"
     desc: "\uBC1B\uB294 \uD53C\uD574 -{P0}"
     cooldown: 0
@@ -466,6 +426,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 50
     skillType: 1
+    rangeType: 0
     name: "\uC790\uC11D \uBC94\uC704 \uC99D\uAC00"
     desc: "\uC544\uC774\uD15C \uC790\uC11D \uBC94\uC704 +{P0}"
     cooldown: 0
@@ -499,6 +460,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 52
     skillType: 1
+    rangeType: 0
     name: "\uACBD\uD5D8\uCE58 \uD68D\uB4DD \uC99D\uAC00"
     desc: "\uACBD\uD5D8\uCE58 \uD68D\uB4DD\uB7C9 +{P0}"
     cooldown: 0
@@ -532,6 +494,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 54
     skillType: 1
+    rangeType: 0
     name: "\uACE8\uB4DC \uD68D\uB4DD \uC99D\uAC00"
     desc: "\uACE8\uB4DC \uD68D\uB4DD\uB7C9 +{P0}"
     cooldown: 0
@@ -565,6 +528,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 56
     skillType: 1
+    rangeType: 0
     name: "\uCE58\uBA85\uD0C0 \uD655\uB960 \uC99D\uAC00"
     desc: "\uCE58\uBA85\uD0C0 \uD655\uB960 +{P0}"
     cooldown: 0
@@ -598,6 +562,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 58
     skillType: 1
+    rangeType: 0
     name: "\uCE58\uBA85\uD0C0 \uD53C\uD574 \uC99D\uAC00"
     desc: "\uCE58\uBA85\uD0C0 \uD53C\uD574 +{P0}"
     cooldown: 0
@@ -631,6 +596,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 60
     skillType: 1
+    rangeType: 0
     name: "\uC2A4\uD0AC \uBC94\uC704 \uC99D\uAC00"
     desc: "\uBAA8\uB4E0 \uC2A4\uD0AC \uBC94\uC704 +{P0}"
     cooldown: 0
@@ -664,6 +630,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 62
     skillType: 1
+    rangeType: 0
     name: "\uC2A4\uD0AC \uCFE8\uB2E4\uC6B4 \uAC10\uC18C"
     desc: "\uBAA8\uB4E0 \uC2A4\uD0AC \uCFE8\uB2E4\uC6B4 -{P0}"
     cooldown: 0
@@ -697,6 +664,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 64
     skillType: 1
+    rangeType: 0
     name: "\uC2A4\uD0AC \uB370\uBBF8\uC9C0 \uC99D\uAC00"
     desc: "\uBAA8\uB4E0 \uC2A4\uD0AC \uB370\uBBF8\uC9C0 +{P0}"
     cooldown: 0
@@ -730,6 +698,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 66
     skillType: 1
+    rangeType: 0
     name: "\uC2A4\uD0AC \uC9C0\uC18D\uC2DC\uAC04 \uC99D\uAC00"
     desc: "\uBAA8\uB4E0 \uC2A4\uD0AC \uC9C0\uC18D\uC2DC\uAC04 +{P0}"
     cooldown: 0
@@ -763,6 +732,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 68
     skillType: 0
+    rangeType: 1
     name: "\uB3C5\uCE68"
     desc: 
     cooldown: 0.5
@@ -796,6 +766,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 69
     skillType: 0
+    rangeType: 2
     name: "\uD654\uC5FC \uD22C\uC0AC\uCCB4"
     desc: 
     cooldown: 5
@@ -829,6 +800,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 70
     skillType: 0
+    rangeType: 1
     name: "\uADFC\uC811 \uACF5\uACA9"
     desc: 
     cooldown: 0.5
@@ -862,6 +834,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 71
     skillType: 0
+    rangeType: 1
     name: '-'
     desc: 
     cooldown: 0.5
@@ -895,6 +868,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 72
     skillType: 0
+    rangeType: 2
     name: '-'
     desc: 
     cooldown: 1.5
@@ -928,6 +902,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 73
     skillType: 0
+    rangeType: 1
     name: '-'
     desc: 
     cooldown: 0.6
@@ -961,6 +936,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 74
     skillType: 0
+    rangeType: 2
     name: '-'
     desc: 
     cooldown: 2.5
@@ -968,7 +944,7 @@ MonoBehaviour:
     skillElements:
     - skillKey: 74
       index: 0
-      componentType: 9
+      componentType: 11
       indicatorType: 4
       order: 0
       timing: 0
@@ -996,7 +972,7 @@ MonoBehaviour:
       index: 1
       componentType: 3
       indicatorType: 0
-      order: 1
+      order: 0
       timing: 1
       firePoint: 0
       maxDistance: 0
@@ -1020,6 +996,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 75
     skillType: 0
+    rangeType: 1
     name: '-'
     desc: 
     cooldown: 0.5
@@ -1053,6 +1030,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 76
     skillType: 0
+    rangeType: 2
     name: '-'
     desc: 
     cooldown: 8
@@ -1086,6 +1064,7 @@ MonoBehaviour:
       buffKeys: 
   - skillKey: 77
     skillType: 0
+    rangeType: 1
     name: '-'
     desc: 
     cooldown: 0

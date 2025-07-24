@@ -14,12 +14,11 @@ public enum SkillComponentType
     RiseAOE,
     InstantAttack,
     Beam,
+    KnockbackAOE,
+    GravityAOE,
     // 이동
     Linear,
     Leap,
-    // 효과
-    Knockback,
-    Gravity,
     Max,
 }
 
@@ -40,26 +39,11 @@ public abstract class SkillComponent
     protected SkillLauncher launcher;
     protected UnitType enemyType;
 
+    protected List<ISkillEffect> skillEffects = new();
+
     public ComponentState State => state;
     public virtual SkillEffectController EffectController => null;
     public bool IsCompleted => state == ComponentState.Completed;
-    private static Stack<MovementData> pools = new();
-
-    protected class MovementData
-    {
-        public Vector3 startPos;
-        public Vector3 direction;
-        public float remainingTime;
-        public float totalInvTime;
-
-        public void Init(Vector3 startPos, Vector3 direction, float totalTime)
-        {
-            this.startPos = startPos;
-            this.direction = direction;
-            this.remainingTime = totalTime;
-            this.totalInvTime = 1f / totalTime;
-        }
-    }
 
     public virtual void Reset()
     {
@@ -68,6 +52,13 @@ public abstract class SkillComponent
         order = 0;
         timing = ExecutionTiming.Instant;
         enemyType = UnitType.Monster;
+
+        foreach (ISkillEffect effect in skillEffects)
+        {
+            effect.Reset();
+        }
+
+        skillEffects.Clear();
     }
 
     public virtual void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
@@ -78,30 +69,64 @@ public abstract class SkillComponent
         timing = holder.timing;
     }
 
-    public virtual void OnStart()
+    protected void AddSkillEffect(ISkillEffect effect) => skillEffects.Add(effect);
+
+    public void OnStart()
     {
         if (state != ComponentState.NotStarted)
             return;
 
+        OnStartAction();
+    }
+
+    protected virtual void OnStartAction()
+    {
         state = ComponentState.Running;
     }
 
-    public virtual void OnUpdate(float deltaTime) { }
-    protected virtual void OnEnd(bool forceEnd = false)
+    public void OnUpdate(float deltaTime)
+    {
+        if (state != ComponentState.Running)
+            return;
+
+        OnUpdateAction(deltaTime);
+    }
+
+    protected virtual void OnUpdateAction(float deltaTime) { }
+
+    protected void OnEnd(bool forceEnd = false)
     {
         if (state == ComponentState.Completed)
             return;
 
+        OnEndAction(forceEnd);
+    }
+
+    protected virtual void OnEndAction(bool forceEnd)
+    {
         state = ComponentState.Completed;
         launcher.CheckDeactivate(forceEnd);
     }
 
-    public virtual void OnHit(Unit target) { }
-    public bool IsHittable(Unit target) => target != null && !target.IsDead && target.UnitType == enemyType;
+    public void OnHit(Unit target)
+    {
+        if (!IsHittable(target))
+            return;
 
-    #region 타겟 Getter
+        OnHitAction(target);
+    }
 
-    protected List<Unit> GetHitTargetsBySphere(Vector3 position, float radius)
+    protected virtual bool IsHittable(Unit target)
+    {
+        if (target == null || target.IsDead || target.UnitType != enemyType)
+            return false;
+
+        return true;
+    }
+
+    protected virtual void OnHitAction(Unit target) { }
+
+    protected List<Unit> GetTargetsByOverlapSphere(Vector3 position, float radius)
     {
         Collider[] colliders = Physics.OverlapSphere(position, radius, GameValue.UNIT_LAYERS);
 
@@ -110,7 +135,9 @@ public abstract class SkillComponent
         {
             Unit target = col.GetComponent<Unit>();
             if (IsHittable(target))
+            {
                 targets.Add(target);
+            }
         }
 
         return targets;
@@ -131,107 +158,103 @@ public abstract class SkillComponent
     {
         return false; // TODO: 사각형 형태로 구현할 것
     }
-
-    #endregion
-
-    #region 데이터 풀
-
-    protected MovementData CreateComponentData(Unit target, Vector3 direct, float duration)
-    {
-        MovementData data = new();
-        data.Init(target.transform.position, direct, duration);
-        return data;
-    }
-
-    protected void PushComponentData(MovementData data)
-    {
-        pools.Push(data);
-    }
-
-    protected MovementData PopComponentData()
-    {
-        if (!pools.TryPop(out MovementData data))
-            data = new MovementData();
-
-        return data;
-    }
-
-    #endregion
 }
 
-#region 공격 컴포넌트
-
-/// <summary> 공격 컴포넌트들의 기본 클래스 </summary>
+/// <summary> 공격 컴포넌트 기본 클래스 </summary>
 public abstract class Attack_Component : SkillComponent
 {
     protected SkillEffectController effectController;
-    protected float damage;
-    protected List<BuffKey> buffKeys;
 
     public override void Reset()
     {
         base.Reset();
         effectController = null;
-        buffKeys = null;
     }
 
     public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
         base.Init(launcher, holder, fixedTarget);
-        damage = holder.damageFinal;
-        buffKeys = holder.BuffKeys;
 
-        // 공격 컴포넌트에만 파티클 할당
+        AddSkillEffect(new DamageEffect(launcher, holder.damageFinal));
+        foreach (BuffKey buffKey in holder.BuffKeys)
+        {
+            AddSkillEffect(new BuffEffect(launcher, buffKey));
+        }
+
         effectController = GameMgr.Instance.skillMgr.PopSkillObject(launcher.SkillKey, launcher.transform);
-        if (effectController == null)
-            return;
-
-        effectController.Init(launcher, OnHit, OnParticleFinished);
+        if (effectController != null)
+        {
+            effectController.Init(launcher, OnHit, OnParticleFinished);
+        }
     }
 
     public override SkillEffectController EffectController => effectController;
+
+    protected override void OnStartAction()
+    {
+        base.OnStartAction();
+        effectController?.Play();
+    }
+
+    protected override void OnHitAction(Unit target)
+    {
+        foreach (ISkillEffect effect in skillEffects)
+        {
+            effect.OnApply(EffectTiming.OnHit, target);
+        }
+
+        effectController?.PlayHit();
+    }
+
+    protected override void OnUpdateAction(float deltaTime)
+    {
+        base.OnUpdateAction(deltaTime);
+
+        // 지속 실행할 효과들
+        foreach (ISkillEffect effect in skillEffects)
+        {
+            effect.OnUpdate(EffectTiming.OnUpdate, deltaTime);
+        }
+    }
+
     protected void OnParticleFinished()
     {
         launcher.SetParticleFinished(true);
         launcher.CheckDeactivate(false);
     }
+}
 
-    public override void OnStart()
+public abstract class BaseProjectile_Component : Attack_Component
+{
+    protected MovementEffect movementEffect;
+    protected float maxLength;
+    protected Vector3 startPos;
+
+    public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
-        base.OnStart();
-        effectController?.Play();
+        base.Init(launcher, holder, fixedTarget);
+
+        maxLength = GameValue.PROJECTILE_MAX_LENGTH_POW;
+        startPos = launcher.Position;
+        movementEffect = new MovementEffect(holder.moveSpeedFinal, launcher.Direction, launcher.transform);
+        AddSkillEffect(movementEffect);
     }
 
-    protected override void OnEnd(bool forceEnd = false)
+    protected bool HasReachedMaxDistance()
     {
-        base.OnEnd(forceEnd);
-        effectController?.StopMain();
-    }
-
-    protected void ApplyToTarget(Unit target)
-    {
-        Vector3 hitPoint = target.transform.position;
-        CombatMgr.ApplyDamageBySkill(launcher.Caster, target, damage, hitPoint, launcher.SkillKey);
-        effectController?.PlayHit();
-
-        if (buffKeys == null || target.IsDead)
-            return;
-
-        foreach (BuffKey buffKey in buffKeys)
-        {
-            target.AddBuff(buffKey, launcher.Caster);
-        }
+        float currentDistance = (launcher.Position - startPos).sqrMagnitude;
+        return currentDistance >= maxLength;
     }
 }
 
-/// <summary> 투사체 계열 컴포넌트들의 기본 클래스 </summary>
-public abstract class Attack_ProjectileBaseComponent : Attack_Component
+/// <summary> 일반 발사체 컴포넌트 </summary>
+public class ProjectileComponent : BaseProjectile_Component
 {
-    protected float moveSpeed;
-    protected float maxLength;
-    protected Vector3 startPos;
-    protected Vector3 direction;
-    protected HashSet<int> hittedUnitIDs = new();
+    public override SkillComponentType Type => SkillComponentType.Projectile;
+    private int ricohet;
+    private int piercing;
+    private HashSet<int> hittedUnitIDs = new();
+    private const float RICOCHET_RADIUS = 6f;
 
     public override void Reset()
     {
@@ -242,66 +265,15 @@ public abstract class Attack_ProjectileBaseComponent : Attack_Component
     public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
         base.Init(launcher, holder, fixedTarget);
-        moveSpeed = holder.moveSpeedFinal;
-        maxLength = GameValue.PROJECTILE_MAX_LENGTH_POW;
-        startPos = launcher.Position;
-        direction = launcher.transform.forward;
+
+        piercing = holder.ShotFinal.GetInt();
+        ricohet = holder.ShotFinal.GetInt();
         hittedUnitIDs.Add(launcher.Caster.UniqueID);
     }
 
-    public override void OnHit(Unit target)
+    protected override void OnUpdateAction(float deltaTime)
     {
-        if (!IsHittable(target))
-            return;
-
-        if (hittedUnitIDs.Contains(target.UniqueID))
-            return;
-
-        // 피해 적용
-        hittedUnitIDs.Add(target.UniqueID);
-        ApplyToTarget(target);
-        OnProjectileHit(target);
-    }
-
-    protected abstract void OnProjectileHit(Unit target);
-    protected void MoveProjectile(Vector3 moveDirection, float speed, float deltaTime)
-    {
-        float moveDistance = speed * deltaTime;
-        launcher.transform.position += moveDirection * moveDistance;
-    }
-
-    protected bool HasReachedMaxDistance()
-    {
-        float currentDistance = (launcher.Position - startPos).sqrMagnitude;
-        return currentDistance >= maxLength;
-    }
-}
-
-/// <summary> 일반 투사체 컴포넌트 </summary>
-public class Attack_ProjectileComponent : Attack_ProjectileBaseComponent
-{
-    public override SkillComponentType Type => SkillComponentType.Projectile;
-    private int richocet;
-    private int piercing;
-    private const float RICOCET_RADIUS = 8f;
-
-    public override void Reset()
-    {
-        base.Reset();
-        richocet = 0;
-        piercing = 0;
-    }
-
-    public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
-    {
-        base.Init(launcher, holder, fixedTarget);
-        richocet = holder.ricochetFinal.GetInt();
-        piercing = holder.piercingFinal.GetInt();
-    }
-
-    public override void OnUpdate(float deltaTime)
-    {
-        MoveProjectile(direction, moveSpeed, deltaTime);
+        base.OnUpdateAction(deltaTime);
 
         if (HasReachedMaxDistance())
         {
@@ -309,126 +281,174 @@ public class Attack_ProjectileComponent : Attack_ProjectileBaseComponent
         }
     }
 
-    protected override void OnProjectileHit(Unit target)
+    protected override bool IsHittable(Unit target)
     {
-        if (richocet > 0) // 도탄
+        if (base.IsHittable(target))
         {
-            Unit nextTarget = FindRicochetTarget(launcher.Position, RICOCET_RADIUS);
-            if (nextTarget != null)
-            {
-                richocet--;
+            if (hittedUnitIDs.Contains(target.UniqueID))
+                return false;
 
-                startPos = launcher.Position;
-                Vector3 targetPos = nextTarget.transform.position;
-                targetPos.y = startPos.y;
-                direction = (targetPos - startPos).normalized;
-                launcher.SetTransform(startPos, direction);
-                return;
-            }
+            return true;
         }
 
-        if (piercing > 0) // 관통
+        return false;
+    }
+
+    protected override void OnHitAction(Unit target)
+    {
+        hittedUnitIDs.Add(target.UniqueID);
+        base.OnHitAction(target);
+
+        if (ricohet-- > 0)
         {
-            piercing--;
+            DoRicochet();
+            return;
+        }
+
+        if (piercing-- > 0)
+        {
             return;
         }
 
         OnEnd();
     }
 
-    /// <summary>
-    /// 도탄 대상(가장 가까운 유닛) 찾기
-    /// </summary>
+    private void DoRicochet()
+    {
+        Unit ricochetTarget = FindRicochetTarget(launcher.Position, RICOCHET_RADIUS);
+        if (ricochetTarget == null)
+            return;
+
+        // 위치
+        startPos = launcher.Position;
+        Vector3 targetPos = ricochetTarget.transform.position;
+        targetPos.y = startPos.y;
+
+        // 방향
+        Vector3 direction = (targetPos - startPos).normalized;
+        launcher.SetTransform(startPos, direction);
+        movementEffect.SetDirection(direction);
+    }
+
     private Unit FindRicochetTarget(Vector3 position, float radius)
     {
-        Unit target = null;
-        float maxDist = float.MaxValue;
-
         Collider[] colliders = Physics.OverlapSphere(position, radius, GameValue.UNIT_LAYERS);
         foreach (Collider col in colliders)
         {
-            Unit unit = col.GetComponent<Unit>();
-            if (!IsHittable(unit) || hittedUnitIDs.Contains(unit.UniqueID))
-                continue;
-
-            Vector3 targetPos = unit.transform.position;
-            targetPos.y = position.y;
-
-            float dist = (position - targetPos).sqrMagnitude;
-            if (dist < maxDist)
-            {
-                maxDist = dist;
-                target = unit;
-            }
+            Unit target = col.GetComponent<Unit>();
+            if (IsHittable(target))
+                return target;
         }
 
-        return target;
+        return null;
     }
 }
 
-/// <summary> 부메랑 투사체 컴포넌트 </summary>
-public class Attack_BoomerangComponent : Attack_ProjectileBaseComponent
+/// <summary> 부메랑 발사체 컴포넌트 </summary>
+public class BoomerangComponent : BaseProjectile_Component
 {
     public override SkillComponentType Type => SkillComponentType.Boomerang;
+
+    private bool isReturning;
+    private int hittedCount;
     private float originalDamage;
     private float returnSpeed;
-    private Vector3 returnDirection;
-    private bool isReturning;
+    private Vector3 endPos;
 
     // 상수
-    private const float RETURN_SPEED_MULTIPLIER = 1.5f; // 돌아올 때 속도 증가 배율
-    private const float DAMAGE_REDUCTION_PER_HIT = 0.15f; // 15%씩 감소
-    private const float MIN_DAMAGE_RATIO = 0.1f; // 최소 10%까지
+    private const float RETURN_SPEED_MULTIPLIER = 1.5f; // 복귀 속도 증가 배율
+    private const float DAMAGE_REDUCTION_PER_HIT = 0.15f; // 데미지 감소 비율
+    private const float MIN_DAMAGE_RATIO = 0.1f; // 최소 데미지 비율
 
     public override void Reset()
     {
         base.Reset();
+        hittedCount = 0;
         isReturning = false;
     }
 
     public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
         base.Init(launcher, holder, fixedTarget);
-        originalDamage = damage;
-        returnSpeed = moveSpeed * RETURN_SPEED_MULTIPLIER;
-        returnDirection = -direction;
+
+        // 부메랑 설정
+        originalDamage = holder.damageFinal;
+        returnSpeed = holder.moveSpeedFinal * RETURN_SPEED_MULTIPLIER;
     }
 
-    public override void OnUpdate(float deltaTime)
+    protected override void OnUpdateAction(float deltaTime)
     {
-        if (isReturning) // 돌아가는 중
-        {
-            MoveProjectile(returnDirection, returnSpeed, deltaTime);
+        base.OnUpdateAction(deltaTime);
 
-            float distanceSqr = (launcher.Position - startPos).sqrMagnitude;
-            if (distanceSqr <= 0.1f)
+        if (isReturning)
+        {
+            if (HasReachedCaster())
             {
                 OnEnd();
             }
+
+            return;
         }
 
-        else // 앞으로 나가는 중
+        if (HasReachedMaxDistance())
         {
-            MoveProjectile(direction, moveSpeed, deltaTime);
+            StartReturnShot();
+        }
+    }
 
-            if (HasReachedMaxDistance())
+    private void StartReturnShot()
+    {
+        hittedCount = 0;
+        isReturning = true;
+
+        // Y축 매칭
+        startPos = launcher.Position;
+        endPos = launcher.Caster.transform.position;
+        endPos.y = startPos.y;
+
+        // 방향
+        Vector3 returnDirection = (endPos - startPos).normalized;
+        launcher.SetTransform(startPos, returnDirection);
+        movementEffect.SetDirection(returnDirection);
+        movementEffect.SetSpeed(returnSpeed);
+
+        // 데미지 복원
+        foreach (ISkillEffect effect in skillEffects)
+        {
+            if (effect is DamageEffect damageEffect)
             {
-                damage = originalDamage;
-                isReturning = true;
+                damageEffect.SetDamage(originalDamage);
             }
         }
     }
 
-    protected override void OnProjectileHit(Unit target)
+    private bool HasReachedCaster()
+    {
+        float currentDistance = (endPos - launcher.Position).sqrMagnitude;
+        return currentDistance <= 0.01f;
+    }
+
+    protected override void OnHitAction(Unit target)
     {
         // 관통 횟수 별 데미지 감소
-        float multiplier = 1f - hittedUnitIDs.Count * DAMAGE_REDUCTION_PER_HIT;
-        damage = Mathf.Max(originalDamage * multiplier, MIN_DAMAGE_RATIO);
+        float multiplier = 1f - hittedCount++ * DAMAGE_REDUCTION_PER_HIT;
+        float currentDamage = Mathf.Max(originalDamage * multiplier, MIN_DAMAGE_RATIO);
+
+        // 데미지 효과 업데이트
+        foreach (ISkillEffect effect in skillEffects)
+        {
+            if (effect is DamageEffect damageEffect)
+            {
+                damageEffect.SetDamage(currentDamage);
+            }
+        }
+
+        base.OnHitAction(target);
     }
 }
 
 /// <summary> 회전하는 구체들로 구성된 이동 공격 컴포넌트 </summary>
-public class Attack_RotatingOrbsComponent : Attack_ProjectileBaseComponent
+public class RotatingOrbs_Component : BaseProjectile_Component
 {
     public override SkillComponentType Type => SkillComponentType.RotatingOrbs;
     private float rotationSpeed;
@@ -436,6 +456,8 @@ public class Attack_RotatingOrbsComponent : Attack_ProjectileBaseComponent
     private float anglePerOrb;
     private float currentAngle;
     private List<SkillEffectController> orbEffects = new();
+
+    private RotationEffect rotationEffect;
 
     // 구체들의 위치 계산용
     private List<Vector3> orbPositions = new();
@@ -476,6 +498,9 @@ public class Attack_RotatingOrbsComponent : Attack_ProjectileBaseComponent
 
         // 구체
         rotationSpeed = holder.rotationSpeedFinal;
+        rotationEffect = new RotationEffect(launcher, rotationSpeed);
+        AddSkillEffect(rotationEffect);
+
         orbCount = holder.ShotFinal.GetInt();
         anglePerOrb = 360f / orbCount; // 360도를 구체 개수로 나누어 균등 배치
 
@@ -498,18 +523,17 @@ public class Attack_RotatingOrbsComponent : Attack_ProjectileBaseComponent
         }
     }
 
-    public override void OnUpdate(float deltaTime)
+    protected override void OnUpdateAction(float deltaTime)
     {
+        base.OnUpdateAction(deltaTime);
+
         currentAngle += rotationSpeed * deltaTime;
         cycleTime += deltaTime;
 
-        MoveProjectile(direction, moveSpeed, deltaTime);
-        // 반지름 확장/축소
         CalculateOrbRadius();
-        // 구체 위치 업데이트
         CalculateOrbPositions();
-        // 구체 이동/회전
-        UpdateOrbTransform();
+        UpdateOrbPosition();
+        UpdateOrbRotation();
 
         if (HasReachedMaxDistance())
         {
@@ -566,44 +590,43 @@ public class Attack_RotatingOrbsComponent : Attack_ProjectileBaseComponent
         }
     }
 
-    private void UpdateOrbTransform()
+    private void UpdateOrbPosition()
     {
         for (int i = 0; i < orbEffects.Count && i < orbPositions.Count; i++)
         {
             orbEffects[i].transform.position = orbPositions[i];
         }
-
-        Quaternion rotation = Quaternion.Euler(0f, currentAngle, 0f);
-        launcher.transform.rotation = rotation;
     }
 
-    protected override void OnProjectileHit(Unit target) { }
+    private void UpdateOrbRotation()
+    {
+        rotationEffect.SetCurrentAngle(currentAngle);
+    }
 }
 
 /// <summary> 범위 공격 컴포넌트 </summary>
-public class Attack_AOEComponent : Attack_Component
+public class InstantAOE_Component : Attack_Component
 {
     public override SkillComponentType Type => SkillComponentType.InstantAOE;
-    protected SkillIndicatorType type;
-    protected float angle;
+    protected SkillIndicatorType indicatorType;
     protected float radius;
+    protected float angle;
 
-    protected virtual bool IsInstantComplete => true;
+    protected virtual bool IsInstantEnd => true;
     public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
         base.Init(launcher, holder, fixedTarget);
-        damage = holder.damageFinal;
         radius = holder.radiusFinal;
         angle = holder.angle;
-        type = angle == 360f ? SkillIndicatorType.Circle : SkillIndicatorType.Sector;
+        indicatorType = holder.angle == 360 ? SkillIndicatorType.Circle : SkillIndicatorType.Sector;
     }
 
-    public override void OnStart()
+    protected override void OnStartAction()
     {
-        base.OnStart();
+        base.OnStartAction();
 
         ExecuteAction();
-        if (IsInstantComplete)
+        if (IsInstantEnd)
         {
             OnEnd();
         }
@@ -611,42 +634,47 @@ public class Attack_AOEComponent : Attack_Component
 
     protected void ExecuteAction()
     {
+        List<Unit> targets = GetTargetsByOverlapSphere(launcher.Position, radius);
+
         Vector3 position = launcher.Position;
         Vector3 direction = launcher.Direction;
-        float maxDistance = radius * radius;
-
-        List<Unit> targets = GetHitTargetsBySphere(position, radius);
         foreach (Unit target in targets)
         {
-            Vector3 targetPos = target.transform.position;
-
-            switch (type)
+            Vector3 targetPosition = target.transform.position;
+            switch (indicatorType)
             {
                 case SkillIndicatorType.Sector:
-                    if (IsTargetInSectorArea(position, direction, targetPos, angle, maxDistance))
-                        OnHit(target);
-                    break;
-
-                case SkillIndicatorType.Circle:
-                    OnHit(target);
+                    if (!IsTargetInSectorArea(position, direction, targetPosition, angle, radius))
+                        continue;
                     break;
 
                 case SkillIndicatorType.Rectangle:
-                    if (IsTargetInRectangleArea(position, direction, targetPos))
-                        OnHit(target);
+                    if (!IsTargetInRectangleArea(position, direction, targetPosition))
+                        continue;
                     break;
             }
-        }
-    }
 
-    public override void OnHit(Unit target)
-    {
-        ApplyToTarget(target);
+            OnHit(target);
+        }
     }
 }
 
-/// <summary> 주기적 데미지 공격 컴포넌트 </summary>
-public class Attack_PeriodicAOEComponent : Attack_AOEComponent
+/// <summary> 넉백 범위 공격 컴포넌트 </summary>
+public class KnockbackAOE_Component : InstantAOE_Component
+{
+    public override SkillComponentType Type => SkillComponentType.KnockbackAOE;
+
+    protected override bool IsInstantEnd => false;
+    public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
+    {
+        base.Init(launcher, holder, fixedTarget);
+        AddSkillEffect(new KnockbackEffect(launcher, holder.gravityFinal, holder.durationFinal));
+        AddSkillEffect(new StunEffect(launcher, holder.durationFinal));
+    }
+}
+
+/// <summary> 주기적 범위 공격 컴포넌트 </summary>
+public class PeriodicAOE_Component : InstantAOE_Component
 {
     public override SkillComponentType Type => SkillComponentType.PeriodicAOE;
     protected float duration;
@@ -654,27 +682,23 @@ public class Attack_PeriodicAOEComponent : Attack_AOEComponent
     protected float tick;
     protected float lastTickTime;
 
-    protected override bool IsInstantComplete => false;
-    public override void Reset()
-    {
-        base.Reset();
-        time = 0f;
-        lastTickTime = 0f;
-    }
-
+    protected override bool IsInstantEnd => false;
     public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
         base.Init(launcher, holder, fixedTarget);
-        tick = holder.damageTickFinal;
+
         duration = holder.durationFinal;
+        tick = holder.damageTickFinal;
         lastTickTime = Time.time;
     }
 
-    public override void OnUpdate(float deltaTime)
+    protected override void OnUpdateAction(float deltaTime)
     {
-        time += deltaTime;
+        base.OnUpdateAction(deltaTime);
 
+        time += deltaTime;
         float currentTime = Time.time;
+
         if (currentTime - lastTickTime >= tick)
         {
             ExecuteAction();
@@ -689,114 +713,72 @@ public class Attack_PeriodicAOEComponent : Attack_AOEComponent
 }
 
 /// <summary> 수직 이동 & 스턴 범위 공격 컴포넌트 </summary>
-public class Attack_RiseAOEComponent : Attack_PeriodicAOEComponent
+public class RiseAOE_Component : PeriodicAOE_Component
 {
     public override SkillComponentType Type => SkillComponentType.RiseAOE;
-
-    // Y축 이동 관리
-    private Dictionary<Unit, MovementData> verticalData = new();
     private const float RISE_DURATION = 0.5f;
-    private const float RISE_FORCE = 2.5f;
-
-    public override void Reset()
-    {
-        base.Reset();
-
-        foreach (var data in verticalData)
-        {
-            PushComponentData(data.Value);
-        }
-        verticalData.Clear();
-    }
-
-    public override void OnUpdate(float deltaTime)
-    {
-        base.OnUpdate(deltaTime);
-        UpdateVerticalMovement(deltaTime);
-    }
-
-    public override void OnHit(Unit target)
-    {
-        ApplyToTarget(target);
-        target.AddBuff(BuffKey.Stun, launcher.Caster);
-        StartVerticalMovement(target, Vector3.up, RISE_DURATION);
-    }
-
-    private void StartVerticalMovement(Unit target, Vector3 direct, float duration)
-    {
-        if (verticalData.ContainsKey(target))
-            return;
-
-        verticalData[target] = CreateComponentData(target, direct, duration);
-    }
-
-    private void UpdateVerticalMovement(float deltaTime)
-    {
-        List<Unit> completedUnits = new();
-        foreach (var pair in verticalData)
-        {
-            Unit unit = pair.Key;
-            if (unit.IsDead)
-            {
-                completedUnits.Add(unit);
-                continue;
-            }
-
-            MovementData data = pair.Value;
-            data.remainingTime -= deltaTime;
-            if (data.remainingTime <= 0f) // y축 이동 완료
-            {
-                unit.transform.position = data.startPos;
-                unit.RemoveBuff(BuffKey.Stun);
-                completedUnits.Add(unit);
-            }
-
-            else // Y축 이동 적용
-            {
-                float p = 1f - (data.remainingTime * data.totalInvTime);
-                float offsetY = Mathf.Sin(p * Mathf.PI) * RISE_FORCE;
-                Vector3 pos = data.startPos;
-                pos.y += offsetY;
-                unit.transform.position = pos;
-            }
-        }
-
-        foreach (Unit unit in completedUnits)
-        {
-            PushComponentData(verticalData[unit]);
-            verticalData.Remove(unit);
-        }
-    }
-}
-
-/// <summary> 즉시 공격 컴포넌트 </summary>
-public class Attack_InstantComponent : Attack_Component
-{
-    public override SkillComponentType Type => SkillComponentType.InstantAttack;
-    private Unit target;
 
     public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
         base.Init(launcher, holder, fixedTarget);
-        target = fixedTarget;
-        damage = holder.damageFinal;
+        AddSkillEffect(new StunEffect(launcher, RISE_DURATION));
+        AddSkillEffect(new VerticalMovementEffect(RISE_DURATION));
+    }
+}
+
+/// <summary> 중력 범위 공격 컴포넌트 </summary>
+public class GravityAOE_Component : PeriodicAOE_Component
+{
+    public override SkillComponentType Type => SkillComponentType.GravityAOE;
+    private HashSet<Unit> hitUnits = new();
+
+    public override void Reset()
+    {
+        base.Reset();
+        hitUnits.Clear();
     }
 
-    public override void OnStart()
+    public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
-        base.OnStart();
-        OnHit(target);
+        base.Init(launcher, holder, fixedTarget);
+        AddSkillEffect(new GravityEffect(launcher, duration, radius, holder.gravityFinal));
+        AddSkillEffect(new StunEffect(launcher, duration));
+    }
+
+    protected override bool IsHittable(Unit target)
+    {
+        return base.IsHittable(target) && !hitUnits.Contains(target);
+    }
+
+    protected override void OnHitAction(Unit target)
+    {
+        base.OnHitAction(target);
+        hitUnits.Add(target);
+    }
+}
+
+/// <summary> 즉시 공격 컴포넌트 </summary>
+public class InstantAttack_Component : Attack_Component
+{
+    public override SkillComponentType Type => SkillComponentType.InstantAttack;
+    private Unit fixedTarget;
+
+    public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
+    {
+        base.Init(launcher, holder, fixedTarget);
+        this.fixedTarget = fixedTarget;
+    }
+
+    protected override void OnStartAction()
+    {
+        base.OnStartAction();
+        OnHit(fixedTarget);
         OnEnd(true);
-    }
-
-    public override void OnHit(Unit target)
-    {
-        ApplyToTarget(target);
     }
 }
 
 /// <summary> 빔 공격 컴포넌트 </summary>
-public class Attack_BeamComponent : Attack_Component
+public class Beam_Component : Attack_Component
 {
     public override SkillComponentType Type => SkillComponentType.Beam;
     private float length;
@@ -829,7 +811,6 @@ public class Attack_BeamComponent : Attack_Component
     public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
         base.Init(launcher, holder, fixedTarget);
-        damage = holder.damageFinal;
         length = GameValue.PROJECTILE_MAX_LENGTH;
         tick = holder.damageTickFinal;
         duration = holder.durationFinal;
@@ -843,9 +824,9 @@ public class Attack_BeamComponent : Attack_Component
         direction = (targetPos - startPos).normalized;
     }
 
-    public override void OnStart()
+    protected override void OnStartAction()
     {
-        base.OnStart();
+        base.OnStartAction();
 
         SkillData data = DataMgr.GetSkillData(launcher.SkillKey);
         SkillElement element = data.skillElements[0];
@@ -858,8 +839,10 @@ public class Attack_BeamComponent : Attack_Component
         finalIndicator.DrawIndicator(startPos, targetPos);
     }
 
-    public override void OnUpdate(float deltaTime)
+    protected override void OnUpdateAction(float deltaTime)
     {
+        base.OnUpdateAction(deltaTime);
+
         time += deltaTime;
 
         if (isIndicatorTime)
@@ -921,37 +904,10 @@ public class Attack_BeamComponent : Attack_Component
             OnEnd();
         }
     }
-
-    public override void OnHit(Unit target)
-    {
-        if (!IsHittable(target))
-            return;
-
-        ApplyToTarget(target);
-    }
-}
-
-#endregion
-
-#region 이동 컴포넌트
-
-public class Movement_LinearComponent : SkillComponent
-{
-    public override SkillComponentType Type => SkillComponentType.Linear;
-
-    public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
-    {
-        base.Init(launcher, holder, fixedTarget);
-    }
-
-    public override void OnUpdate(float deltaTime)
-    {
-        // launcher.transform.position += launcher.Direction * moveSpeed * deltaTime;
-    }
 }
 
 /// <summary> 도약 이동 컴포넌트 </summary>
-public class Movement_LeapComponent : SkillComponent
+public class Leap_Component : SkillComponent
 {
     public override SkillComponentType Type => SkillComponentType.Leap;
     private SkillIndicator startIndicator;
@@ -960,7 +916,6 @@ public class Movement_LeapComponent : SkillComponent
     private Vector3 targetPos;
     private Vector3 casterAdjustedPos;
     private float time;
-    private bool isLeapCompleted;
     private float duration;
     private float invDuration;
     private AnimationCurve curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
@@ -977,7 +932,6 @@ public class Movement_LeapComponent : SkillComponent
     {
         base.Init(launcher, holder, fixedTarget);
         targetPos = fixedTarget.transform.position;
-        isLeapCompleted = false;
         duration = holder.durationFinal;
         invDuration = 1f / duration;
         startPos = launcher.Position;
@@ -985,9 +939,9 @@ public class Movement_LeapComponent : SkillComponent
         casterAdjustedPos = dir * 2f;
     }
 
-    public override void OnStart()
+    protected override void OnStartAction()
     {
-        base.OnStart();
+        base.OnStartAction();
 
         // 스킬 인디케이터
         SkillData data = DataMgr.GetSkillData(launcher.SkillKey);
@@ -1000,229 +954,28 @@ public class Movement_LeapComponent : SkillComponent
         finalIndicator.DrawIndicator(targetPos, targetPos);
     }
 
-    public override void OnUpdate(float deltaTime)
+    protected override void OnUpdateAction(float deltaTime)
     {
-        if (isLeapCompleted)
-            return;
-
         time += deltaTime;
         float p = Mathf.Clamp01(time * invDuration);
         startIndicator.UpdateIndicatorScale(p);
 
-        // 도약 이동
-        float e = curve.Evaluate(p);
-        Vector3 newPos = Vector3.Lerp(startPos, targetPos, e);
-        newPos.y = Mathf.Sin(p * Mathf.PI);
-        launcher.SetTransform(newPos, launcher.Direction);
-        launcher.Caster.transform.position = newPos + casterAdjustedPos;
+        // 도약 위치
+        Vector3 pos = Vector3.Lerp(startPos, targetPos + casterAdjustedPos, curve.Evaluate(p));
+        pos.y = Mathf.Sin(p * Mathf.PI);
+        launcher.SetTransform(pos, launcher.Direction);
+
+        // 유닛 이동
+        Unit caster = launcher.Caster;
+        caster.transform.position = pos;
+        caster.SetForceMoving(true);
 
         if (p >= 1f) // 도약 종료
         {
-            isLeapCompleted = true;
+            caster.SetForceMoving(false);
             GameMgr.Instance.skillMgr.RemoveIndicator(startIndicator);
             GameMgr.Instance.skillMgr.RemoveIndicator(finalIndicator);
             OnEnd();
         }
     }
 }
-
-#endregion
-
-#region 효과 컴포넌트
-
-public class Effect_KnockbackComponent : Attack_AOEComponent
-{
-    public override SkillComponentType Type => SkillComponentType.Knockback;
-    private float knockbackForce;
-
-    // 넉백
-    private float time;
-    private float KNOCKBACK_DURATION = 0.5f;
-    private List<Unit> knockbackTargets = new();
-    private Dictionary<Unit, MovementData> knockbackData = new();
-    protected override bool IsInstantComplete => false;
-    
-    public override void Reset()
-    {
-        base.Reset();
-        time = 0f;
-
-        foreach (var data in knockbackData)
-        {
-            PushComponentData(data.Value);
-        }
-
-        knockbackData.Clear();
-        knockbackTargets.Clear();
-    }
-
-    public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
-    {
-        base.Init(launcher, holder, fixedTarget);
-        knockbackForce = holder.gravityFinal;
-    }
-
-    public override void OnUpdate(float deltaTime)
-    {
-        time += deltaTime;
-
-        // 넉백 효과 적용
-        for (int i = knockbackTargets.Count - 1; i >= 0; i--)
-        {
-            Unit target = knockbackTargets[i];
-            if (target.IsDead)
-            {
-                RemoveKnockbackData(target);
-                continue;
-            }
-
-            ApplyKnockbackEffect(target, deltaTime);
-        }
-
-        // 모든 넉백이 완료되면 종료
-        if (knockbackTargets.Count == 0 || time >= KNOCKBACK_DURATION)
-        {
-            OnEnd();
-        }
-    }
-
-    public override void OnHit(Unit target)
-    {
-        if (knockbackTargets.Contains(target))
-            return;
-
-        Vector3 targetPos = target.transform.position;
-        Vector3 direction = (targetPos - launcher.Position).normalized;
-        direction.y = 0f;
-
-        MovementData data = CreateComponentData(target, direction, KNOCKBACK_DURATION);
-        knockbackTargets.Add(target);
-        knockbackData[target] = data;
-
-        target.AddBuff(BuffKey.Stun, launcher.Caster);
-    }
-
-    private void ApplyKnockbackEffect(Unit target, float deltaTime)
-    {
-        if (!knockbackData.TryGetValue(target, out MovementData data))
-            return;
-
-        data.remainingTime -= deltaTime;
-        if (data.remainingTime <= 0f)
-        {
-            RemoveKnockbackData(target);
-            return;
-        }
-
-        // 넉백 거리 계산 (시간에 따른 감쇠)
-        float p = 1f - (data.remainingTime * data.totalInvTime);
-        float force = knockbackForce * (1f - p);
-
-        // 넉백 적용
-        Vector3 knockbackMovement = data.direction * force * deltaTime;
-        target.transform.position += knockbackMovement;
-    }
-
-    private void RemoveKnockbackData(Unit target)
-    {
-        knockbackTargets.Remove(target);
-        if (knockbackData.TryGetValue(target, out MovementData data))
-        {
-            PushComponentData(data);
-            knockbackData.Remove(target);
-        }
-
-        target.RemoveBuff(BuffKey.Stun);
-    }
-}
-
-public class Effect_GravityComponent : SkillComponent
-{
-    public override SkillComponentType Type => SkillComponentType.Gravity;
-
-    private float gravityForce;        // 중력 강도
-    private float duration;            // 지속 시간
-    private float radius;              // 중력 범위
-    private float radiusSqr;
-    private float invRadiusSqr;
-    private float rotationSpeed;       // 회전 속도
-
-    private Vector3 gravityCenter;     // 중력 중심점
-    private float time;
-    private List<Unit> units = new();
-    private Dictionary<Unit, float> startTimes = new();
-
-    public override void Reset()
-    {
-        base.Reset();
-        time = 0f;
-        units.Clear();
-        startTimes.Clear();
-    }
-
-    public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
-    {
-        base.Init(launcher, holder, fixedTarget);
-        gravityForce = holder.gravityFinal;
-        duration = holder.durationFinal;
-        radius = holder.radiusFinal;
-        radiusSqr = radius * radius;
-        rotationSpeed = 15f;
-        gravityCenter = launcher.Position;
-        invRadiusSqr = 1f / radiusSqr;
-    }
-
-    public override void OnStart()
-    {
-        base.OnStart();
-
-        List<Unit> targets = GetHitTargetsBySphere(gravityCenter, radius);
-        foreach (Unit target in targets)
-        {
-            units.Add(target);
-            startTimes[target] = time;
-        }
-    }
-
-    public override void OnUpdate(float deltaTime)
-    {
-        time += deltaTime;
-
-        for (int i = units.Count - 1; i >= 0; i--)
-        {
-            Unit unit = units[i];
-            if (unit == null || unit.IsDead)
-                continue;
-
-            ApplyGravityEffect(unit, deltaTime);
-        }
-
-        if (time >= duration)
-        {
-            OnEnd();
-        }
-    }
-
-    private void ApplyGravityEffect(Unit unit, float deltaTime)
-    {
-        Vector3 pos = unit.transform.position;
-        float unitTime = time - startTimes[unit];
-
-        float distanceToCenterSqr = (pos - gravityCenter).sqrMagnitude;
-        if (distanceToCenterSqr <= 0.1f)
-            return;
-
-        // 나선형 이동
-        Vector3 directionToCenter = (gravityCenter - pos).normalized;
-        Vector3 rotatedDirection = Quaternion.AngleAxis(rotationSpeed * unitTime, Vector3.up) * directionToCenter;
-
-        // 가까울수록 강해짐
-        float distanceRatio = 1f - (distanceToCenterSqr * invRadiusSqr);
-        float gravityPower = gravityForce * distanceRatio;
-
-        Vector3 finalPos = pos + rotatedDirection * gravityPower * deltaTime;
-        unit.transform.position = Vector3.Lerp(pos, finalPos, 0.1f);
-    }
-}
-
-#endregion

@@ -80,6 +80,9 @@ public class SkillLauncher : MonoBehaviour
 
     public void SetTransform(Vector3 startPos, Vector3 dir)
     {
+        if (dir == Vector3.zero)
+            return;
+
         transform.position = startPos;
         transform.rotation = Quaternion.LookRotation(dir);
     }
