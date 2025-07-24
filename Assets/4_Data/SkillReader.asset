@@ -148,6 +148,32 @@ MonoBehaviour:
       - 0
       - 0
       buffKeys: 
+    - skillKey: 13
+      index: 1
+      componentType: 9
+      indicatorType: 0
+      order: 0
+      timing: 0
+      firePoint: 0
+      maxDistance: 0
+      parameters:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 60
+      - 8.2
+      - 0
+      - 0
+      - 0
+      - 10
+      - 0
+      buffKeys: 
   - skillKey: 16
     skillType: 0
     name: EnergyExplosion
@@ -223,7 +249,7 @@ MonoBehaviour:
     skillElements:
     - skillKey: 26
       index: 0
-      componentType: 9
+      componentType: 10
       indicatorType: 4
       order: 0
       timing: 0

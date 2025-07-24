@@ -1,9 +1,11 @@
 using UnityEngine;
 using System.Collections.Generic;
 using static Easing;
+using System.Linq;
 
 public enum SkillComponentType
 {
+    // 공격
     Projectile,
     Boomerang,
     RotatingOrbs,
@@ -11,8 +13,11 @@ public enum SkillComponentType
     PeriodicAOE,
     InstantAttack,
     Beam,
+    // 이동
     Linear,
     Leap,
+    // 효과
+    Knockback,
     Gravity,
     Max,
 }
@@ -91,6 +96,28 @@ public abstract class SkillComponent
         }
 
         return targets;
+    }
+
+    protected bool IsTargetInSectorArea(Vector3 position, Vector3 direction, Vector3 targetPosition,
+        float angle, float maxDistance)
+    {
+        float sqrDistance = (targetPosition - position).sqrMagnitude;
+        if (sqrDistance > maxDistance)
+            return false;
+
+        float targetAngle = Vector3.Angle(direction, (targetPosition - position).normalized);
+        return targetAngle <= angle * 0.5f;
+    }
+
+    protected bool IsTargetInCircleArea(Vector3 position, Vector3 targetPosition, float maxDistance)
+    {
+        float sqrDistance = (targetPosition - position).sqrMagnitude;
+        return sqrDistance < maxDistance;
+    }
+
+    protected bool IsTargetInRectangleArea(Vector3 position, Vector3 direction, Vector3 targetPosition)
+    {
+        return false; // TODO: 사각형 형태로 구현할 것
     }
 
     #endregion
@@ -525,7 +552,6 @@ public class Attack_AOEComponent : Attack_Component
     protected SkillIndicatorType type;
     protected float angle;
     protected float radius;
-    protected float maxDistance;
 
     protected virtual bool IsInstantComplete => true;
     public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
@@ -534,7 +560,6 @@ public class Attack_AOEComponent : Attack_Component
         damage = holder.damageFinal;
         radius = holder.radiusFinal;
         angle = holder.angle;
-        maxDistance = radius * radius;
         type = angle == 360f ? SkillIndicatorType.Circle : SkillIndicatorType.Sector;
     }
 
@@ -552,48 +577,34 @@ public class Attack_AOEComponent : Attack_Component
     {
         Vector3 position = launcher.Position;
         Vector3 direction = launcher.Direction;
+        float maxDistance = radius * radius;
 
         List<Unit> targets = GetHitTargetsBySphere(position, radius);
         foreach (Unit target in targets)
         {
-            if (IsTargetInSkillArea(position, direction, target.transform.position))
+            if (!IsHittable(target))
+                continue;
+
+            Vector3 targetPos = target.transform.position;
+
+            switch (type)
             {
-                OnHit(target);
+                case SkillIndicatorType.Sector:
+                    if (IsTargetInSectorArea(position, direction, targetPos, angle, maxDistance))
+                        OnHit(target);
+                    break;
+
+                case SkillIndicatorType.Circle:
+                    if (IsTargetInCircleArea(position, targetPos, maxDistance))
+                        OnHit(target);
+                    break;
+
+                case SkillIndicatorType.Rectangle:
+                    if (IsTargetInRectangleArea(position, direction, targetPos))
+                        OnHit(target);
+                    break;
             }
         }
-    }
-
-    protected bool IsTargetInSkillArea(Vector3 position, Vector3 direction, Vector3 targetPosition)
-    {
-        float sqrDistance = (targetPosition - position).sqrMagnitude;
-
-        return type switch
-        {
-            SkillIndicatorType.Line => false,
-            SkillIndicatorType.Sector => IsTargetInSectorArea(position, direction, targetPosition, sqrDistance),
-            SkillIndicatorType.Circle => IsTargetInCircleArea(sqrDistance),
-            SkillIndicatorType.Rectangle => IsTargetInRectangleArea(position, direction, targetPosition, sqrDistance),
-            _ => true,
-        };
-    }
-
-    private bool IsTargetInSectorArea(Vector3 position, Vector3 direction, Vector3 targetPosition, float sqrDistance)
-    {
-        if (sqrDistance > maxDistance)
-            return false;
-
-        float angle = Vector3.Angle(direction, (targetPosition - position).normalized);
-        return angle <= this.angle * 0.5f;
-    }
-
-    private bool IsTargetInCircleArea(float sqrDistance)
-    {
-        return sqrDistance <= maxDistance;
-    }
-
-    private bool IsTargetInRectangleArea(Vector3 position, Vector3 direction, Vector3 targetPosition, float sqrDistance)
-    {
-        return false; // TODO: 사각형 형태로 구현할 것
     }
 
     public override void OnHit(Unit target)
@@ -906,6 +917,183 @@ public class Movement_LeapComponent : SkillComponent
 
 #region 효과 컴포넌트
 
+public class Effect_KnockbackComponent : SkillComponent
+{
+    public override SkillComponentType Type => SkillComponentType.Knockback;
+    private SkillIndicatorType type;
+    private float knockbackForce;
+    private float radius;
+    private float angle;
+
+    // 넉백
+    private float time;
+    private float KNOCKBACK_DURATION = 0.5f;
+    private List<Unit> knockbackTargets = new();
+    private Dictionary<Unit, KnockbackData> knockbackData = new();
+    private static Stack<KnockbackData> pools = new();
+
+    private class KnockbackData
+    {
+        public Vector3 startPos;
+        public Vector3 direction;
+        public float remainingTime;
+        public float totalInvTime;
+
+        public void Init(Vector3 startPos, Vector3 direction, float totalTime)
+        {
+            this.startPos = startPos;
+            this.direction = direction;
+            this.remainingTime = totalTime;
+            this.totalInvTime = 1f / totalTime;
+        }
+    }
+
+    public override void Reset()
+    {
+        base.Reset();
+        time = 0f;
+
+        foreach (var data in knockbackData)
+        {
+            PushKnockbackData(data.Value);
+        }
+
+        knockbackData.Clear();
+        knockbackTargets.Clear();
+    }
+
+    public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
+    {
+        base.Init(launcher, holder, fixedTarget);
+        knockbackForce = holder.gravityFinal;
+        radius = holder.radiusFinal;
+        angle = holder.angle;
+        type = angle == 360f ? SkillIndicatorType.Circle : SkillIndicatorType.Sector;
+    }
+
+    public override void OnStart()
+    {
+        base.OnStart();
+
+        Vector3 startPos = launcher.Position;
+        Vector3 direction = launcher.Direction;
+        float maxDistance = radius * radius;
+
+        List<Unit> targets = GetHitTargetsBySphere(startPos, radius);
+        foreach (Unit target in targets)
+        {
+            if (!IsHittable(target))
+                continue;
+
+            Vector3 targetPos = target.transform.position;
+            switch (type)
+            {
+                case SkillIndicatorType.Sector:
+                    if (IsTargetInSectorArea(startPos, direction, targetPos, angle, maxDistance))
+                        CreateKnockbackData(target);
+                    break;
+
+                case SkillIndicatorType.Circle:
+                    if (IsTargetInCircleArea(startPos, targetPos, maxDistance))
+                        CreateKnockbackData(target);
+                    break;
+
+                case SkillIndicatorType.Rectangle:
+                    if (IsTargetInRectangleArea(startPos, direction, targetPos))
+                        CreateKnockbackData(target);
+                    break;
+            }
+        }
+    }
+
+    public override void OnUpdate(float deltaTime)
+    {
+        time += deltaTime;
+
+        // 넉백 효과 적용
+        for (int i = knockbackTargets.Count - 1; i >= 0; i--)
+        {
+            Unit target = knockbackTargets[i];
+            if (target.IsDead)
+            {
+                RemoveKnockbackData(target);
+                continue;
+            }
+
+            ApplyKnockbackEffect(target, deltaTime);
+        }
+
+        // 모든 넉백이 완료되면 종료
+        if (knockbackTargets.Count == 0 || time >= KNOCKBACK_DURATION)
+        {
+            OnEnd();
+        }
+    }
+
+    private void CreateKnockbackData(Unit target)
+    {
+        if (knockbackTargets.Contains(target))
+            return;
+
+        Vector3 targetPos = target.transform.position;
+        Vector3 direction = (targetPos - launcher.Position).normalized;
+        direction.y = 0f;
+
+        KnockbackData data = PopKnockbackData();
+        data.Init(targetPos, direction, KNOCKBACK_DURATION);
+        knockbackTargets.Add(target);
+        knockbackData[target] = data;
+
+        target.AddBuff(BuffKey.Stun, launcher.Caster);
+    }
+
+    private void RemoveKnockbackData(Unit target)
+    {
+        knockbackTargets.Remove(target);
+        if (knockbackData.TryGetValue(target, out KnockbackData data))
+        {
+            PushKnockbackData(data);
+            knockbackData.Remove(target);
+        }
+
+        target.RemoveBuff(BuffKey.Stun);
+    }
+
+    private void ApplyKnockbackEffect(Unit target, float deltaTime)
+    {
+        if (!knockbackData.TryGetValue(target, out KnockbackData data))
+            return;
+
+        data.remainingTime -= deltaTime;
+        if (data.remainingTime <= 0f)
+        {
+            RemoveKnockbackData(target);
+            return;
+        }
+
+        // 넉백 거리 계산 (시간에 따른 감쇠)
+        float p = 1f - (data.remainingTime * data.totalInvTime);
+        float force = knockbackForce * (1f - p);
+
+        // 넉백 적용
+        Vector3 knockbackMovement = data.direction * force * deltaTime;
+        target.transform.position += knockbackMovement;
+    }
+
+    private void PushKnockbackData(KnockbackData data)
+    {
+        pools.Push(data);
+    }
+
+    private KnockbackData PopKnockbackData()
+    {
+        if (!pools.TryPop(out KnockbackData data))
+            data = new KnockbackData();
+
+        return data;
+    }
+}
+
 public class Effect_GravityComponent : SkillComponent
 {
     public override SkillComponentType Type => SkillComponentType.Gravity;
@@ -949,11 +1137,11 @@ public class Effect_GravityComponent : SkillComponent
         List<Unit> targets = GetHitTargetsBySphere(gravityCenter, radius);
         foreach (Unit target in targets)
         {
-            if (IsHittable(target))
-            {
-                units.Add(target);
-                startTimes[target] = time;
-            }
+            if (!IsHittable(target))
+                continue;
+
+            units.Add(target);
+            startTimes[target] = time;
         }
     }
 

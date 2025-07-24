@@ -112,7 +112,7 @@ public class SkillLauncher : MonoBehaviour
 
     private SkillComponent CreateComponent(SkillComponentType type, int order)
     {
-        SkillComponent component = GameMgr.Instance.skillMgr.PopComponent(type);
+        SkillComponent component = GameMgr.Instance.skillMgr.PopSkillComponent(type);
         if (component == null)
             return null;
 

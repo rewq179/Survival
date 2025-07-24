@@ -453,13 +453,14 @@ public class SkillMgr : MonoBehaviour
         componentPools[type].Push(component);
     }
 
-    public SkillComponent PopComponent(SkillComponentType type)
+    public SkillComponent PopSkillComponent(SkillComponentType type)
     {
         if (componentPools.TryGetValue(type, out Stack<SkillComponent> pools) && pools.Count > 0)
             return pools.Pop();
 
         return type switch
         {
+            // 공격
             SkillComponentType.Projectile => new Attack_ProjectileComponent(),
             SkillComponentType.Boomerang => new Attack_BoomerangComponent(),
             SkillComponentType.RotatingOrbs => new Attack_RotatingOrbsComponent(),
@@ -467,9 +468,12 @@ public class SkillMgr : MonoBehaviour
             SkillComponentType.PeriodicAOE => new Attack_PeriodicAOEComponent(),
             SkillComponentType.InstantAttack => new Attack_InstantComponent(),
             SkillComponentType.Beam => new Attack_BeamComponent(),
+            // 이동
             SkillComponentType.Linear => new Movement_LinearComponent(),
             SkillComponentType.Leap => new Movement_LeapComponent(),
+            // 효과
             SkillComponentType.Gravity => new Effect_GravityComponent(),
+            SkillComponentType.Knockback => new Effect_KnockbackComponent(),
             _ => null,
         };
     }
