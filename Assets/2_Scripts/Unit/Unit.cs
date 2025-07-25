@@ -144,10 +144,6 @@ public class Unit : MonoBehaviour
             behaviourModule.UpdateMoveSpeed();
     }
 
-    // 애니메이션
-    public void PlayAnimation(string name) => animator.Play(name);
-    public void SetTrigger(string name) => animator.SetTrigger(name);
-
     // StatModule
     public float MaxHp => statModule.MaxHP;
     public float MoveSpeed => statModule.MoveSpeed;
@@ -158,9 +154,16 @@ public class Unit : MonoBehaviour
     public bool IsAttacking => behaviourModule.IsAttacking;
     public bool IsForceMoving => behaviourModule.IsForceMoving;
     public void SetForceMoving(bool isForceMoving) => behaviourModule.SetForceMoving(isForceMoving);
-    public void OnAnimationEnd(AnimEvent animEvent) => behaviourModule.OnAnimationEnd(animEvent);
     public void SetAIState(AIState state) => behaviourModule.SetAIState(state);
     public void SetAttacking(bool isAttacking) => behaviourModule.SetAttacking(isAttacking);
+
+    public void PlayAnimation(string name, AnimationType type) => behaviourModule.PlayAnimation(name, type);
+    public void PlayAnimation(AnimationType type) => behaviourModule.PlayAnimation(type);
+
+    public void OnAnimationEnd(AnimEvent animEvent)
+    {
+        behaviourModule.OnAnimationEnd(animEvent);
+    }
 
     // CombatModule
     public bool IsDead => combatModule.IsDead;

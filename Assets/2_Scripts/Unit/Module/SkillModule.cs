@@ -344,7 +344,7 @@ public class SkillModule : MonoBehaviour
 
         owner.SetAttacking(true);
         SkillKey skillKey = availableSkills[UnityEngine.Random.Range(0, availableSkills.Count)];
-        owner.PlayAnimation(skillKey.ToString());
+        owner.PlayAnimation(skillKey.ToString(), AnimationType.Attack);
         GameMgr.Instance.skillMgr.ActivateSkill(skillKey, owner, target);
     }
 

@@ -61,7 +61,7 @@ public class CombatModule
 
         else
         {
-            owner.PlayAnimation("Take Damage");
+            owner.PlayAnimation(AnimationType.TakeDamage);
         }
     }
 
@@ -81,6 +81,6 @@ public class CombatModule
         else
             rewardMgr.CreateItem(owner);
 
-        owner.PlayAnimation("Die");
+        owner.PlayAnimation(AnimationType.Die);
     }
 }

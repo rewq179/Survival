@@ -39,7 +39,7 @@ public class BehaviourMonsterModule : BehaviourModule
 
     public override void Init(Unit unit)
     {
-        owner = unit;
+        base.Init(unit);
         target = GameMgr.Instance.PlayerUnit;
         skillModule = owner.SkillModule;
 
@@ -93,19 +93,5 @@ public class BehaviourMonsterModule : BehaviourModule
     {
         canMeleeAttack = isInRange;
         agent.SetVariableValue("CanMeleeAttack", isInRange);
-    }
-
-    public override void OnAnimationEnd(AnimEvent animEvent)
-    {
-        switch (animEvent)
-        {
-            case AnimEvent.Attack:
-                SetAttacking(false);
-                break;
-
-            case AnimEvent.Die:
-                GameMgr.Instance.spawnMgr.RemoveEnemy(owner);
-                break;
-        }
     }
 }

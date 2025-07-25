@@ -37,6 +37,4 @@ public class SkillEffectController : MonoBehaviour
     public void PlayHit() => particle.PlayHit();
     public void StopMain() => particle.StopMain();
     public void StopHitted() => particle.StopHitted();
-
-
 }
