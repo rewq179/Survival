@@ -4,6 +4,7 @@ using UnityEngine;
 /// <summary> 이펙트 실행 시점 </summary>
 public enum EffectTiming
 {
+    OnStart,    // 시작 시 실행
     OnHit,      // 피격 시 실행
     OnUpdate,   // 지속적으로 실행
 }
@@ -527,5 +528,88 @@ public static class MovementDataPool
             data = new MovementData();
 
         return data;
+    }
+}
+
+/// <summary> 스킬 인디케이터 효과 </summary>
+public class IndicatorEffect : ISkillEffect
+{
+    private SkillIndicator startIndicator;
+    private SkillIndicator finalIndicator;
+    private SkillKey skillKey;
+    private Vector3 startPos;
+    private Vector3 targetPos;
+    private float time;
+    private float invDuration;
+    private bool isActive;
+    private bool isCompleted;
+
+    public bool IsCompleted => isCompleted;
+
+    public IndicatorEffect(SkillKey skillKey, Vector3 startPos, Vector3 targetPos, float duration)
+    {
+        this.skillKey = skillKey;
+        this.startPos = startPos;
+        this.targetPos = targetPos;
+        this.invDuration = 1f / duration;
+    }
+
+    public void Reset()
+    {
+        time = 0f;
+        isActive = false;
+        isCompleted = false;
+        RemoveIndicator();
+    }
+
+    public void OnApply(EffectTiming timing, Unit target)
+    {
+        if (timing != EffectTiming.OnStart)
+            return;
+
+        isActive = true;
+
+        SkillData data = DataMgr.GetSkillData(skillKey);
+        SkillElement element = data.skillElements[0];
+        SkillMgr skillMgr = GameMgr.Instance.skillMgr;
+
+        startIndicator = skillMgr.CreateIndicator(element, false);
+        startIndicator.DrawIndicator(startPos, targetPos);
+
+        finalIndicator = skillMgr.CreateIndicator(element, false);
+        finalIndicator.DrawIndicator(startPos, targetPos);
+    }
+
+    public void OnUpdate(EffectTiming timing, float deltaTime)
+    {
+        if (timing != EffectTiming.OnUpdate || !isActive || isCompleted)
+            return;
+
+        time += deltaTime;
+        float p = Mathf.Clamp01(time * invDuration);
+
+        startIndicator.UpdateIndicatorScale(p);
+
+        if (p >= 1f)
+        {
+            RemoveIndicator();
+            isCompleted = true;
+            isActive = false;
+        }
+    }
+
+    private void RemoveIndicator()
+    {
+        if (startIndicator != null)
+        {
+            GameMgr.Instance.skillMgr.RemoveIndicator(startIndicator);
+            startIndicator = null;
+        }
+
+        if (finalIndicator != null)
+        {
+            GameMgr.Instance.skillMgr.RemoveIndicator(finalIndicator);
+            finalIndicator = null;
+        }
     }
 }

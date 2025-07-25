@@ -82,6 +82,11 @@ public abstract class SkillComponent
     protected virtual void OnStartAction()
     {
         state = ComponentState.Running;
+
+        foreach (ISkillEffect effect in skillEffects)
+        {
+            effect.OnApply(EffectTiming.OnStart, null);
+        }
     }
 
     public void OnUpdate(float deltaTime)
@@ -92,7 +97,13 @@ public abstract class SkillComponent
         OnUpdateAction(deltaTime);
     }
 
-    protected virtual void OnUpdateAction(float deltaTime) { }
+    protected virtual void OnUpdateAction(float deltaTime)
+    {
+        foreach (ISkillEffect effect in skillEffects)
+        {
+            effect.OnUpdate(EffectTiming.OnUpdate, deltaTime);
+        }
+    }
 
     protected void OnEnd(bool forceEnd = false)
     {
@@ -164,6 +175,8 @@ public abstract class SkillComponent
 public abstract class Attack_Component : SkillComponent
 {
     protected SkillEffectController effectController;
+    public override SkillEffectController EffectController => effectController;
+    protected abstract bool IsParticlePlayInStartAction { get; }
 
     public override void Reset()
     {
@@ -188,8 +201,6 @@ public abstract class Attack_Component : SkillComponent
         }
     }
 
-    public override SkillEffectController EffectController => effectController;
-
     protected override void OnStartAction()
     {
         base.OnStartAction();
@@ -199,22 +210,7 @@ public abstract class Attack_Component : SkillComponent
         }
     }
 
-    protected override void OnUpdateAction(float deltaTime)
-    {
-        base.OnUpdateAction(deltaTime);
-
-        // 지속 실행할 효과들
-        foreach (ISkillEffect effect in skillEffects)
-        {
-            effect.OnUpdate(EffectTiming.OnUpdate, deltaTime);
-        }
-    }
-
-    protected abstract bool IsParticlePlayInStartAction { get; }
-    protected void PlayParticle()
-    {
-        effectController?.Play();
-    }
+    protected void PlayParticle() => effectController?.Play();
 
     protected override void OnHitAction(Unit target)
     {
@@ -798,23 +794,19 @@ public class Beam_Component : Attack_Component
 {
     public override SkillComponentType Type => SkillComponentType.Beam;
 
+    private BeamParticle beamParticle;
     private float length;
     private float tick;
     private float duration;
-
-    private BeamParticle beamParticle;
     private Vector3 startPos;
     private Vector3 targetPos;
     private Vector3 direction;
-
-    // 인디케이터
-    private SkillIndicator startIndicator;
-    private SkillIndicator finalIndicator;
-    private bool isIndicatorTime;
     private float time;
     private float lastTickTime;
+
+    private IndicatorEffect indicatorEffect;
+    private bool isIndicatorCompleted;
     private const float INDICATOR_DURATION = 0.4f;
-    private const float INV_INDICATOR_DURATION = 1f / INDICATOR_DURATION;
 
     protected override bool IsParticlePlayInStartAction => false;
 
@@ -824,18 +816,8 @@ public class Beam_Component : Attack_Component
         lastTickTime = 0f;
         time = 0f;
         beamParticle = null;
-        
-        if (startIndicator != null)
-        {
-            GameMgr.Instance.skillMgr.RemoveIndicator(startIndicator);
-            startIndicator = null;
-        }
-
-        if (finalIndicator != null)
-        {
-            GameMgr.Instance.skillMgr.RemoveIndicator(finalIndicator);
-            finalIndicator = null;
-        }
+        isIndicatorCompleted = false;
+        indicatorEffect = null;
     }
 
     public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
@@ -845,54 +827,37 @@ public class Beam_Component : Attack_Component
         tick = holder.damageTickFinal;
         duration = holder.durationFinal;
 
-        // 인디케이터
         startPos = launcher.Position;
         targetPos = fixedTarget.transform.position;
-        isIndicatorTime = true;
+
+        // 인디케이터 이펙트 추가
+        indicatorEffect = new IndicatorEffect(launcher.SkillKey, startPos, targetPos, INDICATOR_DURATION);
+        AddSkillEffect(indicatorEffect);
     }
 
     protected override void OnStartAction()
     {
         base.OnStartAction();
-
-        SkillData data = DataMgr.GetSkillData(launcher.SkillKey);
-        SkillElement element = data.skillElements[0];
-        SkillMgr skillMgr = GameMgr.Instance.skillMgr;
-
-        // 스킬 인디케이터
-        startIndicator = skillMgr.CreateIndicator(element, false);
-        startIndicator.DrawIndicator(startPos, targetPos);
-        finalIndicator = skillMgr.CreateIndicator(element, false);
-        finalIndicator.DrawIndicator(startPos, targetPos);
-
         beamParticle = effectController.GetBeamParticle();
     }
 
     protected override void OnUpdateAction(float deltaTime)
     {
         base.OnUpdateAction(deltaTime);
-
         time += deltaTime;
 
-        if (isIndicatorTime)
-            UpdateIndicator();
-        else
-            UpdateSkill();
-    }
-
-    private void UpdateIndicator()
-    {
-        if (time < INDICATOR_DURATION)
+        // 인디케이터 완료 확인
+        if (!isIndicatorCompleted && indicatorEffect.IsCompleted)
         {
-            float p = Mathf.Clamp01(time * INV_INDICATOR_DURATION);
-            startIndicator.UpdateIndicatorScale(p);
-            return;
+            isIndicatorCompleted = true;
+            PlayParticle();
+            UpdateBeamPosition();
         }
 
-        isIndicatorTime = false;
-        time = 0f;
-        PlayParticle();
-        UpdateBeamPosition();
+        if (!isIndicatorCompleted)
+            return;
+
+        UpdateSkill();
     }
 
     private void UpdateSkill()
@@ -918,7 +883,7 @@ public class Beam_Component : Attack_Component
         startPos = launcher.Caster.firePoint.position;
         targetPos.y = startPos.y;
         direction = (targetPos - startPos).normalized;
-        
+
         launcher.SetTransform(startPos, direction);
         beamParticle.Init(direction, length);
     }
@@ -932,9 +897,13 @@ public class Beam_Component : Attack_Component
     private void ApplyTickDamage()
     {
         lastTickTime = Time.time;
-        if (Physics.Raycast(startPos, direction, out RaycastHit hit, GameValue.PROJECTILE_MAX_LENGTH, GameValue.UNIT_LAYERS))
+        if (Physics.Raycast(startPos, direction, out RaycastHit hit, length, GameValue.UNIT_LAYERS))
         {
-            OnHit(hit.collider.GetComponent<Unit>());
+            Unit target = hit.collider.GetComponent<Unit>();
+            if (target != null)
+            {
+                OnHit(target);
+            }
         }
     }
 }
@@ -943,8 +912,6 @@ public class Beam_Component : Attack_Component
 public class Leap_Component : SkillComponent
 {
     public override SkillComponentType Type => SkillComponentType.Leap;
-    private SkillIndicator startIndicator;
-    private SkillIndicator finalIndicator;
     private Vector3 startPos;
     private Vector3 targetPos;
     private Vector3 casterAdjustedPos;
@@ -957,18 +924,6 @@ public class Leap_Component : SkillComponent
     {
         base.Reset();
         time = 0f;
-
-        if (startIndicator != null)
-        {
-            GameMgr.Instance.skillMgr.RemoveIndicator(startIndicator);
-            startIndicator = null;
-        }
-
-        if (finalIndicator != null)
-        {
-            GameMgr.Instance.skillMgr.RemoveIndicator(finalIndicator);
-            finalIndicator = null;
-        }
     }
 
     public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
@@ -980,30 +935,19 @@ public class Leap_Component : SkillComponent
         startPos = launcher.Position;
         Vector3 dir = (launcher.Position - targetPos).normalized;
         casterAdjustedPos = dir * 2f;
-    }
 
-    protected override void OnStartAction()
-    {
-        base.OnStartAction();
-
-        // 스킬 인디케이터
-        SkillData data = DataMgr.GetSkillData(launcher.SkillKey);
-        SkillElement element = data.skillElements[0];
-        SkillMgr skillMgr = GameMgr.Instance.skillMgr;
-
-        startIndicator = skillMgr.CreateIndicator(element, false);
-        startIndicator.DrawIndicator(targetPos, targetPos);
-        finalIndicator = skillMgr.CreateIndicator(element, false);
-        finalIndicator.DrawIndicator(targetPos, targetPos);
+        // 인디케이터 이펙트 추가
+        AddSkillEffect(new IndicatorEffect(launcher.SkillKey, targetPos, targetPos, duration));
     }
 
     protected override void OnUpdateAction(float deltaTime)
     {
+        base.OnUpdateAction(deltaTime);
         time += deltaTime;
-        float p = Mathf.Clamp01(time * invDuration);
-        startIndicator.UpdateIndicatorScale(p);
 
-        // 도약 위치
+        float p = Mathf.Clamp01(time * invDuration);
+
+        // 도약 위치 계산
         Vector3 pos = Vector3.Lerp(startPos, targetPos + casterAdjustedPos, curve.Evaluate(p));
         pos.y = Mathf.Sin(p * Mathf.PI);
         launcher.SetTransform(pos, launcher.Direction);
