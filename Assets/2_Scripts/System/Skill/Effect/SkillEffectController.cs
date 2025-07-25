@@ -3,8 +3,12 @@ using UnityEngine;
 
 public class SkillEffectController : MonoBehaviour
 {
+    [Header("Skill Effect Controller")]
     [SerializeField] private SkillCollision collision;
     [SerializeField] private SkillParticle particle;
+
+    [Header("Sub Particles")]
+    [SerializeField] private BeamParticle beamParticle;
 
     public void Reset()
     {
@@ -37,4 +41,7 @@ public class SkillEffectController : MonoBehaviour
     public void PlayHit() => particle.PlayHit();
     public void StopMain() => particle.StopMain();
     public void StopHitted() => particle.StopHitted();
+
+    // Sub Particles
+    public BeamParticle GetBeamParticle() => beamParticle;
 }

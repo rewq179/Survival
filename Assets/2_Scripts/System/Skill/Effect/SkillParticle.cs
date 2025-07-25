@@ -33,6 +33,8 @@ public class SkillParticle : MonoBehaviour
 
     public void Init()
     {
+        Reset();
+
         foreach (ParticleSystem particle in hittedParticles)
         {
             hittedInvDurations.Add(1f / particle.main.duration);

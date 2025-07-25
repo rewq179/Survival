@@ -53764,7 +53764,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4377817723901784}
-  - component: {fileID: 120269725676574324}
   - component: {fileID: 7618617680568419384}
   m_Layer: 9
   m_Name: BreathAttack
@@ -53789,14 +53788,65 @@ Transform:
   - {fileID: 1153662629493369803}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!120 &120269725676574324
+--- !u!114 &7618617680568419384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1955173974842222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3994e6f8acc017e4cb797854b0d8925c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collision: {fileID: 0}
+  particle: {fileID: 7258580784964963019}
+  beamParticle: {fileID: 2633261746892133079}
+--- !u!1 &3555372576531262748
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1153662629493369803}
+  - component: {fileID: 6134971653140466753}
+  - component: {fileID: 2633261746892133079}
+  - component: {fileID: 7258580784964963019}
+  m_Layer: 9
+  m_Name: Visuals
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1153662629493369803
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3555372576531262748}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4118572504237920}
+  - {fileID: 4569726889156158}
+  m_Father: {fileID: 4377817723901784}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!120 &6134971653140466753
 LineRenderer:
   serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1955173974842222}
+  m_GameObject: {fileID: 3555372576531262748}
   m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 1
@@ -53905,55 +53955,6 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 0
---- !u!114 &7618617680568419384
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1955173974842222}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3994e6f8acc017e4cb797854b0d8925c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  collision: {fileID: 0}
-  particle: {fileID: 7258580784964963019}
---- !u!1 &3555372576531262748
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1153662629493369803}
-  - component: {fileID: 2633261746892133079}
-  - component: {fileID: 7258580784964963019}
-  m_Layer: 9
-  m_Name: Visuals
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &1153662629493369803
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3555372576531262748}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 4118572504237920}
-  - {fileID: 4569726889156158}
-  m_Father: {fileID: 4377817723901784}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2633261746892133079
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -53971,7 +53972,7 @@ MonoBehaviour:
   useBeamRotation: 0
   mainTextureLength: 0.5
   noiseTextureLength: 0.5
-  beamRenderer: {fileID: 120269725676574324}
+  beamRenderer: {fileID: 6134971653140466753}
 --- !u!114 &7258580784964963019
 MonoBehaviour:
   m_ObjectHideFlags: 0

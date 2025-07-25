@@ -193,17 +193,10 @@ public abstract class Attack_Component : SkillComponent
     protected override void OnStartAction()
     {
         base.OnStartAction();
-        effectController?.Play();
-    }
-
-    protected override void OnHitAction(Unit target)
-    {
-        foreach (ISkillEffect effect in skillEffects)
+        if (IsParticlePlayInStartAction)
         {
-            effect.OnApply(EffectTiming.OnHit, target);
+            PlayParticle();
         }
-
-        effectController?.PlayHit();
     }
 
     protected override void OnUpdateAction(float deltaTime)
@@ -215,6 +208,22 @@ public abstract class Attack_Component : SkillComponent
         {
             effect.OnUpdate(EffectTiming.OnUpdate, deltaTime);
         }
+    }
+
+    protected abstract bool IsParticlePlayInStartAction { get; }
+    protected void PlayParticle()
+    {
+        effectController?.Play();
+    }
+
+    protected override void OnHitAction(Unit target)
+    {
+        foreach (ISkillEffect effect in skillEffects)
+        {
+            effect.OnApply(EffectTiming.OnHit, target);
+        }
+
+        effectController?.PlayHit();
     }
 
     protected void OnParticleFinished()
@@ -255,6 +264,7 @@ public class ProjectileComponent : BaseProjectile_Component
     private int piercing;
     private HashSet<int> hittedUnitIDs = new();
     private const float RICOCHET_RADIUS = 6f;
+    protected override bool IsParticlePlayInStartAction => true;
 
     public override void Reset()
     {
@@ -348,6 +358,7 @@ public class ProjectileComponent : BaseProjectile_Component
 public class BoomerangComponent : BaseProjectile_Component
 {
     public override SkillComponentType Type => SkillComponentType.Boomerang;
+    protected override bool IsParticlePlayInStartAction => false;
 
     private bool isReturning;
     private int hittedCount;
@@ -451,6 +462,8 @@ public class BoomerangComponent : BaseProjectile_Component
 public class RotatingOrbs_Component : BaseProjectile_Component
 {
     public override SkillComponentType Type => SkillComponentType.RotatingOrbs;
+    protected override bool IsParticlePlayInStartAction => true;
+
     private float rotationSpeed;
     private int orbCount;
     private float anglePerOrb;
@@ -608,6 +621,8 @@ public class RotatingOrbs_Component : BaseProjectile_Component
 public class InstantAOE_Component : Attack_Component
 {
     public override SkillComponentType Type => SkillComponentType.InstantAOE;
+    protected override bool IsParticlePlayInStartAction => true;
+
     protected SkillIndicatorType indicatorType;
     protected float radius;
     protected float angle;
@@ -762,6 +777,7 @@ public class InstantAttack_Component : Attack_Component
 {
     public override SkillComponentType Type => SkillComponentType.InstantAttack;
     private Unit fixedTarget;
+    protected override bool IsParticlePlayInStartAction => true;
 
     public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
     {
@@ -781,31 +797,45 @@ public class InstantAttack_Component : Attack_Component
 public class Beam_Component : Attack_Component
 {
     public override SkillComponentType Type => SkillComponentType.Beam;
+
     private float length;
     private float tick;
     private float duration;
 
     private BeamParticle beamParticle;
-    private SkillIndicator startIndicator;
-    private SkillIndicator finalIndicator;
     private Vector3 startPos;
     private Vector3 targetPos;
     private Vector3 direction;
 
+    // 인디케이터
+    private SkillIndicator startIndicator;
+    private SkillIndicator finalIndicator;
     private bool isIndicatorTime;
     private float time;
-    private float tickTime;
-    private float indicatorDuration;
-    private float invIndicatorDuration;
+    private float lastTickTime;
+    private const float INDICATOR_DURATION = 0.4f;
+    private const float INV_INDICATOR_DURATION = 1f / INDICATOR_DURATION;
+
+    protected override bool IsParticlePlayInStartAction => false;
 
     public override void Reset()
     {
         base.Reset();
-        tickTime = 0f;
+        lastTickTime = 0f;
         time = 0f;
         beamParticle = null;
-        startIndicator = null;
-        finalIndicator = null;
+        
+        if (startIndicator != null)
+        {
+            GameMgr.Instance.skillMgr.RemoveIndicator(startIndicator);
+            startIndicator = null;
+        }
+
+        if (finalIndicator != null)
+        {
+            GameMgr.Instance.skillMgr.RemoveIndicator(finalIndicator);
+            finalIndicator = null;
+        }
     }
 
     public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
@@ -815,13 +845,10 @@ public class Beam_Component : Attack_Component
         tick = holder.damageTickFinal;
         duration = holder.durationFinal;
 
-        isIndicatorTime = true;
-        targetPos = fixedTarget.transform.position;
-        indicatorDuration = 0.4f;
-        invIndicatorDuration = 1f / indicatorDuration;
-
+        // 인디케이터
         startPos = launcher.Position;
-        direction = (targetPos - startPos).normalized;
+        targetPos = fixedTarget.transform.position;
+        isIndicatorTime = true;
     }
 
     protected override void OnStartAction()
@@ -837,6 +864,8 @@ public class Beam_Component : Attack_Component
         startIndicator.DrawIndicator(startPos, targetPos);
         finalIndicator = skillMgr.CreateIndicator(element, false);
         finalIndicator.DrawIndicator(startPos, targetPos);
+
+        beamParticle = effectController.GetBeamParticle();
     }
 
     protected override void OnUpdateAction(float deltaTime)
@@ -848,60 +877,64 @@ public class Beam_Component : Attack_Component
         if (isIndicatorTime)
             UpdateIndicator();
         else
-            UpdateSkill(deltaTime);
+            UpdateSkill();
     }
 
     private void UpdateIndicator()
     {
-        if (!isIndicatorTime)
-            return;
-
-        if (time < indicatorDuration)
+        if (time < INDICATOR_DURATION)
         {
-            float p = Mathf.Clamp01(time * invIndicatorDuration);
+            float p = Mathf.Clamp01(time * INV_INDICATOR_DURATION);
             startIndicator.UpdateIndicatorScale(p);
+            return;
         }
 
-        else
-        {
-            isIndicatorTime = false;
-            time = 0f;
-            GameMgr.Instance.skillMgr.RemoveIndicator(startIndicator);
-            GameMgr.Instance.skillMgr.RemoveIndicator(finalIndicator);
-
-            startPos = launcher.Caster.firePoint.position;
-            targetPos.y = startPos.y;
-            direction = (targetPos - startPos).normalized;
-            launcher.SetTransform(startPos, direction);
-
-            beamParticle = effectController.GetComponent<BeamParticle>();
-            beamParticle.Init(direction, length);
-        }
+        isIndicatorTime = false;
+        time = 0f;
+        PlayParticle();
+        UpdateBeamPosition();
     }
 
-    private void UpdateSkill(float deltaTime)
+    private void UpdateSkill()
     {
-        if (isIndicatorTime)
-            return;
-
+        UpdateBeamPosition();
         beamParticle.UpdateBeam();
 
-        if (time < duration)
-        {
-            tickTime += deltaTime;
-            if (tickTime < tick)
-                return;
-
-            tickTime -= tick;
-
-            if (Physics.Raycast(startPos, direction, out RaycastHit hit, GameValue.PROJECTILE_MAX_LENGTH, GameValue.UNIT_LAYERS))
-                OnHit(hit.collider.GetComponent<Unit>());
-        }
-
-        else
+        if (time >= duration)
         {
             beamParticle.DisableBeam();
             OnEnd();
+            return;
+        }
+
+        if (CanApplyTickDamage())
+        {
+            ApplyTickDamage();
+        }
+    }
+
+    private void UpdateBeamPosition()
+    {
+        startPos = launcher.Caster.firePoint.position;
+        targetPos.y = startPos.y;
+        direction = (targetPos - startPos).normalized;
+        
+        launcher.SetTransform(startPos, direction);
+        beamParticle.Init(direction, length);
+    }
+
+    private bool CanApplyTickDamage()
+    {
+        float currentTime = Time.time;
+        return (currentTime - lastTickTime) >= tick;
+    }
+
+    private void ApplyTickDamage()
+    {
+        lastTickTime = Time.time;
+        if (Physics.Raycast(startPos, direction, out RaycastHit hit, GameValue.PROJECTILE_MAX_LENGTH, GameValue.UNIT_LAYERS))
+        {
+            OnHit(hit.collider.GetComponent<Unit>());
         }
     }
 }
@@ -924,8 +957,18 @@ public class Leap_Component : SkillComponent
     {
         base.Reset();
         time = 0f;
-        startIndicator = null;
-        finalIndicator = null;
+
+        if (startIndicator != null)
+        {
+            GameMgr.Instance.skillMgr.RemoveIndicator(startIndicator);
+            startIndicator = null;
+        }
+
+        if (finalIndicator != null)
+        {
+            GameMgr.Instance.skillMgr.RemoveIndicator(finalIndicator);
+            finalIndicator = null;
+        }
     }
 
     public override void Init(SkillLauncher launcher, SkillHolder holder, Unit fixedTarget)
@@ -973,8 +1016,6 @@ public class Leap_Component : SkillComponent
         if (p >= 1f) // 도약 종료
         {
             caster.SetForceMoving(false);
-            GameMgr.Instance.skillMgr.RemoveIndicator(startIndicator);
-            GameMgr.Instance.skillMgr.RemoveIndicator(finalIndicator);
             OnEnd();
         }
     }
