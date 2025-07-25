@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public enum AnimationType
 {
@@ -15,6 +16,22 @@ public abstract class BehaviourModule
 
     protected bool isForceMoving;
     protected AnimationType animationType;
+
+    private static readonly Dictionary<AnimationType, string> AnimationNames = new()
+    {
+        { AnimationType.Attack, "Attack" },
+        { AnimationType.TakeDamage, "TakeDamage" },
+        { AnimationType.Die, "Die" },
+        { AnimationType.Movement, "Movement" },
+    };
+
+    public static string GetAnimationName(AnimationType type)
+    {
+        if (AnimationNames.TryGetValue(type, out string name))
+            return name;
+
+        return string.Empty;
+    }
 
     public abstract void Reset();
     public virtual void Init(Unit unit)
@@ -34,7 +51,12 @@ public abstract class BehaviourModule
     public virtual bool IsAttacking => false;
     public virtual void SetAttacking(bool isAttacking) { }
 
-    public bool PlayAnimation(AnimationType type) => PlayAnimation(type.ToString(), type);
+    public bool PlayAnimation(AnimationType type)
+    {
+        string name = GetAnimationName(type);
+        return PlayAnimation(name, type);
+    }
+
     public bool PlayAnimation(string name, AnimationType type)
     {
         if (animationType < type)
