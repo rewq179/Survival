@@ -211,7 +211,6 @@ public abstract class Attack_Component : SkillComponent
     }
 
     protected void PlayParticle() => effectController?.Play();
-
     protected override void OnHitAction(Unit target)
     {
         foreach (ISkillEffect effect in skillEffects)

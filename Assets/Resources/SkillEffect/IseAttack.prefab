@@ -34131,6 +34131,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   collision: {fileID: 0}
   particle: {fileID: 7893494898440746435}
+  beamParticle: {fileID: 0}
 --- !u!1 &1994824758168566
 GameObject:
   m_ObjectHideFlags: 0
@@ -39018,7 +39019,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.182, y: 0.182, z: 0.182}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4203772162395332}

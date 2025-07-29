@@ -8,6 +8,7 @@ public class SkillCollision : MonoBehaviour
     public event Action<Unit> OnHitTarget;
 
     private bool canUseCollision => skillCollider != null;
+    public Collider Collider => skillCollider;
 
     public void Reset()
     {
