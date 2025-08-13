@@ -1,0 +1,202 @@
+# Unity Performance Optimization Rules
+
+## 🚨 PERFORMANCE CRITICAL - MUST OPTIMIZE
+
+### Update Method Optimization
+- **ALWAYS** cache Time.deltaTime at the start of Update()
+- **ALWAYS** use `sqrMagnitude` instead of `magnitude` for distance checks
+- **ALWAYS** avoid string operations in Update() methods
+- **ALWAYS** use object pooling for frequently created/destroyed objects
+
+### Component Access Optimization
+- **ALWAYS** cache GetComponent() results in Start() or Awake()
+- **ALWAYS** cache Transform.position and Transform.rotation
+- **ALWAYS** use LayerMask.GetMask() once and cache the result
+- **NEVER** call GetComponent() in Update() or FixedUpdate()
+
+### Memory Allocation Prevention
+- **ALWAYS** reuse Vector3, Quaternion, and other structs
+- **ALWAYS** use Stack<T> for object pools
+- **ALWAYS** clear collections in Reset() methods
+- **NEVER** create new objects in performance-critical loops
+
+## 🔧 SPECIFIC OPTIMIZATION TECHNIQUES
+
+### Distance Calculations
+```csharp
+// ✅ CORRECT - Use sqrMagnitude
+private const float ATTACK_RANGE_SQR = ATTACK_RANGE * ATTACK_RANGE;
+float distanceSqr = (target.position - transform.position).sqrMagnitude;
+if (distanceSqr < ATTACK_RANGE_SQR) { /* attack */ }
+
+// ❌ WRONG - Using magnitude
+float distance = (target.position - transform.position).magnitude;
+if (distance < ATTACK_RANGE) { /* attack */ }
+```
+
+### Object Pooling Implementation
+```csharp
+// ✅ CORRECT - Proper object pooling
+private Stack<SkillEffectController> effectPool = new();
+
+public SkillEffectController GetEffect()
+{
+    if (effectPool.TryPop(out SkillEffectController effect))
+        return effect;
+    
+    return Instantiate(effectPrefab);
+}
+
+public void ReturnEffect(SkillEffectController effect)
+{
+    effect.Reset();
+    effectPool.Push(effect);
+}
+```
+
+### Caching Strategy
+```csharp
+// ✅ CORRECT - Cache in Start/Awake
+public class OptimizedUnit : MonoBehaviour
+{
+    private Transform cachedTransform;
+    private Rigidbody cachedRigidbody;
+    private Camera mainCamera;
+    
+    private void Start()
+    {
+        cachedTransform = transform;
+        cachedRigidbody = GetComponent<Rigidbody>();
+        mainCamera = Camera.main;
+    }
+    
+    private void Update()
+    {
+        // Use cached references
+        Vector3 position = cachedTransform.position;
+        cachedRigidbody.velocity = Vector3.zero;
+    }
+}
+```
+
+## 📊 PERFORMANCE MONITORING
+
+### Profiler Best Practices
+- **ALWAYS** profile on target device (not just editor)
+- **ALWAYS** check for GC.Alloc spikes
+- **ALWAYS** monitor Update() method execution time
+- **ALWAYS** use Unity Profiler for memory analysis
+
+### Common Performance Issues
+1. **Garbage Collection**: Avoid allocations in Update loops
+2. **Draw Calls**: Batch similar materials and meshes
+3. **Physics**: Use appropriate collision layers and physics materials
+4. **Scripting**: Minimize per-frame calculations
+
+## 🎯 SKILL SYSTEM OPTIMIZATION
+
+### Effect System Performance
+```csharp
+// ✅ CORRECT - Efficient effect management
+public class OptimizedSkillEffect : ISkillEffect
+{
+    private readonly List<Unit> affectedTargets = new();
+    
+    public void OnUpdate(EffectTiming timing, float deltaTime)
+    {
+        if (timing != EffectTiming.OnUpdate)
+            return;
+            
+        // Process all affected targets efficiently
+        for (int i = affectedTargets.Count - 1; i >= 0; i--)
+        {
+            Unit target = affectedTargets[i];
+            if (target == null || target.IsDead)
+            {
+                affectedTargets.RemoveAt(i);
+                continue;
+            }
+            
+            ProcessTarget(target, deltaTime);
+        }
+    }
+}
+```
+
+### Component State Management
+```csharp
+// ✅ CORRECT - Efficient state checking
+public enum ComponentState
+{
+    NotStarted,
+    Running,
+    Completed
+}
+
+public abstract class OptimizedSkillComponent : SkillComponent
+{
+    protected ComponentState state = ComponentState.NotStarted;
+    
+    public bool IsCompleted => state == ComponentState.Completed;
+    public bool IsRunning => state == ComponentState.Running;
+    
+    protected void SetState(ComponentState newState)
+    {
+        if (state != newState)
+        {
+            state = newState;
+            OnStateChanged(newState);
+        }
+    }
+}
+```
+
+## 🚫 PERFORMANCE ANTI-PATTERNS
+
+### ❌ NEVER DO THESE
+```csharp
+// ❌ WRONG - Creating objects in Update
+private void Update()
+{
+    Vector3 newPosition = new Vector3(x, y, z); // Creates new object every frame
+    transform.position = newPosition;
+}
+
+// ❌ WRONG - Calling GetComponent every frame
+private void Update()
+{
+    Rigidbody rb = GetComponent<Rigidbody>(); // Expensive call every frame
+    rb.velocity = Vector3.zero;
+}
+
+// ❌ WRONG - String operations in Update
+private void Update()
+{
+    string status = "Current HP: " + currentHP + "/" + maxHP; // Allocates memory
+    statusText.text = status;
+}
+```
+
+## 📈 OPTIMIZATION CHECKLIST
+
+### Before Commit
+- [ ] No GetComponent() calls in Update methods
+- [ ] All frequently accessed components are cached
+- [ ] Object pooling implemented for frequent objects
+- [ ] No new object creation in performance loops
+- [ ] Distance checks use sqrMagnitude
+- [ ] Collections are properly cleared in Reset()
+- [ ] Events are unsubscribed in OnDestroy
+
+### Performance Testing
+- [ ] Test on target device (mobile/console)
+- [ ] Check Profiler for GC.Alloc spikes
+- [ ] Verify frame rate consistency
+- [ ] Monitor memory usage over time
+- [ ] Test with multiple objects spawned
+
+Remember: Performance optimization is not optional in ARPG games. Players expect smooth 60fps gameplay even with hundreds of objects on screen.
+description:
+globs:
+alwaysApply: false
+---

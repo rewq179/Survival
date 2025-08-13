@@ -1,0 +1,324 @@
+# Unity Skill System Architecture Rules
+
+## 🚨 SKILL SYSTEM FUNDAMENTALS - MUST FOLLOW
+
+### Component Architecture
+- **ALWAYS** inherit from `SkillComponent` for new skill types
+- **ALWAYS** implement `ISkillEffect` interface for effects
+- **ALWAYS** use `AddSkillEffect()` method to register effects
+- **ALWAYS** implement proper state management (NotStarted, Running, Completed)
+- **ALWAYS** override `OnStartAction()`, `OnUpdateAction()`, and `OnEndAction()`
+
+### Effect System Design
+- **ALWAYS** implement `Reset()` method for effects
+- **ALWAYS** use `EffectTiming` enum for execution timing
+- **ALWAYS** implement `OnApply()` and `OnUpdate()` methods correctly
+- **ALWAYS** handle target validation in effects
+- **NEVER** create new objects in effect update methods
+
+### Skill Data Structure
+- **ALWAYS** use `SkillElement` for skill configuration
+- **ALWAYS** implement `SkillHolder` for runtime skill data
+- **ALWAYS** use `SkillInstance` for skill management
+- **ALWAYS** follow the established parameter system (Damage, Radius, Duration, etc.)
+
+## 🏗️ SKILL SYSTEM ARCHITECTURE
+
+### Core Classes Hierarchy
+```
+SkillComponent (abstract)
+├── Attack_Component (abstract)
+│   ├── ProjectileComponent
+│   ├── AOEComponent
+│   └── InstantAttackComponent
+├── MovementComponent
+└── UtilityComponent
+
+ISkillEffect (interface)
+├── DamageEffect
+├── BuffEffect
+├── StunEffect
+├── KnockbackEffect
+└── MovementEffect
+```
+
+### Skill Execution Flow
+1. **Skill Use** → `SkillMgr.UseSkill()`
+2. **Indicator Show** → `SkillIndicator.DrawIndicator()`
+3. **Skill Launch** → `SkillLauncher.Launch()`
+4. **Component Execution** → `SkillComponent.OnStartAction()`
+5. **Effect Application** → `ISkillEffect.OnApply()`
+6. **Continuous Updates** → `ISkillEffect.OnUpdate()`
+7. **Completion** → `SkillComponent.OnEndAction()`
+
+## 📝 IMPLEMENTATION GUIDELINES
+
+### ✅ CORRECT Skill Component Implementation
+```csharp
+public class CustomSkillComponent : Attack_Component
+{
+    public override SkillComponentType Type => SkillComponentType.Projectile;
+    
+    protected override bool IsParticlePlayInStartAction => true;
+    
+    protected override void OnStartAction()
+    {
+        base.OnStartAction();
+        
+        // Add custom effects
+        AddSkillEffect(new DamageEffect(launcher, holder.damageFinal));
+        AddSkillEffect(new BuffEffect(launcher, BuffKey.Stun));
+        
+        // Initialize effect controller
+        if (effectController != null)
+        {
+            effectController.Play();
+        }
+    }
+    
+    protected override void OnUpdateAction(float deltaTime)
+    {
+        base.OnUpdateAction(deltaTime);
+        
+        // Custom update logic
+        if (ShouldEnd())
+        {
+            OnEnd();
+        }
+    }
+    
+    protected override void OnHitAction(Unit target)
+    {
+        base.OnHitAction(target);
+        
+        // Custom hit logic
+        if (effectController != null)
+        {
+            effectController.PlayHit();
+        }
+    }
+}
+```
+
+### ✅ CORRECT Effect Implementation
+```csharp
+public class CustomEffect : ISkillEffect
+{
+    private float duration;
+    private Dictionary<Unit, float> effectData = new();
+    
+    public CustomEffect(float duration)
+    {
+        this.duration = duration;
+    }
+    
+    public void Reset()
+    {
+        // Clean up effect data
+        effectData.Clear();
+    }
+    
+    public void OnApply(EffectTiming timing, Unit target)
+    {
+        if (timing != EffectTiming.OnHit || target == null)
+            return;
+            
+        if (!effectData.ContainsKey(target))
+        {
+            effectData[target] = duration;
+            // Apply initial effect
+        }
+    }
+    
+    public void OnUpdate(EffectTiming timing, float deltaTime)
+    {
+        if (timing != EffectTiming.OnUpdate)
+            return;
+            
+        // Process ongoing effects
+        List<Unit> completedUnits = new();
+        
+        foreach (var pair in effectData)
+        {
+            Unit unit = pair.Key;
+            float remainingTime = pair.Value;
+            
+            if (unit == null || unit.IsDead)
+            {
+                completedUnits.Add(unit);
+                continue;
+            }
+            
+            remainingTime -= deltaTime;
+            if (remainingTime <= 0f)
+            {
+                completedUnits.Add(unit);
+            }
+            else
+            {
+                effectData[unit] = remainingTime;
+            }
+        }
+        
+        // Remove completed units
+        foreach (Unit unit in completedUnits)
+        {
+            effectData.Remove(unit);
+        }
+    }
+}
+```
+
+## 🎯 SKILL PARAMETER SYSTEM
+
+### Parameter Types
+```csharp
+public enum ElementType
+{
+    Order,          // Execution order
+    Timing,         // Execution timing
+    FirePoint,      // Launch position
+    Damage,         // Base damage
+    MoveSpeed,      // Movement speed
+    Duration,       // Effect duration
+    Tick,           // Damage tick rate
+    Height,         // Vertical offset
+    Width,          // Width for rectangular skills
+    Angle,          // Angle for sector skills
+    Radius,         // Area of effect
+    Ricochet,       // Bounce count
+    Piercing,       // Pierce count
+    Shot,           // Projectile count
+    Gravity,        // Gravity effect
+    RotationSpeed   // Rotation speed
+}
+```
+
+### Parameter Access
+```csharp
+public class SkillElement
+{
+    private float[] parameters = new float[(int)ElementType.Max];
+    
+    public float Damage => GetParameter(ElementType.Damage);
+    public float Radius => GetParameter(ElementType.Radius);
+    public float Duration => GetParameter(ElementType.Duration);
+    
+    public float GetParameter(ElementType key)
+    {
+        int index = (int)key;
+        if (index >= 0 && index < parameters.Length)
+            return parameters[index];
+        return 0f;
+    }
+    
+    public void SetFloatParameter(ElementType key, float value)
+    {
+        int index = (int)key;
+        if (index >= 0 && index < parameters.Length)
+            parameters[index] = value;
+    }
+}
+```
+
+## 🔧 SKILL SYSTEM OPTIMIZATION
+
+### Effect Management
+- **ALWAYS** use object pooling for effects
+- **ALWAYS** implement efficient target tracking
+- **ALWAYS** batch effect updates when possible
+- **NEVER** allocate memory in Update loops
+
+### Component State Management
+```csharp
+public enum ComponentState
+{
+    NotStarted,
+    Running,
+    Completed
+}
+
+public abstract class SkillComponent
+{
+    protected ComponentState state = ComponentState.NotStarted;
+    
+    public ComponentState State => state;
+    public bool IsCompleted => state == ComponentState.Completed;
+    
+    protected void SetState(ComponentState newState)
+    {
+        if (state != newState)
+        {
+            state = newState;
+            OnStateChanged(newState);
+        }
+    }
+}
+```
+
+## 🚫 SKILL SYSTEM ANTI-PATTERNS
+
+### ❌ NEVER DO THESE
+```csharp
+// ❌ WRONG - Not inheriting from SkillComponent
+public class BadSkill : MonoBehaviour
+{
+    // Missing required architecture
+}
+
+// ❌ WRONG - Not implementing ISkillEffect
+public class BadEffect
+{
+    // Missing required interface methods
+}
+
+// ❌ WRONG - Creating objects in Update
+public void OnUpdate(EffectTiming timing, float deltaTime)
+{
+    if (timing == EffectTiming.OnUpdate)
+    {
+        Vector3 newPos = new Vector3(x, y, z); // Memory allocation
+    }
+}
+
+// ❌ WRONG - Not handling state properly
+public void Update()
+{
+    // No state checking
+    ProcessSkill(); // Could run multiple times
+}
+```
+
+## 📊 SKILL SYSTEM TESTING
+
+### Unit Testing Guidelines
+- **ALWAYS** test skill component lifecycle
+- **ALWAYS** test effect application and removal
+- **ALWAYS** test parameter calculations
+- **ALWAYS** test state transitions
+- **ALWAYS** test target validation
+
+### Performance Testing
+- **ALWAYS** test with multiple active skills
+- **ALWAYS** test effect update performance
+- **ALWAYS** monitor memory allocation
+- **ALWAYS** test skill chaining performance
+
+## 🚀 BEST PRACTICES SUMMARY
+
+1. **Follow the established component hierarchy** strictly
+2. **Implement all required interface methods** completely
+3. **Use the parameter system** for all skill values
+4. **Implement proper state management** for all components
+5. **Use object pooling** for frequently created effects
+6. **Handle target validation** in all effects
+7. **Implement Reset() methods** for all effects
+8. **Use EffectTiming** for proper execution control
+9. **Test skill combinations** thoroughly
+10. **Monitor performance** during skill execution
+
+Remember: The skill system is the core gameplay mechanic. Proper architecture ensures scalability, performance, and maintainability.
+description:
+globs:
+alwaysApply: false
+---

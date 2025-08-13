@@ -1,0 +1,204 @@
+# Unity ARPG Project Coding Standards
+
+## 🚨 CRITICAL RULES - MUST FOLLOW
+
+### Naming Conventions
+- **ALWAYS** use PascalCase for classes, methods, and public properties
+- **ALWAYS** use camelCase for private fields and local variables
+- **ALWAYS** use UPPER_CASE_WITH_UNDERSCORES for constants
+- **ALWAYS** prefix boolean variables with `is`, `has`, `should`, `can`
+- **ALWAYS** prefix event handlers with `On` (e.g., `OnMove`, `OnSkillActivate`)
+
+### Architecture Patterns
+- **ALWAYS** inherit from `MonoBehaviour` for Unity components
+- **ALWAYS** implement `Reset()` method for object pooling
+- **ALWAYS** use module pattern for complex systems (StatModule, SkillModule, etc.)
+- **ALWAYS** implement `Init()` method for initialization
+- **ALWAYS** use events for communication between modules
+
+### Code Structure
+- **ALWAYS** place using statements at the top
+- **ALWAYS** group fields with [Header] attributes
+- **ALWAYS** implement proper null checks before accessing components
+- **ALWAYS** use `#if UNITY_EDITOR` for editor-only code
+
+## ❌ CRITICAL RULES - NEVER DO
+
+### Performance Anti-Patterns
+- **NEVER** use `var` in foreach loops - always specify the type
+- **NEVER** use division in performance-critical loops - use multiplication instead
+- **NEVER** create new objects in Update() methods
+- **NEVER** use `GetComponent()` in Update() - cache in Start/Awake
+
+### Unity Anti-Patterns
+- **NEVER** use `Find()` or `FindObjectOfType()` in Update methods
+- **NEVER** destroy objects immediately - use object pooling
+- **NEVER** use `SendMessage()` - use events instead
+- **NEVER** access Transform.position/rotation without caching
+
+### Code Quality Anti-Patterns
+- **NEVER** use magic numbers - always define constants
+- **NEVER** leave empty catch blocks
+- **NEVER** use public fields without [SerializeField]
+- **NEVER** ignore null reference exceptions
+
+## 🏗️ Project Architecture
+
+### Core Systems
+- **Unit System**: Base class for all game objects
+- **Module System**: StatModule, CombatModule, SkillModule, BuffModule
+- **Skill System**: Component-based skill architecture with ISkillEffect interface
+- **Data System**: Google Sheets integration for game balance
+
+### File Organization
+```
+Assets/2_Scripts/
+├── Unit/           # Unit and module classes
+├── System/         # Core game systems
+├── UI/             # User interface components
+├── Data/           # Data structures and enums
+├── DataReader/     # Google Sheets data loaders
+└── Behavior/       # AI behavior trees
+```
+
+## 📝 Code Examples
+
+### ✅ CORRECT Class Structure
+```csharp
+public class SkillEffectController : MonoBehaviour
+{
+    [Header("Skill Effect Controller")]
+    [SerializeField] private SkillCollision collision;
+    [SerializeField] private SkillParticle particle;
+
+    public void Reset()
+    {
+        collision?.Reset();
+        particle.Reset();
+        transform.position = Vector3.zero;
+        transform.rotation = Quaternion.identity;
+        gameObject.SetActive(false);
+    }
+
+    public void Init(SkillLauncher launcher, Action<Unit> onHitTarget, Action onParticleFinished)
+    {
+        if (collision != null)
+        {
+            collision.Init();
+            collision.OnHitTarget += onHitTarget;
+        }
+        
+        particle.Init();
+        particle.OnParticleFinished += onParticleFinished;
+        
+        transform.position = launcher.Position;
+        gameObject.SetActive(true);
+    }
+}
+```
+
+### ✅ CORRECT Module Pattern
+```csharp
+public class Unit : MonoBehaviour
+{
+    [Header("Components")]
+    [SerializeField] private Animator animator;
+    [SerializeField] private HealthBarBase healthBar;
+
+    // Modules
+    private StatModule statModule = new();
+    private CombatModule combatModule = new();
+    private SkillModule skillModule = new();
+    private BuffModule buffModule = new();
+
+    public bool IsActionable => !IsDead && !IsForceMoving && !IsAttacking;
+    public bool CanMove => IsActionable && buffModule.CanMove;
+    public bool CanAttack => IsActionable && buffModule.CanAttack;
+}
+```
+
+### ✅ CORRECT Event Usage
+```csharp
+public class SkillModule : MonoBehaviour
+{
+    public event Action<SkillKey, float> OnSkillCooldownChanged;
+    public event Action<SkillKey> OnSkillCooldownEnded;
+    public event Action<SkillKey> OnSkillAdded;
+    public event Action<SkillKey> OnSkillRemoved;
+
+    private void NotifySkillAdded(SkillKey skillKey)
+    {
+        OnSkillAdded?.Invoke(skillKey);
+    }
+}
+```
+
+## 🔧 Performance Guidelines
+
+### Object Pooling
+- **ALWAYS** implement object pooling for frequently created/destroyed objects
+- **ALWAYS** use Stack<T> for object pools
+- **ALWAYS** reset object state in Reset() method
+
+### Caching
+- **ALWAYS** cache Transform, Rigidbody, and other components in Start/Awake
+- **ALWAYS** cache Camera.main and other frequently accessed objects
+- **ALWAYS** use const for values that don't change
+
+### Memory Management
+- **ALWAYS** unsubscribe from events in OnDestroy
+- **ALWAYS** clear collections in Reset() methods
+- **ALWAYS** use structs for small, frequently copied data
+
+## 🎯 Skill System Guidelines
+
+### Component Architecture
+- **ALWAYS** inherit from `SkillComponent` for new skill types
+- **ALWAYS** implement `ISkillEffect` interface for effects
+- **ALWAYS** use `AddSkillEffect()` method to register effects
+- **ALWAYS** implement proper state management (NotStarted, Running, Completed)
+
+### Effect System
+- **ALWAYS** use `EffectTiming` enum for effect execution
+- **ALWAYS** implement `Reset()` method for effects
+- **ALWAYS** use `OnApply()` and `OnUpdate()` methods correctly
+
+## 🧪 Testing and Debugging
+
+### Editor Support
+- **ALWAYS** use `#if UNITY_EDITOR` for debug code
+- **ALWAYS** implement debug logging for critical systems
+- **ALWAYS** use `[System.Serializable]` for inspector visibility
+
+### Error Handling
+- **ALWAYS** validate input parameters in public methods
+- **ALWAYS** use Debug.LogError for critical failures
+- **ALWAYS** implement graceful fallbacks for missing components
+
+## 📚 Reference Files
+
+Key architecture files to study:
+- [Unit.cs](mdc:Assets/2_Scripts/Unit/Unit.cs) - Core unit system
+- [SkillEffectController.cs](mdc:Assets/2_Scripts/System/Skill/Effect/SkillEffectController.cs) - Skill effect management
+- [SkillComponent.cs](mdc:Assets/2_Scripts/System/Skill/Launcher/SkillComponent.cs) - Skill component base class
+- [ISkillEffect.cs](mdc:Assets/2_Scripts/System/Skill/Launcher/ISkillEffect.cs) - Skill effect interface
+- [GameValue.cs](mdc:Assets/2_Scripts/Utility/GameValue.cs) - Game constants and utilities
+
+## 🚀 Best Practices Summary
+
+1. **Follow Unity lifecycle methods** (Awake, Start, Update, OnDestroy)
+2. **Use events for loose coupling** between systems
+3. **Implement object pooling** for performance-critical objects
+4. **Cache frequently accessed components** and objects
+5. **Use proper naming conventions** consistently
+6. **Implement Reset() methods** for object reuse
+7. **Use module pattern** for complex systems
+8. **Validate inputs** and handle errors gracefully
+9. **Use constants** instead of magic numbers
+10. **Follow the established architecture** patterns
+
+Remember: This is a production ARPG project. Code quality, performance, and maintainability are critical for success.
+description:
+globs:
+alwaysApply: false
+---
