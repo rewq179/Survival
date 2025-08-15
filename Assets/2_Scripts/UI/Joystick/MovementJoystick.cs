@@ -13,10 +13,13 @@ public class MovementJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler
         Max,
     }
 
-    [Header("UI Components")]
-    [SerializeField] private RectTransform handle;
+    [Header("UI Components")] [SerializeField]
+    private RectTransform handle;
+
     [SerializeField] private RectTransform[] focusButton;
     [SerializeField] private RectTransform joystickPanel;
+
+    [Header("Touch Settings")] private LayerMask uiLayerMask = -1;
 
     private Vector2 startMousePosition;
     private Vector2 currentMousePosition;
@@ -42,12 +45,13 @@ public class MovementJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler
 
     private void Awake()
     {
+        uiLayerMask = LayerMask.GetMask("UI");
         SetJoystickActive(false);
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (eventData.pointerCurrentRaycast.gameObject == gameObject)
+        if (IsValidTouch(eventData))
         {
             StartJoystick(eventData.position);
         }
@@ -193,5 +197,17 @@ public class MovementJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler
             else
                 return HandlePosition.RightBottom;
         }
+    }
+
+    private bool IsValidTouch(PointerEventData eventData)
+    {
+        // 1. 기본적인 게임오브젝트 체크
+        GameObject hitObject = eventData.pointerCurrentRaycast.gameObject;
+        if (hitObject == gameObject)
+            return true;
+
+        // 2. UI 요소와의 충돌 방지
+        int hitLayer = 1 << hitObject.layer;
+        return (uiLayerMask.value & hitLayer) != 0;
     }
 }
