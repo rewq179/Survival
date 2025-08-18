@@ -9108,6 +9108,7 @@ GameObject:
   - component: {fileID: 267096341}
   - component: {fileID: 267096340}
   - component: {fileID: 267096342}
+  - component: {fileID: 267096343}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -9172,6 +9173,18 @@ MonoBehaviour:
   subSkillDataReader: {fileID: 11400000, guid: 2ad8e467b429c7040b01f36820b68f07, type: 2}
   waveDataReader: {fileID: 11400000, guid: 0ccf7f79a9063804cbf338947227de0b, type: 2}
   buffDataReader: {fileID: 11400000, guid: b975f7e6b64e1c645ace6b0454a1bf96, type: 2}
+--- !u!114 &267096343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 267096339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1dada9c238d42c14b81e19f8659b1e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &269721178
 GameObject:
   m_ObjectHideFlags: 0
@@ -72703,6 +72716,9 @@ MonoBehaviour:
   - {fileID: 2135026668114571379}
   panel: {fileID: 7117234955964455375}
   canvasGroup: {fileID: 3897754502840802747}
+  animator: {fileID: 9211403988964769216}
+  maxSelectionCount: 3
+  showDelay: 0.1
 --- !u!114 &2708135180018371556
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -86420,6 +86436,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1470668557371853697}
   - component: {fileID: 2696163189347361055}
+  - component: {fileID: 9211403988964769216}
   - component: {fileID: 3897754502840802747}
   m_Layer: 5
   m_Name: SelectionPanel
@@ -86428,6 +86445,48 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &9211403988964769216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9211403988964769215}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20888a748b8881e4097cc51a9b2f3dcd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  settings:
+    slideCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 2
+        outSlope: 2
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    fadeInDuration: 0.3
+    moveDuration: 0.2
+    delayBetweenSlots: 0.1
+    slotSpacing: 600
+  canvasGroup: {fileID: 3897754502840802747}
 --- !u!222 &9217582752110272036
 CanvasRenderer:
   m_ObjectHideFlags: 0

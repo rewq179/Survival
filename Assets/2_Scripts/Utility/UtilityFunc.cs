@@ -32,7 +32,7 @@ public static class VectorExtension
 {
     public static Vector2 Bezier2D(Vector2 start, Vector2 end, float t)
     {
-        Vector2 p1 = (start + end) / 2 + Vector2.up * 100f;
+        Vector2 p1 = (start + end) * 0.5f + Vector2.up * 50f;
         return Bezier2D(start, p1, end, t);
     }
 
@@ -71,7 +71,7 @@ public static class Easing
         {
             return t * t;
         }
-        
+
         public static float Out(float t)
         {
             return t * (2f - t);

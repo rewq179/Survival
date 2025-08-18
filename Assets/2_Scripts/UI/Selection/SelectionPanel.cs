@@ -4,290 +4,196 @@ using System.Collections;
 using System;
 using System.Linq;
 
-public class SelectionPanel : MonoBehaviour
+public class SelectionPanel : MonoBehaviour, IUIComponent
 {
     [Header("UI Components")]
     [SerializeField] private List<SelectionSlot> selectionSlots = new();
     [SerializeField] private GameObject panel;
-    [SerializeField] private CanvasGroup canvasGroup;
+    private List<RectTransform> selectionSlotRects = new();
 
-    // 데이터
+    // 데이터 관련
     private Unit playerUnit;
-    private List<SelectionData> skills = new();
-    private List<SelectionData> selectedSkills = new();
-    private Stack<SelectionData> skillPool = new();
-    private Vector2 slotStartPosition = new Vector2(0, -Screen.height * 0.3f);
-    private Vector2[] startPos = new Vector2[SELECTION_COUNT];
-    private Vector2[] targetPos = new Vector2[SELECTION_COUNT];
-
-    // 레벨업
     private int levelUpCount;
-    private bool isAnimationing;
 
-    // 상수
-    private const int SELECTION_COUNT = 3;
-    private const float ACTIVE_WEIGHT = 1.2f;
-    private const float PASSIVE_WEIGHT = 0.7f;
-    private const float SUB_WEIGHT = 0.5f;
-    private const float FADE_IN_DURATION = 0.3f;
-    private const float FADE_IN_INV_DURATION = 1 / FADE_IN_DURATION;
-    private const float FADE_OUT_DURATION = 0.2f;
-    private const float FADE_OUT_INV_DURATION = 1 / FADE_OUT_DURATION;
-    private const float MOVE_DURATION = 0.2f;
-    private const float MOVE_INV_DURATION = 1 / MOVE_DURATION;
-    private const float SLOT_DIFF = 600f;
+    // 분리된 시스템들
+    [SerializeField] private UISelectionPanelAnimator animator;
+    private SelectionDataManager dataManager = new();
+    private PanelStateController stateController = new();
 
-    public void Init(Unit unit)
+    // 애니메이션 관련
+    private Vector2[] slotStartPositions;
+    private Vector2[] slotEndPositions;
+
+    private const int MAX_SELECTION_COUNT = 3;
+
+    public void Reset()
     {
-        playerUnit = unit;
-        SetActive(false);
-    }
-
-    public void SetActive(bool isActive)
-    {
-        canvasGroup.alpha = isActive ? 1f : 0f;
-        panel.SetActive(isActive);
-    }
-
-    public void AddLevelUpCount(int levelUpCount)
-    {
-        this.levelUpCount += levelUpCount;
-        
-        if (!isAnimationing)
-            ProcessShowSelection();
-    }
-
-    private void UpdateSkillPool()
-    {
-        foreach (SelectionData data in skills)
+        // 모든 슬롯 초기화
+        foreach (SelectionSlot slot in selectionSlots)
         {
-            PushSelectionData(data);
+            slot.Reset();
         }
-        skills.Clear();
 
-        for (SkillKey skillKey = 0; skillKey < SkillKey.StingAttack; skillKey++)
+        // 상태 초기화
+        stateController.SetState(PanelStateController.PanelState.Hidden);
+        UnsubscribeEvents();
+    }
+
+    public void Init(object data)
+    {
+        foreach (SelectionSlot slot in selectionSlots)
         {
-            if (!playerUnit.IsSkillLearnable(skillKey))
-                continue;
+            selectionSlotRects.Add(slot.Rect);
+        }
 
-            if (DataMgr.IsSubSkill(skillKey))
-                skills.Add(CreateSelectionDataBySub(skillKey));
+        if (data is Unit unit)
+        {
+            playerUnit = unit;
+            SubscribeEvents();
 
-            else
-                skills.Add(CreateSelectionDataByMain(skillKey));
+            // 초기 데이터 로드
+            dataManager.UpdateAvailableSkills(playerUnit);
+
+            // 애니메이션 위치 계산
+            CalculateAnimationPositions();
         }
     }
 
-    private SelectionData CreateSelectionDataByMain(SkillKey key)
+    private void UnsubscribeEvents()
     {
-        SkillData skillData = DataMgr.GetSkillData(key);
-        SelectionData data = PopSelectionData();
-        data.Init(key, skillData.skillType, skillData.name, skillData.desc, GetSkillIcon(key));
-        return data;
-    }
+        dataManager.OnSkillSelected -= OnSkillSelected;
+        stateController.OnStateChanged -= OnStateChanged;
 
-    private SelectionData CreateSelectionDataBySub(SkillKey key)
-    {
-        SubSkillData skillData = DataMgr.GetSubSkillData(key);
-        SelectionData data = PopSelectionData();
-        data.Init(key, SkillType.Sub, skillData.name, skillData.description, GetSkillIcon(skillData.parentSkillKey));
-        return data;
-    }
-
-    private Sprite GetSkillIcon(SkillKey key)
-    {
-        return GameMgr.Instance.resourceMgr.GetSkillIcon(key);
-    }
-
-    private void GetRandomSkills(int count)
-    {
-        List<SelectionData> availableSkills = new(skills);
-        selectedSkills.Clear();
-
-        for (int i = 0; i < count && availableSkills.Count > 0; i++)
+        if (GameEvents.Instance != null)
         {
-            SelectionData picked = RandomPickerByWeight.PickOne(
-                availableSkills, data => GetWeight(data));
-
-            selectedSkills.Add(picked);
-            availableSkills.Remove(picked);
+            GameEvents.Instance.OnPlayerLevelUp -= AddLevelUpCount;
         }
     }
 
-    private float GetWeight(SelectionData data)
+    private void SubscribeEvents()
     {
-        return data.skillType switch
+        dataManager.OnSkillSelected += OnSkillSelected;
+        stateController.OnStateChanged += OnStateChanged;
+
+        if (GameEvents.Instance != null)
         {
-            SkillType.Active => ACTIVE_WEIGHT,
-            SkillType.Passive => PASSIVE_WEIGHT,
-            SkillType.Sub => SUB_WEIGHT,
-            _ => 0f
-        };
+            GameEvents.Instance.OnPlayerLevelUp += AddLevelUpCount;
+        }
     }
 
-    private void SelectSkill(SelectionData data)
+    private void CalculateAnimationPositions()
     {
-        playerUnit.LearnSkill(data.skillKey);
-        StartCoroutine(HideSelectionCoroutine());
+        // 시작 위치
+        Vector2 startPosition = Vector2.down * Screen.height * 0.3f;
+        // 목표 위치
+        Vector2 endPosition = Vector2.up * -200f;
+
+        int slotCount = Mathf.Min(MAX_SELECTION_COUNT, selectionSlots.Count);
+        slotStartPositions = new Vector2[slotCount];
+        slotEndPositions = new Vector2[slotCount];
+        for (int i = 0; i < slotCount; i++)
+        {
+            slotStartPositions[i] = startPosition;
+            slotEndPositions[i] = endPosition;
+        }
     }
 
-    #region Animation
-
-    private void ProcessShowSelection()
+    public void AddLevelUpCount(int count)
     {
-        if (levelUpCount == 0)
-        {
-            isAnimationing = false;
+        levelUpCount += count;
+        Show();
+    }
+
+    public void Show()
+    {
+        if (!stateController.CanShow() || stateController.IsAnimating())
             return;
-        }
 
-        isAnimationing = true;
-        levelUpCount--;
-        
-        UpdateSkillPool();
-        GetRandomSkills(SELECTION_COUNT);
-        StartCoroutine(ShowSelectionCoroutine());
+        if (levelUpCount <= 0)
+            return;
+
+        levelUpCount -= 1;
+        stateController.SetState(PanelStateController.PanelState.Showing);
+        panel.SetActive(true);
+
+        // 스킬 데이터 업데이트
+        dataManager.UpdateAvailableSkills(playerUnit);
+
+        // 슬롯 애니메이션 시작
+        StartShowAnimation();
     }
 
-    private IEnumerator ShowSelectionCoroutine()
+    private void StartShowAnimation()
     {
-        // 1. 초기 상태: 하단에 배치, 투명도 0
-        yield return StartCoroutine(InitSelection());
+        // 활성화할 슬롯들 준비
+        UpdateSelectionSlots(dataManager.AvailableSkills);
 
-        // 2. 페이드 인 + 상단 중앙으로 이동
-        yield return StartCoroutine(FadeInAndMoveSlots());
-
-        // 3. 슬롯별 목표 위치 계산 (좌, 중앙, 우)
-        yield return StartCoroutine(SetGoalPos());
-
-        // 4. 곡선(혹은 직선)으로 각 슬롯 이동
-        yield return StartCoroutine(MoveSlots());
+        // 애니메이션 시스템 사용
+        animator.AnimateSlotsIn(selectionSlotRects, slotStartPositions, slotEndPositions, () =>
+        {
+            stateController.SetState(PanelStateController.PanelState.Visible);
+        });
     }
 
-    private IEnumerator InitSelection()
+    private void UpdateSelectionSlots(List<SelectionData> skills)
     {
-        GameMgr.Instance.OnGamePause();
-        SetActive(true);
-        canvasGroup.alpha = 0f;
-
+        // 슬롯 초기화
         for (int i = 0; i < selectionSlots.Count; i++)
         {
-            selectionSlots[i].Reset();
-        }
-
-        int count = selectedSkills.Count;
-        for (int i = 0; i < count; i++)
-        {
-            SelectionSlot slot = selectionSlots[i];
-            slot.Init(selectedSkills[i], SelectSkill);
-            slot.UpdatePosition(slotStartPosition);
-            startPos[i] = slot.Rect.anchoredPosition;
-        }
-
-        yield return null;
-    }
-
-    private IEnumerator FadeInAndMoveSlots()
-    {
-        float time = 0f;
-        while (time < FADE_IN_DURATION)
-        {
-            time += Time.unscaledDeltaTime;
-            float alpha = Mathf.Clamp01(time * FADE_IN_INV_DURATION);
-            canvasGroup.alpha = alpha;
-            for (int i = 0; i < selectedSkills.Count; i++)
+            if (i < skills.Count)
             {
-                selectionSlots[i].UpdatePosition(Vector2.Lerp(startPos[i], Vector2.zero, alpha));
+                SelectionSlot slot = selectionSlots[i];
+                SelectionData skillData = skills[i];
+
+                slot.Init(skillData, OnSlotClicked);
+                slot.gameObject.SetActive(true);
             }
 
-            yield return null;
-        }
-
-        canvasGroup.alpha = 1f;
-    }
-
-    private IEnumerator SetGoalPos()
-    {
-        for (int i = 0; i < selectedSkills.Count; i++)
-        {
-            startPos[i] = selectionSlots[i].Rect.anchoredPosition;
-        }
-
-        if (selectedSkills.Count == 3)
-        {
-            targetPos[0] = Vector2.left * SLOT_DIFF;
-            targetPos[1] = Vector2.zero;
-            targetPos[2] = Vector2.right * SLOT_DIFF;
-        }
-
-        else if (selectedSkills.Count == 2)
-        {
-            targetPos[0] = Vector2.left * SLOT_DIFF * 0.5f;
-            targetPos[1] = Vector2.right * SLOT_DIFF * 0.5f;
-        }
-
-        else if (selectedSkills.Count == 1)
-        {
-            targetPos[0] = Vector2.zero;
-        }
-
-        yield return null;
-    }
-
-    private IEnumerator MoveSlots()
-    {
-        float time = 0f;
-        while (time < MOVE_DURATION)
-        {
-            time += Time.unscaledDeltaTime;
-            float alpha = Mathf.SmoothStep(0, 1, time * MOVE_INV_DURATION);
-            for (int i = 0; i < selectedSkills.Count; i++)
+            else
             {
-                Vector2 pos = VectorExtension.Bezier2D(startPos[i], targetPos[i], alpha);
-                selectionSlots[i].UpdatePosition(pos);
+                selectionSlots[i].gameObject.SetActive(false);
             }
-
-            yield return null;
         }
-
-        for (int i = 0; i < selectedSkills.Count; i++)
-            selectionSlots[i].UpdatePosition(targetPos[i]);
     }
 
-    private IEnumerator HideSelectionCoroutine()
+    public void Hide()
     {
-        float time = 0f;
-        while (time < FADE_OUT_DURATION)
+        if (!stateController.CanHide())
+            return;
+
+        stateController.SetState(PanelStateController.PanelState.Hiding);
+        StartHideAnimation();
+    }
+
+    private void StartHideAnimation()
+    {
+        animator.AnimateSlotsOut(selectionSlotRects, slotStartPositions, () =>
         {
-            time += Time.unscaledDeltaTime;
-            float alpha = Mathf.Lerp(1f, 0f, time * FADE_OUT_INV_DURATION);
-            canvasGroup.alpha = alpha;
-            yield return null;
+            panel.SetActive(false);
+            stateController.SetState(PanelStateController.PanelState.Hidden);
+            Show();
+        });
+    }
+
+    private void OnSlotClicked(SelectionData skillData)
+    {
+        dataManager.SelectSkill(skillData);
+    }
+
+    private void OnSkillSelected(SelectionData skillData)
+    {
+        Hide();
+    }
+
+    private void OnStateChanged(PanelStateController.PanelState newState)
+    {
+        switch (newState)
+        {
+            case PanelStateController.PanelState.Visible:
+                break;
+
+            case PanelStateController.PanelState.Hidden:
+                break;
         }
-
-        SetActive(false);
-
-        ProcessShowSelection();
-        if (!isAnimationing)
-            GameMgr.Instance.OnGameResume();
     }
-
-    #endregion
-
-    #region Pool
-
-    private SelectionData PopSelectionData()
-    {
-        if (skillPool.TryPop(out SelectionData data))
-            return data;
-
-        return new SelectionData();
-    }
-
-    private void PushSelectionData(SelectionData data)
-    {
-        skillPool.Push(data);
-    }
-
-    #endregion
 }

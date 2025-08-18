@@ -21,6 +21,12 @@ public class SelectionSlot : MonoBehaviour
     [SerializeField] private IconSlot iconSlot;
     [SerializeField] private DetailInfo detailInfo;
 
+    // 상수 정의
+    private const string ACTIVE_SKILL_TEXT = "액티브";
+    private const string PASSIVE_SKILL_TEXT = "패시브";
+    private const string SUB_SKILL_TEXT = "서브";
+    private const string ITEM_TEXT = "아이템";
+
     // 데이터
     private SelectionData data;
     private bool isSelected;
@@ -42,8 +48,8 @@ public class SelectionSlot : MonoBehaviour
     public void Init(SelectionData data, System.Action<SelectionData> onClickCallback)
     {
         this.data = data;
+        this.onSlotClicked = onClickCallback;
         UpdateUI();
-        onSlotClicked = onClickCallback;
         clickButton.onClick.AddListener(OnClick);
     }
 
@@ -54,31 +60,26 @@ public class SelectionSlot : MonoBehaviour
 
     private void UpdateUI()
     {
-        titleText.text = data.skillType switch
-        {
-            SkillType.Active => "액티브",
-            SkillType.Passive => "패시브",
-            SkillType.Sub => "서브",
-            _ => "아이템"
-        };
+        if (data == null)
+            return;
 
+        titleText.text = GetSkillTypeText(data.skillType);
         iconSlot.Init(data.icon, string.Empty);
         nameText.text = data.name;
+        descText.text = SkillDescriptionGenerator.GetSlectionSlotDesc(data);
 
-        float value = 0;
-        if (data.skillType == SkillType.Passive)
-            value = DataMgr.GetSkillData(data.skillKey).baseValue;
-        else if (data.skillType == SkillType.Sub)
-            value = DataMgr.GetSubSkillData(data.skillKey).baseValue;
+        detailInfo.Init(data.name, descText.text);
+    }
 
-        string desc = DescMgr.GetSubSkillDescription(data.description, value);
-        if (data.skillType == SkillType.Sub)
-            desc += "\n\n<color=yellow>레벨업!</color>";
-        else
-            desc += "\n\n<color=green>새로 획득!</color>";
-
-        descText.text = desc;
-        // detailInfo.Init(data.name, desc);
+    private string GetSkillTypeText(SkillType skillType)
+    {
+        return skillType switch
+        {
+            SkillType.Active => ACTIVE_SKILL_TEXT,
+            SkillType.Passive => PASSIVE_SKILL_TEXT,
+            SkillType.Sub => SUB_SKILL_TEXT,
+            _ => ITEM_TEXT
+        };
     }
 
     public void OnClick()

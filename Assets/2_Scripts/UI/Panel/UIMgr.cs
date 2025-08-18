@@ -1,6 +1,14 @@
 using UnityEngine;
 using TMPro;
 
+public interface IUIComponent
+{
+    void Init(object data);
+    void Show();
+    void Hide();
+    void Reset();
+}
+
 public class UIMgr : MonoBehaviour
 {
     public static UIMgr Instance { get; private set; }
@@ -24,7 +32,7 @@ public class UIMgr : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        
+
         else
         {
             Destroy(gameObject);
