@@ -13,7 +13,7 @@ public class AnimationEnd : StateMachineBehaviour
 
         isDeactivated = false;
     }
-
+    
     public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         if (isDeactivated || stateInfo.normalizedTime < 0.9f)

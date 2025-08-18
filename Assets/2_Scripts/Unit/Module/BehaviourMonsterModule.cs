@@ -34,6 +34,7 @@ public class BehaviourMonsterModule : BehaviourModule
 
     public override void Reset()
     {
+        base.Reset();
         SetAIState(AIState.Chasing);
     }
 

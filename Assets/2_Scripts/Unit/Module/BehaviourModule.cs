@@ -3,9 +3,10 @@ using System.Collections.Generic;
 
 public enum AnimationType
 {
-    Attack = 0,
-    TakeDamage = 1,
-    Die = 2,
+    None = -1,
+    Die = 0,
+    Attack = 1,
+    TakeDamage = 2,
     Movement = 3,
 }
 
@@ -15,7 +16,7 @@ public abstract class BehaviourModule
     protected Animator animator;
 
     protected bool isForceMoving;
-    protected AnimationType animationType;
+    protected AnimationType animationType = AnimationType.None;
 
     private static readonly Dictionary<AnimationType, string> AnimationNames = new()
     {
@@ -33,7 +34,11 @@ public abstract class BehaviourModule
         return string.Empty;
     }
 
-    public abstract void Reset();
+    public virtual void Reset()
+    {
+        animationType = AnimationType.None;
+    }
+
     public virtual void Init(Unit unit)
     {
         owner = unit;
@@ -59,7 +64,7 @@ public abstract class BehaviourModule
 
     public bool PlayAnimation(string name, AnimationType type)
     {
-        if (animationType < type)
+        if (animationType != AnimationType.None && animationType < type)
             return false;
 
         animationType = type;
