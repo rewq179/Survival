@@ -211,7 +211,14 @@ public class SkillModule : MonoBehaviour
         if (!owner.CanAttack)
             return false;
 
-        return cooldowns.ContainsKey(skillKey) && cooldowns[skillKey] <= 0f;
+        return GetSkillCooldown(skillKey) <= 0f;
+    }
+
+    public float GetSkillCooldown(SkillKey skillKey)
+    {
+        if (cooldowns.ContainsKey(skillKey))
+            return cooldowns[skillKey];
+        return 0f;
     }
 
     public bool CanUseSkillType(RangeType rangeType)
@@ -535,4 +542,12 @@ public class SkillModule : MonoBehaviour
 
         return units[0];
     }
+
+    #region  에디터용
+
+    public bool IsAutoAttackEnabled => isAutoAttack;
+    public List<SkillKey> GetAllSkills() => new(skills);
+
+
+    #endregion
 }

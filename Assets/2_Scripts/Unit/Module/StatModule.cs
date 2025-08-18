@@ -61,7 +61,7 @@ public class StatModule
         {
             statModifiers[type] += value;
         }
-        
+
         else
         {
             statModifiers[type] = value;

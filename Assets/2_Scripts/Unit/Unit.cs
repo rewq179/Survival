@@ -251,7 +251,10 @@ public class Unit : MonoBehaviour
     }
 
     // BuffModule
+    public BuffModule BuffModule => buffModule;
     public BuffInstance GetBuffInstance(BuffKey buffKey) => buffModule.GetBuffInstance(buffKey);
+    public List<BuffInstance> GetActiveBuffInstances() => buffModule.GetActiveBuffInstances();
+
     public bool HasBuff(BuffKey buffKey) => buffModule.HasBuff(buffKey);
     public void AddBuff(BuffKey buffKey, Unit giver) => buffModule.AddBuff(buffKey, giver);
     public void ReduceBuff(BuffKey buffKey, int value) => buffModule.ReduceBuff(buffKey, value);

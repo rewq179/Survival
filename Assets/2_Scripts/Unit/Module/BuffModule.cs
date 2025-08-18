@@ -48,6 +48,18 @@ public class BuffModule
     public bool CanMove => !HasStatusEffect(StatusEffect.CanNotMove);
     public bool CanAttack => !HasStatusEffect(StatusEffect.CanNotAttack);
     public BuffInstance GetBuffInstance(BuffKey buffKey) => buffInstances[(int)buffKey];
+    public List<BuffInstance> GetActiveBuffInstances()
+    {
+        List<BuffInstance> activeBuffs = new();
+        for (int i = 0; i < buffInstances.Length; i++)
+        {
+            if (buffInstances[i] != null && buffInstances[i].stack > 0)
+                activeBuffs.Add(buffInstances[i]);
+        }
+
+        return activeBuffs;
+    }
+
     private bool HasStatusEffect(StatusEffect effect) => (statusEffects & effect) != 0;
     public bool HasBuff(BuffKey buffKey) => buffInstances[(int)buffKey] != null;
 
