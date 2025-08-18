@@ -1,3 +1,9 @@
+
+Remember: The skill system is the core gameplay mechanic. Proper architecture ensures scalability, performance, and maintainability.
+description:(when should the AI use this rule)
+globs:
+alwaysApply: false
+
 # Unity Skill System Architecture Rules
 
 ## 🚨 SKILL SYSTEM FUNDAMENTALS - MUST FOLLOW
@@ -317,8 +323,4 @@ public void Update()
 9. **Test skill combinations** thoroughly
 10. **Monitor performance** during skill execution
 
-Remember: The skill system is the core gameplay mechanic. Proper architecture ensures scalability, performance, and maintainability.
-description:
-globs:
-alwaysApply: false
 ---

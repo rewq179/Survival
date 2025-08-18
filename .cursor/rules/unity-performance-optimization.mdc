@@ -1,3 +1,9 @@
+
+Remember: Performance optimization is not optional in ARPG games. Players expect smooth 60fps gameplay even with hundreds of objects on screen.
+description:(when should the AI use this rule)
+globs:
+alwaysApply: false
+
 # Unity Performance Optimization Rules
 
 ## 🚨 PERFORMANCE CRITICAL - MUST OPTIMIZE
@@ -194,9 +200,4 @@ private void Update()
 - [ ] Verify frame rate consistency
 - [ ] Monitor memory usage over time
 - [ ] Test with multiple objects spawned
-
-Remember: Performance optimization is not optional in ARPG games. Players expect smooth 60fps gameplay even with hundreds of objects on screen.
-description:
-globs:
-alwaysApply: false
 ---

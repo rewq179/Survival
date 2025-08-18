@@ -1,3 +1,8 @@
+Remember: This is a production ARPG project. Code quality, performance, and maintainability are critical for success.
+description:(when should the AI use this rule)
+globs:
+alwaysApply: false
+
 # Unity ARPG Project Coding Standards
 
 ## 🚨 CRITICAL RULES - MUST FOLLOW
@@ -197,8 +202,4 @@ Key architecture files to study:
 9. **Use constants** instead of magic numbers
 10. **Follow the established architecture** patterns
 
-Remember: This is a production ARPG project. Code quality, performance, and maintainability are critical for success.
-description:
-globs:
-alwaysApply: false
 ---
