@@ -10,7 +10,7 @@ public class TopBar : MonoBehaviour
     public void Init(Unit playerUnit)
     {
         goldText.text = string.Empty;
-        playerUnit.OnGoldChanged += UpdateGoldDisplay;
+        GameEvents.Instance.OnPlayerGoldChanged += UpdateGoldDisplay;
         UpdateGoldDisplay(playerUnit.Gold);
         pauseButton.onClick.AddListener(OnPauseButtonClicked);
     }

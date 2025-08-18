@@ -3,7 +3,7 @@ using System.Collections;
 
 public abstract class HealthBarBase : MonoBehaviour
 {
-    [SerializeField] private GameObject panelObject;
+    [SerializeField] protected GameObject panelObject;
 
     protected AnimationCurve curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
     protected const float DAMAGE_DURATION = 0.5f;
@@ -17,6 +17,9 @@ public abstract class HealthBarBase : MonoBehaviour
             StopCoroutine(damageCoroutine);
             damageCoroutine = null;
         }
+
+        if (panelObject != null && !panelObject.activeInHierarchy)
+            ShowHealthBar(true);
 
         SetHealthBar(nextRatio);
         if (nextRatio > prevRatio)

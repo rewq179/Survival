@@ -9,20 +9,11 @@ public class PlayerSaveData
     public float exp;
     public int gold;
 
-    // 델리게이트/이벤트
-    public event Action<int> OnLevelChanged;
-    public event Action<float> OnExpChanged;
-    public event Action<int> OnGoldChanged;
-
     public void Reset()
     {
         level = 1;
         exp = 0f;
         gold = 0;
-        
-        OnLevelChanged = null;
-        OnExpChanged = null;
-        OnGoldChanged = null;
         unit = null;
     }
 
@@ -47,13 +38,13 @@ public class PlayerSaveData
             levelUpCount++;
         }
 
-        OnExpChanged?.Invoke(exp);
+        GameEvents.Instance.PlayerExpChanged(exp);
 
         if (levelUpCount > 0)
         {
-            UIMgr.Instance.selectionPanel.AddLevelUpCount(levelUpCount);
+            GameEvents.Instance.PlayerLevelUp(levelUpCount);
             unit.UpdateHp();
-            OnLevelChanged?.Invoke(level);
+            GameEvents.Instance.PlayerLevelChanged(level);
         }
 
         return levelUpCount;
@@ -62,6 +53,6 @@ public class PlayerSaveData
     public void AddGold(int amount)
     {
         gold += (int)(amount * (1 + unit.GetFinalStat(StatType.GoldGain)));
-        OnGoldChanged?.Invoke(gold);
+        GameEvents.Instance.PlayerGoldChanged(gold);
     }
 }

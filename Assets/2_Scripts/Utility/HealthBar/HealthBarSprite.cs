@@ -19,6 +19,7 @@ public class HealthBarSprite : HealthBarBase
     {
         healthBar.enabled = isShow;
         damageBar.enabled = isShow;
+        panelObject.SetActive(isShow);
     }
 
     protected override void SetHealthBar(float ratio)

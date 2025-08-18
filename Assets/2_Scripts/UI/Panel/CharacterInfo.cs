@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class CharacterInfo : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class CharacterInfo : MonoBehaviour
     [SerializeField] private Image profileImage;
     [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private TextMeshProUGUI nameText;
-    
+
     private Unit unit;
 
     public void Init(Unit unit)
@@ -25,20 +26,22 @@ public class CharacterInfo : MonoBehaviour
     {
         if (unit == null)
             return;
-            
-        unit.OnHpChanged += UpdateHpUI;
-        unit.OnExpChanged += UpdateExpUI;
-        unit.OnLevelChanged += UpdateLevelUI;
+
+        GameEvents events = GameEvents.Instance;
+        events.OnPlayerHpChanged += UpdateHpUI;
+        events.OnPlayerExpChanged += UpdateExpUI;
+        events.OnPlayerLevelChanged += UpdateLevelUI;
     }
 
     private void UnsubscribeFromEvents()
     {
         if (unit == null)
             return;
-            
-        unit.OnHpChanged -= UpdateHpUI;
-        unit.OnExpChanged -= UpdateExpUI;
-        unit.OnLevelChanged -= UpdateLevelUI;
+
+        GameEvents events = GameEvents.Instance;
+        events.OnPlayerHpChanged -= UpdateHpUI;
+        events.OnPlayerExpChanged -= UpdateExpUI;
+        events.OnPlayerLevelChanged -= UpdateLevelUI;
     }
 
     public void UpdateAllUI()

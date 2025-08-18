@@ -27,13 +27,6 @@ public class SkillModule : MonoBehaviour
     private Dictionary<SkillKey, float> cooldownTimes = new();
     private List<SkillKey> activatedSkills = new();
 
-    // 이벤트
-    public event Action<SkillKey, float> OnSkillCooldownChanged;
-    public event Action<SkillKey> OnSkillCooldownEnded;
-    public event Action<SkillKey> OnSkillAdded;
-    public event Action<SkillKey> OnSkillRemoved;
-    public event Action<SkillKey, int> OnSkillLevelChanged;
-
     private static HashSet<SkillKey> applyAllSkill = new()
     {
         SkillKey.AllSkillRange,
@@ -48,12 +41,6 @@ public class SkillModule : MonoBehaviour
 
     public void Reset()
     {
-        OnSkillCooldownChanged = null;
-        OnSkillCooldownEnded = null;
-        OnSkillAdded = null;
-        OnSkillRemoved = null;
-        OnSkillLevelChanged = null;
-
         isAutoAttack = false;
         autoAttackTime = 0f;
         cooldowns.Clear();
@@ -90,12 +77,14 @@ public class SkillModule : MonoBehaviour
             if (cool <= 0f)
             {
                 activatedSkills.RemoveAt(i);
-                OnSkillCooldownEnded?.Invoke(skillKey);
+                if (owner.IsPlayer)
+                    GameEvents.Instance.PlayerSkillCooldownEnded(skillKey);
             }
 
             else
             {
-                OnSkillCooldownChanged?.Invoke(skillKey, cool);
+                if (owner.IsPlayer)
+                    GameEvents.Instance.PlayerSkillCooldownChanged(skillKey, cool);
             }
         }
     }
@@ -155,13 +144,15 @@ public class SkillModule : MonoBehaviour
                 cooldownTimes[skillKey] = GetSkillInstance(skillKey).cooldownFinal;
                 cooldowns[skillKey] = 0f;
                 activeSkillCount++;
-                OnSkillAdded?.Invoke(skillKey);
+                if (owner.IsPlayer)
+                    GameEvents.Instance.PlayerSkillAdded(skillKey);
                 break;
 
             case SkillType.Passive:
                 ApplyPassiveSkillEffect(skillKey);
                 passiveSkillCount++;
-                OnSkillAdded?.Invoke(skillKey);
+                if (owner.IsPlayer)
+                    GameEvents.Instance.PlayerSkillAdded(skillKey);
                 break;
 
             case SkillType.Sub:
@@ -183,7 +174,8 @@ public class SkillModule : MonoBehaviour
             return;
 
         skillLevels[skillKey]++;
-        OnSkillLevelChanged?.Invoke(skillKey, skillLevels[skillKey]);
+        if (owner.IsPlayer)
+            GameEvents.Instance.SkillLevelChanged(skillKey, skillLevels[skillKey]);
 
         if (DataMgr.IsSubSkill(skillKey))
         {

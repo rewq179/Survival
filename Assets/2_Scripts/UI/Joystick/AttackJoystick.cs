@@ -37,12 +37,12 @@ public class AttackJoystick : MonoBehaviour
 
     private void UnsubscribeFromEvents()
     {
-        playerUnit.OnSkillAdded -= RefreshSkill;
+        GameEvents.Instance.OnPlayerSkillAdded -= RefreshSkill;
     }
 
     private void SubscribeToEvents()
     {
-        playerUnit.OnSkillAdded += RefreshSkill;
+        GameEvents.Instance.OnPlayerSkillAdded += RefreshSkill;
     }
 
     private void RefreshSkill(SkillKey skillKey)

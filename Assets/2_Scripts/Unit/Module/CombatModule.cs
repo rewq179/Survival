@@ -69,7 +69,14 @@ public class CombatModule
     {
         float prevHp = curHp;
         curHp = Mathf.Clamp(hp, 0, maxHp);
-        OnHpChanged?.Invoke(prevHp * maxInvHp, curHp * maxInvHp);
+
+        float prev = prevHp * maxInvHp;
+        float cur = curHp * maxInvHp;
+
+        if (owner.IsPlayer)
+            GameEvents.Instance.PlayerHpChanged(prev, cur);
+        else
+            OnHpChanged?.Invoke(prev, cur);
     }
 
     public void OnDead()
@@ -77,9 +84,15 @@ public class CombatModule
         isDead = true;
 
         if (owner.IsPlayer)
+        {
             UIMgr.Instance.gameOverUI.ShowGameOverUI();
+        }
+
         else
+        {
             rewardMgr.CreateItem(owner);
+            owner.ShowHealthBar(false);
+        }
 
         owner.PlayAnimation(AnimationType.Die);
     }

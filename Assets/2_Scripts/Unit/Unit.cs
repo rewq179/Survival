@@ -73,7 +73,11 @@ public class Unit : MonoBehaviour
 
         if (healthBar != null)
         {
-            OnHpChanged -= healthBar.UpdateHealthBar;
+            if (IsPlayer)
+                GameEvents.Instance.OnPlayerHpChanged -= healthBar.UpdateHealthBar;
+            else
+                combatModule.OnHpChanged -= healthBar.UpdateHealthBar;
+
             healthBar.ShowHealthBar(false);
         }
 
@@ -114,11 +118,14 @@ public class Unit : MonoBehaviour
 
     private void InitHealthBar()
     {
-        if (healthBar != null)
-        {
-            healthBar.Init(CurHp, MaxHp);
-            OnHpChanged += healthBar.UpdateHealthBar;
-        }
+        if (healthBar == null)
+            return;
+
+        healthBar.Init(CurHp, MaxHp);
+        if (IsPlayer)
+            GameEvents.Instance.OnPlayerHpChanged += healthBar.UpdateHealthBar;
+        else
+            combatModule.OnHpChanged += healthBar.UpdateHealthBar;
     }
 
     private void Update()
@@ -168,12 +175,6 @@ public class Unit : MonoBehaviour
     // CombatModule
     public bool IsDead => combatModule.IsDead;
     public float CurHp => combatModule.CurHp;
-    public event Action<float, float> OnHpChanged
-    {
-        add => combatModule.OnHpChanged += value;
-        remove => combatModule.OnHpChanged -= value;
-    }
-
     public void UpdateHp() => combatModule.UpdateHp();
     public void TakeHealRate(float healRate) => combatModule.TakeHeal(MaxHp * healRate);
     public void TakeHeal(float healAmount) => combatModule.TakeHeal(healAmount);
@@ -184,25 +185,6 @@ public class Unit : MonoBehaviour
     public float CurExp => playerSaveData.exp;
     public float MaxExp => GameValue.GetRequiredExp(playerSaveData.level);
     public int Gold => playerSaveData.gold;
-
-    public event Action<int> OnLevelChanged
-    {
-        add => playerSaveData.OnLevelChanged += value;
-        remove => playerSaveData.OnLevelChanged -= value;
-    }
-
-    public event Action<float> OnExpChanged
-    {
-        add => playerSaveData.OnExpChanged += value;
-        remove => playerSaveData.OnExpChanged -= value;
-    }
-
-    public event Action<int> OnGoldChanged
-    {
-        add => playerSaveData.OnGoldChanged += value;
-        remove => playerSaveData.OnGoldChanged -= value;
-    }
-
     public void AddGold(int amount) => playerSaveData.AddGold(amount);
     public int AddExp(float amount) => playerSaveData.AddExp(amount);
 
@@ -220,43 +202,18 @@ public class Unit : MonoBehaviour
     public SkillInstance GetSkillInstance(SkillKey skillKey) => skillModule.GetSkillInstance(skillKey);
     public void UseRandomSkill(Unit target, RangeType rangeType) => skillModule.UseRandomSkill(target, rangeType);
 
-    public event Action<SkillKey, float> OnSkillCooldownChanged
-    {
-        add => skillModule.OnSkillCooldownChanged += value;
-        remove => skillModule.OnSkillCooldownChanged -= value;
-    }
-
-    public event Action<SkillKey> OnSkillCooldownEnded
-    {
-        add => skillModule.OnSkillCooldownEnded += value;
-        remove => skillModule.OnSkillCooldownEnded -= value;
-    }
-
-    public event Action<SkillKey> OnSkillAdded
-    {
-        add => skillModule.OnSkillAdded += value;
-        remove => skillModule.OnSkillAdded -= value;
-    }
-
-    public event Action<SkillKey> OnSkillRemoved
-    {
-        add => skillModule.OnSkillRemoved += value;
-        remove => skillModule.OnSkillRemoved -= value;
-    }
-
-    public event Action<SkillKey, int> OnSkillLevelChanged
-    {
-        add => skillModule.OnSkillLevelChanged += value;
-        remove => skillModule.OnSkillLevelChanged -= value;
-    }
-
     // BuffModule
     public BuffModule BuffModule => buffModule;
     public BuffInstance GetBuffInstance(BuffKey buffKey) => buffModule.GetBuffInstance(buffKey);
     public List<BuffInstance> GetActiveBuffInstances() => buffModule.GetActiveBuffInstances();
-
     public bool HasBuff(BuffKey buffKey) => buffModule.HasBuff(buffKey);
     public void AddBuff(BuffKey buffKey, Unit giver) => buffModule.AddBuff(buffKey, giver);
     public void ReduceBuff(BuffKey buffKey, int value) => buffModule.ReduceBuff(buffKey, value);
     public void RemoveBuff(BuffKey buffKey) => buffModule.RemoveBuff(buffKey);
+
+    // HealthBar
+    public void ShowHealthBar(bool isShow)
+    {
+        healthBar?.ShowHealthBar(isShow);
+    }
 }

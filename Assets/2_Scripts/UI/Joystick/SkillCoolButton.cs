@@ -31,8 +31,8 @@ public class SkillCoolButton : BaseAttackButton
         if (skillManager == null)
             skillManager = GameMgr.Instance.skillMgr;
 
-        playerUnit.OnSkillCooldownChanged += OnSkillCooldownChanged;
-        playerUnit.OnSkillCooldownEnded += OnSkillCooldownEnded;
+        GameEvents.Instance.OnPlayerSkillCooldownChanged += OnSkillCooldownChanged;
+        GameEvents.Instance.OnPlayerSkillCooldownEnded += OnSkillCooldownEnded;
     }
 
     private void OnSkillCooldownChanged(SkillKey skillKey, float cooldown)
@@ -72,8 +72,8 @@ public class SkillCoolButton : BaseAttackButton
     {
         if (playerUnit != null)
         {
-            playerUnit.OnSkillCooldownChanged -= OnSkillCooldownChanged;
-            playerUnit.OnSkillCooldownEnded -= OnSkillCooldownEnded;
+            GameEvents.Instance.OnPlayerSkillCooldownChanged -= OnSkillCooldownChanged;
+            GameEvents.Instance.OnPlayerSkillCooldownEnded -= OnSkillCooldownEnded;
         }
     }
 }
