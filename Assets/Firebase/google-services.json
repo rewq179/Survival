@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "463153945657",
+    "project_id": "survival-3d53e",
+    "storage_bucket": "survival-3d53e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:463153945657:android:e03e63e3a0dcbed8b241e8",
+        "android_client_info": {
+          "package_name": "com.DefaultCompany.Survival"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBv70smy1CDr1hVDYbKabGtBbqxbQKalGI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
