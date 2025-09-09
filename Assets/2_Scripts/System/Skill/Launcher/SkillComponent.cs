@@ -537,6 +537,18 @@ public class RotatingOrbs_Component : BaseProjectile_Component
         }
     }
 
+    protected override void OnStartAction()
+    {
+        base.OnStartAction();
+        if (!IsParticlePlayInStartAction)
+            return;
+
+        foreach (SkillEffectController effect in orbEffects)
+        {
+            effect.Play();
+        }
+    }
+
     protected override void OnUpdateAction(float deltaTime)
     {
         base.OnUpdateAction(deltaTime);
