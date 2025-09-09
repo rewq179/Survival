@@ -282,7 +282,7 @@ public class ProjectileComponent : BaseProjectile_Component
 
         if (HasReachedMaxDistance())
         {
-            OnEnd();
+            OnEnd(true);
         }
     }
 
@@ -316,6 +316,12 @@ public class ProjectileComponent : BaseProjectile_Component
         }
 
         OnEnd();
+    }
+
+    protected override void OnEndAction(bool forceEnd)
+    {
+        launcher.SetParticleFinished(true);
+        base.OnEndAction(forceEnd);
     }
 
     private void DoRicochet()
