@@ -249,6 +249,12 @@ public abstract class BaseProjectile_Component : Attack_Component
         float currentDistance = (launcher.Position - startPos).sqrMagnitude;
         return currentDistance >= maxLength;
     }
+
+    protected override void OnEndAction(bool forceEnd)
+    {
+        launcher.SetParticleFinished(true);
+        base.OnEndAction(forceEnd);
+    }
 }
 
 /// <summary> 일반 발사체 컴포넌트 </summary>
@@ -316,12 +322,6 @@ public class ProjectileComponent : BaseProjectile_Component
         }
 
         OnEnd();
-    }
-
-    protected override void OnEndAction(bool forceEnd)
-    {
-        launcher.SetParticleFinished(true);
-        base.OnEndAction(forceEnd);
     }
 
     private void DoRicochet()
@@ -396,7 +396,7 @@ public class BoomerangComponent : BaseProjectile_Component
         {
             if (HasReachedCaster())
             {
-                OnEnd();
+                OnEnd(true);
             }
 
             return;
@@ -551,7 +551,7 @@ public class RotatingOrbs_Component : BaseProjectile_Component
 
         if (HasReachedMaxDistance())
         {
-            OnEnd();
+            OnEnd(true);
         }
     }
 
